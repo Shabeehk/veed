@@ -1581,7 +1581,7 @@ HOME_PLACES.push({name: "Vegetable garden", x: .4, z: 19, y: 0, yaw: Math.PI / 2
   {name: "Pond & fire pit", x: 15.5, z: 4.2, y: 0, yaw: 0}, {name: "Livestock", x: 4.4, z: 30.6, y: 0, yaw: -Math.PI / 2});
 
 /* ---------- the two-seat car (lives outside the world group so it never blocks walking) ---------- */
-const car = {x: CARPARK.x, z: CARPARK.z, yaw: CARPARK.yaw, v: 0, steer: 0, driver: null, pass: null, g: new THREE.Group(), wheels: [], fronts: [], tx: CARPARK.x, tz: CARPARK.z, tyaw: CARPARK.yaw};
+const car = {x: CARPARK.x, z: CARPARK.z, yaw: CARPARK.yaw, v: 0, steer: 0, driver: null, : null, g: new THREE.Group(), wheels: [], fronts: [], tx: CARPARK.x, tz: CARPARK.z, tyaw: CARPARK.yaw};
 (function buildCar(){
   const g = car.g; scene.add(g);
   const paint = new THREE.MeshPhysicalMaterial({color: 0xb3202f, roughness: .25, metalness: .45, clearcoat: 1, clearcoatRoughness: .08});
@@ -2237,7 +2237,7 @@ function tickCinema(dt){
 // Relay (TURN) for networks that block direct connections, such as mobile data or guests abroad.
 // Paste the USERNAME and PASSWORD of your Metered TURN credential (TURN Server > Credentials) between the quotes.
 // Never put the Metered "Secret Key" here.
-const TURN_USER = "PASTE_USERNAME_HERE", TURN_PASS = "PASTE_PASSWORD_HERE";
+const TURN_USER = "8a679914236634889d6fb556", TURN_PASS = "FUXh6ifJOPeY1h96";
 const RELAY_SERVERS = /PASTE_/.test(TURN_USER + TURN_PASS) ? [] : [
   {urls: "turn:global.relay.metered.ca:80", username: TURN_USER, credential: TURN_PASS},
   {urls: "turn:global.relay.metered.ca:80?transport=tcp", username: TURN_USER, credential: TURN_PASS},
