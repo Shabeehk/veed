@@ -240,6 +240,18 @@ body.driving #runBtn{display:none!important}
 .ginvite{position:fixed;z-index:9;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));width:min(340px,calc(100% - 24px));padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .ginvite p{margin:0;font-size:14px}
 .weather{font-size:12px;color:var(--muted);line-height:1.35}
+.couplebar{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:600;color:#c8102e;background:rgba(200,16,46,.08);border-radius:9px;padding:6px 10px}
+.library .libctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:760px;margin:0 auto 10px}
+.library .libctl select{max-width:100%;flex:1;min-width:160px;font-size:13px;padding:6px 8px}
+.library .libctl input{font:600 13px var(--font);width:90px;padding:6px 8px;border-radius:8px;border:1px solid rgba(120,100,60,.3);background:transparent;color:inherit}
+.libar{direction:rtl;text-align:right;font:400 clamp(24px,4.4vw,31px)/2.05 "Amiri","Noto Naskh Arabic",serif;border-bottom:1px solid rgba(120,100,60,.18);padding-bottom:10px}
+.libtext p{font-size:15.5px;line-height:1.7;margin:0 0 12px}
+.libtext p[dir=rtl]{font-size:19px;line-height:1.9;text-align:right;font-family:"Amiri","Noto Naskh Arabic","Noto Nastaliq Urdu",serif}
+.libtext h3{font-size:16px;margin:14px 0 6px}
+.libcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:760px;margin:0 auto}
+.libcard{border:1px solid rgba(120,100,60,.25);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.libcard h3{margin:0;font-size:16px}.libcard p{margin:0;font-size:13px;line-height:1.45;opacity:.85}
+.libcard a{align-self:flex-start;text-decoration:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -265,6 +277,7 @@ body.driving #runBtn{display:none!important}
       <div class="field"><label for="skySel">Sky</label><select id="skySel"></select></div>
       <div class="weather" id="weather"></div>
       <label class="toggle"><input type="checkbox" id="musicOn" checked> Romantic music in the car and on the bike</label>
+      <div class="couplebar" id="coupleBar" hidden><span>❤ Couple mode is on</span><button class="linkbtn" id="coupleOff" type="button">Turn off</button></div>
       <div class="row">
         <button class="btn" id="viewBtn" type="button">First-person view</button>
         <button class="btn" id="mapBtn" type="button" aria-pressed="false">Map</button>
@@ -397,6 +410,48 @@ body.driving #runBtn{display:none!important}
   </div>
 </section>
 <div class="wildpick" id="wildPick" hidden><div class="panel" role="dialog" aria-label="Choose a colour"><b>Choose a colour</b><div class="row"><button type="button" data-c="r" style="background:#d63d3d" aria-label="Red"></button><button type="button" data-c="y" style="background:#e8b520" aria-label="Yellow"></button><button type="button" data-c="g" style="background:#3f9a4f" aria-label="Green"></button><button type="button" data-c="b" style="background:#2f6ec0" aria-label="Blue"></button></div></div></div>
+<div class="dialog" id="wardDlg" hidden><div class="panel" role="dialog" aria-labelledby="wardTitle">
+  <h2 id="wardTitle">Change clothes</h2>
+  <p class="note">Pick something from the shelf.</p>
+  <div class="grid2" id="wardOpts"></div>
+  <button class="btn" type="button" data-close>Close</button>
+</div></div>
+<section class="quran library" id="library" hidden aria-label="Library">
+  <header>
+    <h2>Veed Islamic Library</h2>
+    <div class="row" id="libTabs"><button class="btn" type="button" data-t="tafsir">Tafsir</button><button class="btn" type="button" data-t="tafheem">Tafheem-ul-Quran</button><button class="btn" type="button" data-t="hadith">Hadith</button><button class="btn" type="button" data-t="books">More books</button></div>
+    <button class="btn" type="button" id="libQuran">Quran reader</button>
+    <button class="btn" type="button" id="libClose">Close</button>
+    <div class="qprog"><span>Study time toward ★15: <b id="libTime">–</b></span></div>
+  </header>
+  <div class="qbody" id="libBody">
+    <div id="lib_tafsir">
+      <div class="libctl"><select id="libTafsir" aria-label="Tafsir"></select></div>
+      <div class="libctl"><select id="libSurah" aria-label="Surah"></select><select id="libAyah" aria-label="Verse"></select><button class="btn" type="button" id="libPrev">‹ Previous</button><button class="btn" type="button" id="libNext">Next ›</button></div>
+      <div class="qinner" id="libTafOut"></div>
+    </div>
+    <div id="lib_tafheem" hidden>
+      <div class="libcards">
+        <div class="libcard"><h3>തഫ്ഹീമുൽ ഖുർആൻ · Malayalam</h3><p>Thafheemul Quran in Malayalam, from Islamic Publishing House, Kerala.</p><a class="btn primary" href="https://thafheem.net/" target="_blank" rel="noopener">Open Thafheem (Malayalam)</a></div>
+        <div class="libcard"><h3>تفہیم القرآن · Urdu</h3><p>Tafheem-ul-Quran by Syed Abul A'la Maududi, in the original Urdu.</p><a class="btn primary" href="https://tafheemulquran.net/" target="_blank" rel="noopener">Open Tafheem (Urdu)</a></div>
+        <div class="libcard"><h3>Towards Understanding the Quran · English</h3><p>The English translation of Tafheem-ul-Quran.</p><a class="btn primary" href="https://islamicstudies.info/tafheem.php" target="_blank" rel="noopener">Open Tafheem (English)</a></div>
+      </div>
+      <p class="qnote">Tafheem-ul-Quran belongs to its publishers, so it opens on its own websites in a new tab.</p>
+    </div>
+    <div id="lib_hadith" hidden>
+      <div class="libctl"><select id="libBook" aria-label="Book"></select><select id="libLang" aria-label="Language"></select></div>
+      <div class="libctl"><label for="libHadithN">Hadith no.</label><input id="libHadithN" type="number" min="1" value="1"><button class="btn" type="button" id="libHPrev">‹ Previous</button><button class="btn" type="button" id="libHNext">Next ›</button></div>
+      <div class="qinner" id="libHadOut"></div>
+    </div>
+    <div id="lib_books" hidden>
+      <div class="libcards">
+        <div class="libcard"><h3>The Holy Quran</h3><p>Read any surah with English, Malayalam, Hindi or Urdu translation.</p><button class="btn primary" type="button" onclick="document.getElementById('libQuran').click()">Open the Quran reader</button></div>
+        <div class="libcard"><h3>Sunnah.com</h3><p>The hadith collections with search, chapters and gradings.</p><a class="btn primary" href="https://sunnah.com/" target="_blank" rel="noopener">Open Sunnah.com</a></div>
+        <div class="libcard"><h3>IslamHouse</h3><p>Thousands of free Islamic books, articles and audio in Malayalam, English, Urdu and many more languages.</p><a class="btn primary" href="https://islamhouse.com/" target="_blank" rel="noopener">Open IslamHouse</a></div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="quran" id="quran" hidden aria-label="Quran reader">
   <header>
     <h2>The Holy Quran</h2>
@@ -1116,7 +1171,7 @@ function buildTown(){
     box(.5, .12, .28, x, 5.82, side + dir * 1.35, M.glow, {noCollide: true, noShadow: true});
   }
   // roadside trees, leaving space at the home gate and the three destinations
-  const busy = [[-14, 24], [125, 175], [-182, -138], [296, 344], [20, 100], [-140, -104], [-50, -18]];
+  const busy = [[-14, 24], [125, 210], [-182, -138], [296, 344], [20, 100], [-140, -104], [-50, -18]];
   for (let x = x0 + 10; x < x1; x += 22 + Math.random() * 14){
     if (busy.some(([a, b]) => x > a && x < b)) continue;
     [z0 - 4.5 - Math.random() * 4, z1 + 4.5 + Math.random() * 6].forEach(z => tree(x + Math.random() * 6, z, 6 + Math.random() * 3, 2 + Math.random() * 1.2, [0x3a6a30, 0x4b7a37, 0x355f2c][Math.floor(Math.random() * 3)]));
@@ -1435,6 +1490,10 @@ const AV = {
   stud: new THREE.PointsMaterial({color: 0xfaf6ec, size: .014, sizeAttenuation: true})
 };
 const _avMats = {};
+// colour versions of the abaya satin and the bandhgala jacket (for changing clothes)
+const _varM = {};
+function satinVar(c, ds){ const k = "s" + c + (ds ? "d" : ""); if (!_varM[k]){ _varM[k] = (ds ? AV.satinDS : AV.satin).clone(); _varM[k].color.setHex(c); } return _varM[k]; }
+function jacketVar(c){ const k = "j" + c; if (!_varM[k]){ _varM[k] = AV.jacket.clone(); _varM[k].color.setHex(c); _varM[k].sheenColor = new THREE.Color(c).offsetHSL(0, 0, .15); } return _varM[k]; }
 function avMat(color, rough, ds){ const k = color + "|" + rough + "|" + (ds ? 1 : 0); return _avMats[k] || (_avMats[k] = new THREE.MeshStandardMaterial({color, roughness: rough == null ? .8 : rough, side: ds ? THREE.DoubleSide : THREE.FrontSide})); }
 // skin, top, lower ("robe" = one-piece to the ankles, "skirt"/"mundu" = from the waist, "trousers"), sleeves, head, beard
 const STYLES = {
@@ -1458,10 +1517,22 @@ const STYLES = {
   officeF:   {female: 1, scale: .93, skin: 0xb98058, topC: 0x3a6ea5, lower: "trousers", lowerC: 0x2b2b30, sleeve: "long", head: "hijab", hijab: 0x2e4a7a, shoe: 0x2a1d16, kurti: 1},
   officeM:   {female: 0, scale: .98, skin: 0xa8734f, topC: 0xdfe8f2, lower: "trousers", lowerC: 0x3a3f48, sleeve: "long", head: "hair", hair: 0x16110e, mustache: 0x16110e, shoe: 0x2a1d16},
   farmer:    {female: 0, scale: .96, skin: 0x93623f, topC: 0x2c8a5c, lower: "mundu", lowerC: 0xf2eee2, sleeve: "short", head: "hair", hair: 0x2a2420, mustache: 0x2a2420, shoe: 0x3a2a1a, hem: -.08},
+  // outfits from the wardrobe by the washroom
+  salwarF:   {female: 1, scale: .95, skin: 0xc68e64, topC: 0xb03a5b, lower: "trousers", lowerC: 0xf2e6d0, sleeve: "long", head: "hijab", hijab: 0xf2c14e, shoe: 0x8a5a3a, kurti: 1},
+  homeF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x6a8fb5, lower: "trousers", lowerC: 0x2b2b30, sleeve: "long", head: "hijab", hijab: 0x9fbcd8, shoe: 0x6b4a2b, kurti: 1},
+  whiteF:    {female: 1, scale: .95, skin: 0xc68e64, topC: 0xf6f4ee, lower: "robe", sleeve: "long", head: "hijab", hijab: 0xffffff, shoe: 0xe8e2d6},
+  kurtaM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf6f4ee, lower: "trousers", lowerC: 0xf1eee6, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x6b4a2b, hem: -.36},
+  munduM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0x8fb7d9, lower: "mundu", lowerC: 0xf7f3e6, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x3a2a1a, hem: -.08},
+  thobeM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf6f4ee, lower: "robe", sleeve: "long", head: "kufi", kufi: 0xffffff, hair: 0x1a1411, beard: 0x1a1411, shoe: 0x5a4a3a},
+  casualM2:  {female: 0, scale: 1, skin: 0xc68e64, topC: 0x2b4a6b, lower: "trousers", lowerC: 0x3a4a6a, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0xeeeeee, hem: -.06},
   // swimwear: a full-cover burkini for the abaya look, a rash guard and long shorts for the bandhgala look
   swimF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x1f3d6b, lower: "trousers", lowerC: 0x1f3d6b, sleeve: "long", head: "hijab", hijab: 0x1f3d6b, shoe: 0xc68e64, kurti: 1},
   swimM:     {female: 0, scale: 1, skin: 0xc68e64, topC: 0x1d4a35, lower: "shorts", lowerC: 0x22345a, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0xc68e64, hem: -.12}
 };
+STYLES.abayaNavy = Object.assign({}, STYLES.abaya, {satinC: 0x1b2a4e, hijab: 0x141c33});
+STYLES.abayaMaroon = Object.assign({}, STYLES.abaya, {satinC: 0x4a1022, hijab: 0x2a0a12});
+STYLES.bandhgalaMaroon = Object.assign({}, STYLES.bandhgala, {jacketC: 0x6a1f2b});
+STYLES.bandhgalaNavy = Object.assign({}, STYLES.bandhgala, {jacketC: 0x1f2f55});
 function mesh(geo, m, parent, x, y, z){ const o = new THREE.Mesh(geo, m); o.position.set(x || 0, y || 0, z || 0); o.castShadow = true; o.userData.noCollide = true; parent.add(o); return o; }
 function jointG(parent, x, y, z){ const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
 function seg(parent, len, r1, r2, m, n){ return mesh(new THREE.CylinderGeometry(r1, r2, len, n || 14), m, parent, 0, -len / 2, 0); }
@@ -1488,7 +1559,8 @@ function faceFeatures(head, S, skinM, hy, fz){
 function buildHuman(look){
   const S = STYLES[look] || STYLES.abaya, female = !!S.female;
   const skinM = avMat(S.skin, .62);
-  const topM = S.top === "satin" ? AV.satin : S.top === "jacket" ? AV.jacket : avMat(S.topC, .82);
+  const topM = S.top === "satin" ? (S.satinC ? satinVar(S.satinC) : AV.satin) : S.top === "jacket" ? (S.jacketC ? jacketVar(S.jacketC) : AV.jacket) : avMat(S.topC, .82);
+  const satinDS = S.satinC ? satinVar(S.satinC, true) : AV.satinDS, jacketM = S.jacketC ? jacketVar(S.jacketC) : AV.jacket;
   const covered = S.lower !== "trousers" && S.lower !== "shorts";
   const lowM = S.lower === "robe" ? topM : avMat(S.lowerC, .85);
   const shoeM = avMat(S.shoe || 0x222222, .4);
@@ -1507,7 +1579,7 @@ function buildHuman(look){
   if (S.kurti) lathe([[.001, -.28], [.2, -.28], [.16, .02], [.155, .1], [.001, .1]], topM, torso, 0, .8);
   if (S.belt){ const b = mesh(new THREE.CylinderGeometry(.137, .137, .045, 28), topM, torso, 0, .07, 0); b.scale.z = .8; }
   if (S.buttons){
-    mesh(new THREE.CylinderGeometry(.07, .074, .075, 20), AV.jacket, torso, 0, .545, 0);
+    mesh(new THREE.CylinderGeometry(.07, .074, .075, 20), jacketM, torso, 0, .545, 0);
     for (let i = 0; i < 5; i++){ const y = .46 - i * .115, r = y > .3 ? .186 : y > .1 ? .168 : .174; mesh(new THREE.SphereGeometry(.012, 10, 8), AV.gold, torso, 0, y, -r * .74 - .004); }
     mesh(new THREE.BoxGeometry(.065, .03, .012), AV.square, torso, -.095, .37, -.137);
   } else if (!female && S.top !== "jacket"){
@@ -1555,7 +1627,7 @@ function buildHuman(look){
   // arms
   sx.forEach((s, i) => {
     const sh = jointG(torso, s * (female ? .17 : .195) * w, female ? .45 : .46, 0);
-    const sleeveM = S.top === "jacket" ? AV.jacket : topM;
+    const sleeveM = S.top === "jacket" ? jacketM : topM;
     mesh(new THREE.SphereGeometry(female ? .058 : .062, 14, 10), sleeveM, sh);
     if (S.sleeve === "bell"){ seg(sh, .28, .055, .062, sleeveM); studs(sh, .28, .056, .063, 70); }
     else seg(sh, S.sleeve === "short" ? .2 : .29, .06 * w, .054 * w, sleeveM);
@@ -1563,7 +1635,7 @@ function buildHuman(look){
     const el = jointG(sh, 0, female ? -.28 : -.29, 0);
     mesh(new THREE.SphereGeometry(female ? .05 : .048, 12, 10), S.sleeve === "short" ? skinM : sleeveM, el);
     if (S.sleeve === "bell"){
-      mesh(new THREE.CylinderGeometry(.062, .155, .27, 22, 1, true), AV.satinDS, el, 0, -.135, 0);
+      mesh(new THREE.CylinderGeometry(.062, .155, .27, 22, 1, true), satinDS, el, 0, -.135, 0);
       studs(el, .27, .063, .156, 140);
       mesh(new THREE.SphereGeometry(.04, 12, 10), skinM, el, 0, -.255, 0).scale.set(.8, 1.15, .6);
     } else {
@@ -1630,6 +1702,7 @@ POSES.eat = Object.assign({}, POSES.sit, {arm: [.35, .55], fore: [.85, 1.9], for
 POSES.swing = Object.assign({}, POSES.sit, {arm: [-.15, -.15], armZ: [.2, -.2], fore: [1.4, 1.4], head: -.05});
 POSES.ride = {leg: [1.2, 1.2], legZ: [.22, -.22], knee: [-1.35, -1.35], arm: [1.1, 1.1], armZ: [-.22, .22], fore: [.35, .35], foreZ: [0, 0], hipY: .93, torso: -.12, head: -.08};
 POSES.ridep = Object.assign({}, POSES.ride, {arm: [.75, .75], armZ: [-.1, .1], fore: [.75, .75], torso: -.04, head: 0});
+POSES.dance = {leg: [0, 0], knee: [-.06, -.06], arm: [1.2, 1.2], armZ: [-.32, .32], fore: [.55, .55], foreZ: [0, 0], hipY: .93, torso: -.04, head: -.05};
 POSES.swim = {leg: [0, 0], knee: [-.1, -.1], arm: [0, 0], armZ: [.1, -.1], fore: [.1, .1], foreZ: [0, 0], hipY: .93, torso: 0, head: -1.0};
 // a rose that can sit in a hand
 function makeRose(){
@@ -1668,6 +1741,10 @@ function animateHuman(H, pose, speed, dt, extra){
     arm = [ph % (Math.PI * 2), (ph + Math.PI) % (Math.PI * 2)];
     leg = [Math.sin(S.t * 9) * .25, -Math.sin(S.t * 9) * .25]; knee = [-.15 - Math.max(0, Math.sin(S.t * 9)) * .3, -.15 - Math.max(0, -Math.sin(S.t * 9)) * .3];
     foreArr = [.2, .2]; armZ = [.15, -.15];
+  } else if (pose === "dance"){
+    const w = Math.sin(S.t * 2.2);
+    leg = [Math.max(0, w) * .25, Math.max(0, -w) * .25]; knee = [-Math.max(0, w) * .35 - .05, -Math.max(0, -w) * .35 - .05];
+    hipY = .93 - Math.abs(w) * .02;
   } else if (pose === "eat"){
     foreArr = [P.fore[0], 1.2 + Math.max(0, Math.sin(S.t * 2.2)) * .9];
   }
@@ -1691,7 +1768,7 @@ function animateHuman(H, pose, speed, dt, extra){
   H.inner.rotation.x = lerpA(H.inner.rotation.x, lying ? Math.PI / 2 : swim ? -Math.PI / 2 : 0, kk);
   H.inner.position.y = lerpA(H.inner.position.y, lying ? .13 : 0, kk);
   H.inner.position.z = lerpA(H.inner.position.z, lying ? -.86 * H.scale : swim ? .9 * H.scale : 0, kk);
-  if (swim) H.inner.rotation.z = Math.sin(S.t * 1.7) * .25; else H.inner.rotation.z = lerpA(H.inner.rotation.z, 0, kk);
+  if (swim) H.inner.rotation.z = Math.sin(S.t * 1.7) * .25; else if (pose === "dance") H.inner.rotation.z = Math.sin(S.t * 2.2) * .07; else H.inner.rotation.z = lerpA(H.inner.rotation.z, 0, kk);
   setLower(H, pose);
 }
 // so the hips rest on a seat surface
@@ -1928,7 +2005,7 @@ function stepWalk(dt){
   const mag = Math.hypot(f, s);
   if ((player.mode === "sit" || player.mode === "sleep") && mag > .3) standUp();
   player.speed = 0;
-  if (player.mode !== "walk" || performance.now() < player.hugUntil || performance.now() < (player.kneelUntil || 0) || performance.now() < (player.fallUntil || 0)) return;
+  if (player.mode !== "walk" || dance.on || performance.now() < player.hugUntil || performance.now() < (player.kneelUntil || 0) || performance.now() < (player.fallUntil || 0)) return;
   if (mag > .05){
     const tired = life.v <= 0, run = (keys.ShiftLeft || keys.ShiftRight || runToggle) && !tired;
     const speed = (player.swim ? (run && !tired ? 1.7 : 1.05) : tired ? .55 : run ? 3.6 : 1.7) * Math.min(1, mag);
@@ -2159,6 +2236,7 @@ function findNear(){
 function doAct(){
   if (topView || !entered) return;
   if (player.mode === "pray"){ endPrayer(false); return; }
+  if (player.mode === "shower"){ endShower(); return; }
   if (player.mode === "car"){ requestSeat("out"); return; }
   if (player.mode === "sit" || player.mode === "sleep"){ standUp(); return; }
   if (nearItem){ const lab = nearItem.label(); if (lab && !lab.info) nearItem.act(); }
@@ -2167,6 +2245,7 @@ function updateActs(){
   const b = $("act"); let t = "", info = false;
   if (player.mode === "car") t = player.veh === bike ? "Get off the bike" : "Get out of the car";
   else if (player.mode === "pray") t = "Stop praying";
+  else if (player.mode === "shower") t = "Finish the shower";
   else if (player.mode === "sit") t = "Stand up";
   else if (player.mode === "sleep") t = "Wake up";
   else if (nearItem){ const lab = nearItem.label(); if (lab && lab.info){ t = lab.info; info = true; } else if (lab) t = lab; }
@@ -2614,6 +2693,7 @@ $("enterForm").addEventListener("submit", async e => {
   const n = $("nameIn").value.trim().slice(0, 24); if (!n) return;
   const chosen = document.querySelector('input[name="look"]:checked');
   me.name = n; me.look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
+  { const o = store.get("veed-outfit", ""); if (OUTFIT_KEYS.has(o) && !!STYLES[o].female === (me.look === "abaya")) me.look = o; }
   store.set("veed-name", n); store.set("veed-look", me.look);
   ensureCtx();
   await ready;
@@ -2648,7 +2728,7 @@ function startNet(T){
   let room;
   try { room = T.joinRoom(cfg, "veed2-" + net.homeId, {onJoinError: netIssue}); } catch(e){ netFailed(); return; }
   net.room = room; net.selfId = T.selfId || "me";
-  ["hi", "admit", "st", "chat", "garden", "gift", "car", "seat", "hug", "movie", "serve", "rose", "hit", "game"].forEach(k => net.act[k] = room.makeAction(k));
+  ["hi", "admit", "st", "chat", "garden", "gift", "car", "seat", "hug", "movie", "serve", "rose", "hit", "game", "couple"].forEach(k => net.act[k] = room.makeAction(k));
   room.onPeerJoin = id => { peer(id); sendHi(id); };
   room.onPeerLeave = id => peerLeft(id);
   room.onPeerStream = (stream, id) => { const p = peer(id); p.stream = stream; if (allowed(id)) attachAudio(p, stream); };
@@ -2656,7 +2736,9 @@ function startNet(T){
   net.act.admit.onMessage = (d, meta) => onAdmit(meta.peerId, d || {});
   net.act.st.onMessage = (d, meta) => {
     if (!allowed(meta.peerId) || !d || typeof d.x !== "number") return;
-    const p = peer(meta.peerId); p.t = d; ensureAvatar(p);
+    const p = peer(meta.peerId); p.t = d;
+    if (d.lk && d.lk !== p.look && OUTFIT_KEYS.has(d.lk)) p.look = d.lk;
+    ensureAvatar(p);
     if (p.mic !== d.m){ p.mic = d.m; renderPeople(); }
   };
   net.act.chat.onMessage = (d, meta) => {
@@ -2687,6 +2769,7 @@ function startNet(T){
   net.act.rose.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onRose(d); };
   net.act.hit.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onHitMsg(d); };
   net.act.game.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onGameMsg(d); };
+  net.act.couple.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onCoupleMsg(d); };
   net.act.hug.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onHug(d); };
   net.act.movie.onMessage = (d, meta) => { if (allowed(meta.peerId)) onMovie(d); };
   sendHi();
@@ -2714,7 +2797,7 @@ async function onHi(id, d){
   const p = peer(id);
   p.name = String(d.name || "Guest").slice(0, 24);
   p.color = COLORS.includes(d.color) ? d.color : COLORS[0];
-  p.look = d.look === "bandhgala" ? "bandhgala" : "abaya";
+  p.look = OUTFIT_KEYS.has(d.look) ? d.look : d.look === "bandhgala" ? "bandhgala" : "abaya";
   if (net.isOwner){
     if (d.owner) return;                                    // your own home open on another device
     p.invite = String(d.invite || "").slice(0, 16);
@@ -2745,7 +2828,7 @@ function showKnocks(){
   list.forEach(p => {
     const row = document.createElement("div"); row.className = "knock-row panel";
     const t = document.createElement("p"), b = document.createElement("b"); b.textContent = p.name;
-    t.append(b, " is at the door with your invite link (" + (p.look === "bandhgala" ? "Bandhgala" : "Abaya") + ")");
+    t.append(b, " is at the door with your invite link");
     const yes = document.createElement("button"); yes.className = "btn primary"; yes.type = "button"; yes.textContent = "Let in";
     const no = document.createElement("button"); no.className = "btn"; no.type = "button"; no.textContent = "Not now";
     yes.addEventListener("click", () => decide(p.id, true)); no.addEventListener("click", () => decide(p.id, false));
@@ -2795,6 +2878,7 @@ function peerLeft(id){
   delete net.peers[id];
   VEHS.forEach(V => { if (V.driver === id || V.pass === id){ if (V.driver === id) V.driver = null; if (V.pass === id) V.pass = null; V.v = 0; } });
   if (net.isOwner && id === net.guestId){ net.guestId = null; chatLine("", p.name + " left", true); }
+  coupleLeft();
   if (!net.isOwner && id === net.ownerId){
     if (net.admitted) chatLine("", p.name + " left the house", true);
     net.ownerId = null; net.admitted = false;
@@ -2857,6 +2941,8 @@ function myPose(){
   if (player.mode === "car"){ const V = player.veh || car; if (V === car) return V.driver === net.selfId ? "drive" : "sit"; return V.driver === net.selfId ? "ride" : (me.H && me.H.female ? "sit" : "ridep"); }
   if (player.swim) return "swim";
   if (player.fallUntil && performance.now() < player.fallUntil) return "sleep";
+  if (player.mode === "shower") return "shower";
+  if (dance.on) return "dance";
   if (player.kneelUntil && performance.now() < player.kneelUntil) return "kneel";
   if (player.mode === "sit") return "sit";
   if (player.mode === "sleep") return "sleep";
@@ -2867,7 +2953,7 @@ function myState(){
   const r = v => Math.round(v * 100) / 100, m = !net.stream ? 0 : net.muted ? 2 : 1, pose = myPose();
   const seat = player.mode === "car" ? ((player.veh || car).driver === net.selfId ? "d" : "p") : "", vid = player.mode === "car" ? (player.veh || car).id : undefined;
   if (player.mode === "sit" || player.mode === "sleep"){ const p = player.spot.pos; return {x: r(p.x), y: r(p.y), z: r(p.z), yaw: r(player.mode === "sleep" ? player.spot.yaw + Math.PI : player.spot.yaw), pose, m, sp: 0, seat, sw: player.spot.swing ? player.spot.swing.i : undefined, sk: player.spot.swing ? player.spot.swing.k : undefined}; }
-  return {x: r(player.pos.x), y: r(player.pos.y), z: r(player.pos.z), yaw: r(player.yaw), pose, m, sp: r(player.speed), seat, vid, life: Math.round(life.v), hy: player.mode === "pray" ? prayer.headY : 0, rose: roseInHand() ? 1 : 0};
+  return {x: r(player.pos.x), y: r(player.pos.y), z: r(player.pos.z), yaw: r(player.yaw), pose, m, sp: r(player.speed), seat, vid, life: Math.round(life.v), hy: player.mode === "pray" ? prayer.headY : 0, rose: roseInHand() ? 1 : 0, lk: me.look};
 }
 function placeAvatar(H, st, cur, dt){
   let pose = st.pose || "stand";
@@ -2917,7 +3003,7 @@ function bubble(p, text){
 /* ---------- hugs: both press Hug when close, and both get full life ---------- */
 let hugAskAt = 0, partnerAskAt = 0, hugTarget = null;
 function hugPossible(){
-  const pid = partner(); if (!pid || player.mode !== "walk") return false;
+  const pid = partner(); if (!pid || player.mode !== "walk" || !coupleOn()) return false;
   const p = net.peers[pid]; if (!p || !p.t || p.t.pose === "sit" || p.t.pose === "sleep" || p.t.seat) return false;
   return Math.hypot(p.t.x - player.pos.x, p.t.z - player.pos.z) < 2.0;
 }
@@ -2933,13 +3019,14 @@ $("hugBtn").addEventListener("click", () => { doHug(); view.focus({preventScroll
 function doHug(){
   const pid = partner();
   if (!pid){ toast("Hugs need two people. Invite someone to your home."); return; }
+  if (!coupleOn()){ toast("Hugs are part of couple mode."); return; }
   if (!hugPossible()){ toast("Walk up close to " + (net.peers[pid].name || "them") + " to hug."); return; }
   const now = performance.now();
   if (now - partnerAskAt < 15000){ net.act.hug.send({op: "yes"}, {target: pid}); startHug(); }
   else { hugAskAt = now; net.act.hug.send({op: "ask"}, {target: pid}); toast("Waiting for " + net.peers[pid].name + " to hug you back…", 4000); }
 }
 function onHug(d){
-  const pid = partner(); if (!pid) return;
+  const pid = partner(); if (!pid || !coupleOn()) return;
   if (d.op === "ask"){
     partnerAskAt = performance.now();
     if (performance.now() - hugAskAt < 15000 && hugPossible()){ net.act.hug.send({op: "yes"}, {target: pid}); startHug(); }
@@ -3010,6 +3097,7 @@ function chatLine(name, text, sys){
 $("chatForm").addEventListener("submit", e => {
   e.preventDefault();
   const inp = $("chatIn"), text = inp.value.trim().slice(0, 200); if (!text) return;
+  if (secretCode(text)){ inp.value = ""; inp.blur(); view.focus({preventScroll: true}); return; }   // codes are never sent as chat
   const pid = partner();
   if (!pid){ toast(net.isOwner ? "No guest is inside yet." : "You can chat once the owner lets you in."); return; }
   inp.value = ""; chatLine(me.name + " (you)", text); net.act.chat.send({text}, {target: pid});
@@ -3026,7 +3114,7 @@ function updateHint(){
   $("hint").innerHTML = topView ? "Click a spot inside your plot to stand there · drag to move · scroll to zoom · <kbd>M</kbd> back"
     : player.mode === "car" ? "<kbd>W</kbd><kbd>S</kbd> speed · <kbd>A</kbd><kbd>D</kbd> steer · or use the arrow buttons · drag to look · <kbd>E</kbd> get out"
     : player.mode === "pray" ? "Praying · move or press <kbd>E</kbd> to stop"
-    : "Drag to look · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>E</kbd> use · <kbd>H</kbd> hug · <kbd>V</kbd> view · <kbd>M</kbd> map · <kbd>Enter</kbd> chat";
+    : "Drag to look · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> run · <kbd>E</kbd> use · " + (typeof coupleOn === "function" && coupleOn() ? "<kbd>H</kbd> hug · " : "") + "<kbd>V</kbd> view · <kbd>M</kbd> map · <kbd>Enter</kbd> chat";
 }
 
 
@@ -4255,7 +4343,7 @@ KIDS.forEach(k => interact.push({pos: new THREE.Vector3(), r: 1.9, dist: p => Ma
     toast("A hug from " + k.name + ". Life +" + Math.round(life.v - before) + "%.", 2500);
   }}));
 
-/* ---------- Minnu the cat wanders round the house ---------- */
+/* ---------- Huraira the cat wanders round the house ---------- */
 const CAT = (() => {
   const g = new THREE.Group(); scene.add(g);
   const fur = mat(0xd98a3a, .8), white = mat(0xf4efe6, .8), add = (geo, m, x, y, z, p) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; (p || g).add(o); return o; };
@@ -4270,7 +4358,7 @@ const CAT = (() => {
   for (let k = 0; k < 5; k++) add(new THREE.SphereGeometry(.022 - k * .002, 6, 4), fur, 0, k * .045, k * .02, tail);
   g.traverse(o => o.userData.noCollide = true);
   compactGroup(g); compactGroup(head); compactGroup(tail);
-  const tag = tagSprite("Minnu", 0xd98a3a); tag.scale.set(.6, .13, 1); tag.position.y = .55; g.add(tag);
+  const tag = tagSprite("Huraira", 0xd98a3a); tag.scale.set(.6, .13, 1); tag.position.y = .55; g.add(tag);
   return {g, head, legs, tail, tag, x: -4, z: 5, yaw: 0, sitting: false, petUntil: 0};
 })();
 const CAT_AREAS = [["liv", -7.2, -3.0, .4, 7.0], ["sit", -7.4, -3.0, 7.9, 9.2], ["front", -6.5, 2.0, 10.2, 13.0]];
@@ -4303,8 +4391,8 @@ function meow(){
   g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.18, t + .06); g.gain.linearRampToValueAtTime(.12, t + .35); g.gain.linearRampToValueAtTime(0, t + .6);
   o.connect(f); f.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .65);
 }
-interact.push({pos: new THREE.Vector3(), r: 1.5, dist: p => Math.hypot(p.x - CAT.x, p.z - CAT.z) + (Math.abs(homeY(CAT.x, CAT.z) - p.y) > 1 ? 9 : 0), label: () => player.mode === "walk" && !player.swim ? "Pet Minnu the cat" : null,
-  act: () => { meow(); burst(CAT.x, homeY(CAT.x, CAT.z) + .5, CAT.z, heartTex, 6); toast("Minnu purrs. Meow!", 2000); }});
+interact.push({pos: new THREE.Vector3(), r: 1.5, dist: p => Math.hypot(p.x - CAT.x, p.z - CAT.z) + (Math.abs(homeY(CAT.x, CAT.z) - p.y) > 1 ? 9 : 0), label: () => player.mode === "walk" && !player.swim ? "Pet Huraira the cat" : null,
+  act: () => { meow(); burst(CAT.x, homeY(CAT.x, CAT.z) + .5, CAT.z, heartTex, 6); toast("Huraira purrs. Meow!", 2000); }});
 
 /* ---------- eggs, milk, roses, snacks ---------- */
 const COOLDOWN = 10 * 60 * 1000;
@@ -4314,7 +4402,7 @@ interact.push({pos: new THREE.Vector3(HENHOUSE.x, 0, HENHOUSE.z + .9), r: 1.8, l
 interact.push({pos: new THREE.Vector3(), r: 2.2, dist: p => Math.hypot(p.x - COW.g.position.x, p.z - COW.g.position.z), label: () => { if (player.mode !== "walk") return null; const r = readyIn("veed-milk"); return r ? {info: "The cow · milk again in " + Math.ceil(r / 60000) + " min"} : "Milk the cow"; },
   act: () => { if (readyIn("veed-milk")) return; store.set("veed-milk", Date.now()); COW.wait = 6; addItem("milk", 1); toast("You got a bottle of fresh milk.", 2500); }});
 interact.push({pos: new THREE.Vector3(ROSES.x, 0, ROSES.z), r: 1.9, label: () => player.mode === "walk" && !player.swim ? ((basket.rose || 0) >= 3 ? {info: "Roses · you already have " + basket.rose} : "Pick a rose") : null,
-  act: () => { if ((basket.rose || 0) >= 3) return; addItem("rose", 1); toast("You picked a red rose. Walk up to " + (partner() ? peerName(partner()) : "someone special") + " and give it.", 4000); }});
+  act: () => { if ((basket.rose || 0) >= 3) return; addItem("rose", 1); toast(coupleOn() ? "You picked a red rose. Walk up to " + peerName(partner()) + " and give it." : "You picked a red rose.", 4000); }});
 function buySnack(name, price, gain){
   if (cash < price){ toast("You need ₹" + price + ". Sell some food at the store first."); return; }
   addCash(-price); const before = life.v; life.v = Math.min(100, life.v + gain); renderLife();
@@ -4374,7 +4462,7 @@ function rosePossible(){
 }
 function updateRoseBtn(){
   const b = $("roseBtn"), offered = performance.now() - roseAskedAt < 40000;
-  const show = rosePossible() && !topView && ((basket.rose || 0) > 0 || offered);
+  const show = coupleOn() && rosePossible() && !topView && ((basket.rose || 0) > 0 || offered);
   b.hidden = !show; if (!show) return;
   b.textContent = offered ? "Accept the rose" : "Give a rose to " + peerName(partner());
   b.classList.toggle("pulse", offered);
@@ -4401,6 +4489,7 @@ function roseJoy(receiver){
   toast(receiver ? "You accepted the rose. ❤" : peerName(pid) + " accepted your rose! ❤", 5000);
 }
 function onRose(d){
+  if (!coupleOn()) return;
   if (d.op === "offer"){ roseAskedAt = performance.now(); toast(peerName(partner()) + " is kneeling with a rose for you. Walk close and press Accept the rose.", 7000); }
   else if (d.op === "yes"){ if ((basket.rose || 0) > 0){ basket.rose--; store.set("veed-basket", basket); renderBasket(); } player.kneelUntil = performance.now() + 600; roseJoy(false); }
 }
@@ -5145,6 +5234,351 @@ function tickGames(dt){
 interact.push({pos: new THREE.Vector3(-5.93, SCENE.P, 8.62), r: 1.8, label: () => player.mode === "walk" ? "Play a game (chess, ludo, cards)" : null, act: () => gameOpen()});
 
 
+/* ---------- couple mode: hugs, roses, romantic music and dancing stay off until the secret code is typed in the chat ---------- */
+// the codes are stored only as hashes, so they can't be read in the page source
+const CODE_COUPLE = 355054862, CODE_DANCE = 2477283449;
+let COUPLE = null;
+function coupleKey(){ return "veed-couple-" + net.homeId; }
+function coupleRec(){ if (!COUPLE || COUPLE.key !== coupleKey()){ const r = store.get(coupleKey(), null); COUPLE = {key: coupleKey(), on: !!(r && r.on), with: r && r.with || ""}; } return COUPLE; }
+function coupleOn(){ const r = coupleRec(), pid = partner(); return r.on && !!pid && peerName(pid) === r.with; }
+function setCouple(on, withName){ const r = coupleRec(); r.on = on; r.with = on ? withName : ""; store.set(coupleKey(), {on: r.on, with: r.with}); renderCouple(); updateHint(); }
+function renderCouple(){
+  const on = coupleOn();
+  $("coupleBar").hidden = !on;
+  $("musicOn").parentElement.hidden = !on;
+}
+function secretCode(text){
+  const h = hashStr("veed:" + String(text || "").trim().toUpperCase());
+  if (h !== CODE_COUPLE && h !== CODE_DANCE) return false;
+  const pid = partner();
+  if (!pid){ toast("Your partner needs to be inside with you."); return true; }
+  if (h === CODE_COUPLE){
+    if (coupleOn()){ toast("You're already a couple. ❤", 2500); return true; }
+    setCouple(true, peerName(pid)); net.act.couple.send({op: "on", by: me.name}, {target: pid});
+    coupleJoy(); return true;
+  }
+  // the dance code works once you're a couple
+  if (!coupleOn()){ toast("That code works once you're a couple.", 3000); return true; }
+  const p = net.peers[pid], pp = p && p.cur;
+  if (player.mode === "car" || (p && p.t && p.t.seat)){ toast("Get out of the car first, then dance.", 3000); return true; }
+  let cx = player.pos.x, cz = player.pos.z;
+  if (pp && Math.hypot(pp.x - cx, pp.z - cz) < 10){ cx = (cx + pp.x) / 2; cz = (cz + pp.z) / 2; }
+  net.act.couple.send({op: "dance", cx, cz, y: player.pos.y}, {target: pid});
+  startDance(cx, cz, player.pos.y);
+  return true;
+}
+function coupleJoy(){
+  const pid = partner(), p = pid && net.peers[pid];
+  burst(player.pos.x, player.pos.y + 1.6, player.pos.z, heartTex, 24);
+  if (p && p.cur) burst(p.cur.x, p.cur.y + 1.6, p.cur.z, heartTex, 24);
+  $("hugfx").style.opacity = 1; setTimeout(() => $("hugfx").style.opacity = 0, 1800);
+  toast("You're a couple now ❤ Hugs, roses, romantic music and dancing are on for the two of you.", 6000);
+}
+function onCoupleMsg(d){
+  const pid = partner(); if (!pid) return;
+  if (d.op === "on"){ setCouple(true, peerName(pid)); coupleJoy(); }
+  else if (d.op === "off"){ setCouple(false); toast(peerName(pid) + " turned couple mode off.", 4000); }
+  else if (d.op === "state"){ if (d.on && !coupleOn()) setCouple(true, peerName(pid)); else renderCouple(); }
+  else if (d.op === "dance" && coupleOn() && typeof d.cx === "number"){ startDance(d.cx, d.cz, +d.y || 0); }
+}
+function coupleWelcome(p){ setTimeout(() => { if (partner() === p.id) net.act.couple.send({op: "state", on: coupleOn() || (coupleRec().on && coupleRec().with === peerName(p.id))}, {target: p.id}); renderCouple(); updateHint(); }, 600); }
+function coupleLeft(){ if (dance.on) endDance(); setTimeout(() => { renderCouple(); updateHint(); }, 0); }
+$("coupleOff").addEventListener("click", () => { const pid = partner(); setCouple(false); if (pid) net.act.couple.send({op: "off"}, {target: pid}); toast("Couple mode is off.", 3000); });
+renderCouple();
+
+/* ---------- dancing together for 10 seconds ---------- */
+const dance = {on: false, t0: 0, cx: 0, cz: 0, y: 0, off: 0, heartT: 0};
+function startDance(cx, cz, y){
+  if (player.mode === "car") return;
+  standUp(); if (player.mode === "pray") endPrayer(false); if (player.mode === "shower") endShower();
+  if (player.swim) setSwim(false);
+  Object.assign(dance, {on: true, t0: performance.now(), cx, cz, y: y || player.pos.y, off: net.isOwner ? 0 : Math.PI, heartT: 0});
+  player.camPitch = .32;
+  showPlace("Dance together");
+}
+function endDance(){ dance.on = false; }
+function tickDance(dt){
+  if (!dance.on) return;
+  const t = (performance.now() - dance.t0) / 1000;
+  if (t > 10){ endDance(); toast("What a lovely dance! ❤", 3000); return; }
+  const a = dance.off + (nowH() / 1000 % 10000) * 1.25, r = .42;     // both use the home's clock, so you stay opposite each other
+  player.pos.set(dance.cx + Math.cos(a) * r, dance.y, dance.cz + Math.sin(a) * r);
+  player.yaw = Math.atan2(player.pos.x - dance.cx, player.pos.z - dance.cz);
+  if (!firstPerson) player.camYaw += dt * .35;
+  dance.heartT -= dt; if (dance.heartT <= 0){ dance.heartT = 1.4; burst(dance.cx, dance.y + 1.8, dance.cz, heartTex, 6); }
+}
+
+/* ---------- shower in the washroom (you step behind the steamed-up glass) ---------- */
+const SHOWER = {x: 1.18, z: 8.96, y: SCENE.P};
+const steam = (() => {
+  const tex = canvasTex(64, (g, s) => { const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2); gr.addColorStop(0, "rgba(255,255,255,.9)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, s, s); });
+  const list = [];
+  for (let i = 0; i < 14; i++){ const s = new THREE.Sprite(new THREE.SpriteMaterial({map: tex, transparent: true, opacity: 0, depthWrite: false})); s.position.set(SHOWER.x, SHOWER.y + .4, SHOWER.z); s.userData.k = i / 14; scene.add(s); list.push(s); }
+  return list;
+})();
+let showerT = 0, showerAudio = null;
+function startShower(){
+  standUp(); if (player.swim) return;
+  player.standPos.copy(player.pos); player.mode = "shower"; showerT = 0;
+  player.pos.set(SHOWER.x, SHOWER.y, SHOWER.z);
+  showerSound(.05);
+  toast("Taking a shower… press E (or the button) when you're done.", 4000);
+}
+function endShower(){
+  if (player.mode !== "shower") return;
+  player.mode = "walk"; player.pos.copy(player.standPos); showerSound(0);
+  const before = life.v; life.v = Math.min(100, life.v + 10); renderLife();
+  toast("Fresh and clean! Life +" + Math.round(life.v - before) + "%.", 3000);
+}
+function showerSound(level){
+  const ctx = net.ctx; if (!ctx) return;
+  if (!showerAudio && level > 0){
+    const len = ctx.sampleRate * 2, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * .3;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2500; bp.Q.value = .6;
+    const g = ctx.createGain(); g.gain.value = 0; src.connect(bp); bp.connect(g); g.connect(ctx.destination); src.start();
+    showerAudio = {g};
+  }
+  if (showerAudio) showerAudio.g.gain.setTargetAtTime(level, ctx.currentTime, .4);
+}
+function tickShower(dt){
+  const pid = partner(), pt = pid && net.peers[pid] && net.peers[pid].t;
+  const on = player.mode === "shower" || (pt && pt.pose === "shower");
+  const tt = performance.now() / 1000;
+  steam.forEach(s => {
+    const k = (s.userData.k + tt * .18) % 1;
+    s.position.set(SHOWER.x + Math.sin(k * 9 + s.userData.k * 20) * .35, SHOWER.y + .3 + k * 2.1, SHOWER.z + Math.cos(k * 7) * .25);
+    s.scale.setScalar(.4 + k * .9);
+    s.material.opacity += ((on ? (1 - k) * .35 : 0) - s.material.opacity) * Math.min(1, dt * 2);
+  });
+  if (player.mode === "shower"){ showerT += dt; if (showerT > 20) endShower(); else if (Math.hypot(player.pos.x - SHOWER.x, player.pos.z - SHOWER.z) > 2){ player.mode = "walk"; showerSound(0); } }
+}
+interact.push({pos: new THREE.Vector3(SHOWER.x, SHOWER.y, SHOWER.z - .7), r: 1.5, label: () => player.mode === "walk" && !player.swim ? "Take a shower" : null, act: startShower});
+
+/* ---------- the wardrobe shelf by the washroom: change your clothes ---------- */
+const OUTFITS = {
+  f: [["abaya", "Black abaya"], ["abayaNavy", "Navy abaya"], ["abayaMaroon", "Maroon abaya"], ["salwarF", "Salwar kameez"], ["homeF", "Home kurti"], ["whiteF", "White prayer dress"]],
+  m: [["bandhgala", "Green bandhgala"], ["bandhgalaMaroon", "Maroon bandhgala"], ["bandhgalaNavy", "Navy bandhgala"], ["kurtaM", "White kurta"], ["munduM", "Shirt & mundu"], ["thobeM", "White thobe"], ["casualM2", "T-shirt & jeans"]]
+};
+const OUTFIT_KEYS = new Set([...OUTFITS.f, ...OUTFITS.m].map(o => o[0]));
+const WARDROBE = {x: .75, z: 4.78};
+{
+  const y0 = SCENE.P, X = WARDROBE.x, Z = WARDROBE.z;
+  box(1.2, 1.9, .05, X, y0, Z + .2, M.woodLight); box(.05, 1.9, .42, X - .58, y0, Z, M.woodLight); box(.05, 1.9, .42, X + .58, y0, Z, M.woodLight);
+  [0, .45, .9].forEach(h => box(1.12, .03, .4, X, y0 + .1 + h, Z, M.woodLight, {noCollide: true}));
+  const cols = [0x141417, 0x1b2a4e, 0x6a1f2b, 0xb03a5b, 0xf6f4ee, 0x1d4a35, 0x8fb7d9, 0x2b4a6b];
+  for (let k = 0; k < 9; k++) box(.3, .1 + (k % 2) * .04, .3, X - .38 + (k % 3) * .38, y0 + .13 + Math.floor(k / 3) * .45, Z, mat(cols[k % cols.length], .9), {noCollide: true});
+  box(1.12, .03, .03, X, y0 + 1.75, Z - .05, M.metal, {noCollide: true});
+  for (let k = 0; k < 4; k++){ const hg = box(.22, .6, .04, X - .36 + k * .24, y0 + 1.12, Z - .05, mat(cols[(k + 3) % cols.length], .9), {noCollide: true}); hg.rotation.y = .3; }
+}
+interact.push({pos: new THREE.Vector3(WARDROBE.x, SCENE.P, WARDROBE.z - .5), r: 1.5, label: () => player.mode === "walk" && !player.swim ? "Change clothes" : null, act: openWardrobe});
+function openWardrobe(){
+  const box2 = $("wardOpts"); box2.textContent = "";
+  const female = !!(STYLES[me.look] && STYLES[me.look].female);
+  OUTFITS[female ? "f" : "m"].forEach(([k, label]) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn" + (me.look === k ? " primary" : ""); b.textContent = label; b.addEventListener("click", () => changeOutfit(k, label)); box2.appendChild(b); });
+  $("wardDlg").hidden = false;
+}
+function changeOutfit(k, label){
+  $("wardDlg").hidden = true; view.focus({preventScroll: true});
+  if (!OUTFIT_KEYS.has(k) || k === me.look || !me.H) return;
+  me.look = k; store.set("veed-outfit", k);
+  scene.remove(me.H.root); me.H = buildHuman(k); scene.add(me.H.root);
+  const pid = partner(); if (pid) sendHi(pid);
+  toast("You changed into the " + label.toLowerCase() + ".", 2500);
+}
+
+/* ---------- everything above that moves ---------- */
+function tickExtra(dt){ tickDance(dt); tickShower(dt); tickLibrary(dt); }
+
+
+/* ---------- Veed Islamic Library, next to the school: tafsirs, Tafheem-ul-Quran, hadith and books ---------- */
+const LIB = {x0: 185, x1: 201, z0: 52, z1: 63};
+{
+  const {x0, x1, z0, z1} = LIB, cx = (x0 + x1) / 2, cream = mat(0xffffff, .9, {map: TEX.plaster, color: 0xf4ead6}), trimM = mat(0x1d5c3a, .5);
+  addZone("Veed Islamic Library", x0 - 1, z0 - 3, x1 + 1, z1, {indoor: true});
+  addMesh(new THREE.PlaneGeometry(x1 - x0 + 2, 3), mat(0xffffff, .9, {map: rep(TEX.concrete, 8, 1)}), cx, .03, z0 - 1.5, {noCollide: true, noShadow: true}).rotation.x = -Math.PI / 2;
+  building({x0, x1, z0, z1, h: 4.4, out: cream, inn: M.plaster, floor: mat(0xffffff, .5, {map: rep(TEX.wood, .5)}), trim: trimM,
+    holes: {front: [[x0 + 1.2, x0 + 5.5, .8, 3.2, 1], [cx - 1.2, cx + 1.2, 0, 3.0, 0], [x1 - 5.5, x1 - 1.2, .8, 3.2, 1]], left: [[55, 60, 1.2, 3.2, 1]], right: [[55, 60, 1.2, 3.2, 1]]}});
+  // arch over the door and the sign
+  addMesh(new THREE.TorusGeometry(1.25, .12, 6, 20, Math.PI), trimM, cx, 3.0, z0 - .12, {noCollide: true});
+  const sg = textPlane(["Veed Islamic Library", "مكتبة · Tafsir · Hadith · Books"], 7, 1.2, {bg: "#1d5c3a", border: "#c9a54c"}); sg.position.set(cx, 4.95, z0 - .16); sg.rotation.y = Math.PI; world.add(sg);
+  box(16.4, .3, .4, cx, 4.4, z0 - .1, trimM, {noCollide: true});
+  // bookshelves round the walls, filled with books (one draw call for all the books)
+  const shelves = [];
+  for (let k = 0; k < 6; k++) shelves.push({x: x0 + 1.6 + k * 2.6, z: z1 - .35, rot: 0});
+  for (let k = 0; k < 3; k++){ shelves.push({x: x0 + .35, z: z0 + 2.2 + k * 3.2, rot: Math.PI / 2}); shelves.push({x: x1 - .35, z: z0 + 2.2 + k * 3.2, rot: -Math.PI / 2}); }
+  const bookCols = [0x1f5a3a, 0x7a2d2d, 0x2d3e7a, 0x8a6a2a, 0x3a2a20, 0x5a1626, 0x2c7a6a, 0xc9a54c, 0x1b2a4e];
+  const bookN = shelves.length * 5 * 16;
+  const books = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .7}), bookN);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), R = rng(99); let bi = 0;
+  shelves.forEach(s => {
+    const g = new THREE.Group(); g.position.set(s.x, 0, s.z); g.rotation.y = s.rot; world.add(g);
+    const add = (w, h, d, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M.wood); o.position.set(x, y + h / 2, z); o.castShadow = true; o.receiveShadow = true; g.add(o); };
+    add(2.4, 2.6, .06, 0, 0, .2); add(.06, 2.6, .44, -1.2, 0, 0); add(.06, 2.6, .44, 1.2, 0, 0);
+    for (let r = 0; r < 5; r++){
+      add(2.36, .04, .42, 0, .1 + r * .5, 0);
+      let x = -1.12;
+      for (let k = 0; k < 16 && x < 1.08; k++){
+        const w = .06 + R() * .07, h = .3 + R() * .14, d = .26 + R() * .06;
+        q.setFromEuler(new THREE.Euler(0, s.rot, k % 7 === 6 ? .12 : 0));
+        const local = new THREE.Vector3(x + w / 2, .14 + r * .5 + h / 2, .02).applyAxisAngle(UPV, s.rot);
+        m4.compose(new THREE.Vector3(s.x + local.x, local.y, s.z + local.z), q, new THREE.Vector3(w, h, d));
+        books.setMatrixAt(bi, m4); books.setColorAt(bi, new THREE.Color(bookCols[Math.floor(R() * bookCols.length)])); bi++; x += w + .008;
+      }
+    }
+  });
+  books.count = bi; books.castShadow = true; books.receiveShadow = true; books.userData.noCollide = true; scene.add(books);
+  // reading tables with chairs, a Quran stand, the librarian's desk
+  [[cx - 3.2, 57.5], [cx + 3.2, 57.5]].forEach(([tx, tz]) => {
+    box(2.2, .05, 1.1, tx, .74, tz, M.woodLight); [[-1, -.5], [1, -.5], [-1, .5], [1, .5]].forEach(([sx, sz]) => box(.06, .74, .06, tx + sx * 1.0, 0, tz + sz * .45, M.wood));
+    box(.3, .04, .22, tx - .5, .79, tz, mat(0x1f5a3a, .6), {noCollide: true}); box(.3, .04, .22, tx + .4, .79, tz + .1, mat(0x7a2d2d, .6), {noCollide: true});
+    [[-.55, -.85, 0], [.55, -.85, 0], [-.55, .85, Math.PI], [.55, .85, Math.PI]].forEach(([dx, dz, yaw]) => {
+      box(.42, .45, .42, tx + dx, 0, tz + dz, M.wood); box(.42, .5, .05, tx + dx, .45, tz + dz + (yaw ? .19 : -.19), M.wood);
+      addSpot({type: "sit", pos: new THREE.Vector3(tx + dx, .47, tz + dz), yaw: yaw ? 0 : Math.PI, group: null, what: "library chair"});
+    });
+  });
+  box(2.4, 1.0, .7, cx, 0, z0 + 2.4, trimM); box(2.5, .05, .8, cx, 1.0, z0 + 2.4, M.woodLight, {noCollide: true});
+  addNPC({look: "imam", name: "Librarian", pose: "stand", x: cx + .4, y: .06, z: z0 + 3.3, yaw: 0, role: "librarian"});
+  LIB.desk = {x: cx, z: z0 + 1.4};
+  LIGHT_SPOTS.push([cx, 4, 57], [cx, 3, z0 - 1]);
+  PLACES.push({name: "Veed Islamic Library", x: cx, z: 49.5, y: .12, yaw: Math.PI});
+}
+
+/* the tafsirs that can be read here (they load from the open tafsir collection on jsDelivr) */
+const TAFSIRS = [
+  ["Malayalam", [["malayalam-mokhtasar", "Al-Mukhtasar (Malayalam) · Tafsir Center"]]],
+  ["English", [["en-tafisr-ibn-kathir", "Ibn Kathir (abridged)"], ["en-tafsir-maarif-ul-quran", "Ma'ariful Qur'an · Mufti Muhammad Shafi"], ["en-tazkirul-quran", "Tazkirul Quran · Wahiduddin Khan"], ["en-al-jalalayn", "Tafsir al-Jalalayn"], ["en-tafsir-al-mukhtasar", "Al-Mukhtasar · Tafsir Center"], ["en-tafsir-ibn-abbas", "Tanwir al-Miqbas (Ibn Abbas)"], ["en-asbab-al-nuzul-by-al-wahidi", "Asbab al-Nuzul · Al-Wahidi"], ["en-tafsir-al-tustari", "Tafsir al-Tustari"], ["en-al-qushairi-tafsir", "Al-Qushairi"], ["en-kashani-tafsir", "Kashani"], ["en-kashf-al-asrar-tafsir", "Kashf al-Asrar"]]],
+  ["Urdu", [["ur-tafsir-bayan-ul-quran", "Bayan ul Quran · Dr Israr Ahmad"], ["ur-tafseer-ibn-e-kaseer", "Ibn Kathir (Urdu)"], ["ur-tazkirul-quran", "Tazkirul Quran (Urdu)"], ["ur-tafsir-fe-zalul-quran-syed-qatab", "Fi Zilal al-Quran · Sayyid Qutb (Urdu)"], ["ur-tafsir-as-saadi-urdu", "As-Sa'di (Urdu)"]]],
+  ["Hindi, Tamil, Telugu, Assamese", [["hindi-mokhtasar", "Al-Mukhtasar (Hindi)"], ["tamil-mokhtasar", "Al-Mukhtasar (Tamil)"], ["telugu-mokhtasar", "Al-Mukhtasar (Telugu)"], ["assamese-mokhtasar", "Al-Mukhtasar (Assamese)"]]],
+  ["Bengali", [["bn-tafsir-ahsanul-bayaan", "Ahsanul Bayaan"], ["bn-tafseer-ibn-e-kaseer", "Ibn Kathir (Bengali)"], ["bn-tafsir-abu-bakr-zakaria", "Abu Bakr Zakaria"], ["bn-tafisr-fathul-majid", "Fathul Majid"], ["bengali-mokhtasar", "Al-Mukhtasar (Bengali)"]]],
+  ["Arabic · العربية", [["ar-tafsir-ibn-kathir", "تفسير ابن كثير · Ibn Kathir"], ["ar-tafsir-al-tabari", "تفسير الطبري · Al-Tabari"], ["ar-tafseer-al-qurtubi", "تفسير القرطبي · Al-Qurtubi"], ["ar-tafseer-al-saddi", "تفسير السعدي · As-Sa'di"], ["ar-tafsir-al-baghawi", "تفسير البغوي · Al-Baghawi"], ["ar-tafsir-muyassar", "التفسير الميسر · Al-Muyassar"], ["ar-tafsir-al-jalalayn", "تفسير الجلالين · Al-Jalalayn"], ["ar-tafsir-al-wasit", "التفسير الوسيط · Tantawi"], ["ar-tafseer-tahrir-al-tanwir", "التحرير والتنوير · Ibn Ashur"], ["tafsir-al-razi", "تفسير الرازي · Al-Razi"], ["adwa-al-bayan", "أضواء البيان · Al-Shinqiti"], ["fath-al-qadir-al-shawkani", "فتح القدير · Al-Shawkani"], ["tafsir-ibn-uthaymeen", "تفسير ابن عثيمين · Ibn Uthaymeen"], ["al-durr-al-manthur", "الدر المنثور · Al-Suyuti"], ["tafsir-al-alusi", "روح المعاني · Al-Alusi"], ["tafsir-al-baydawi", "تفسير البيضاوي · Al-Baydawi"], ["al-kashshaf-al-zamakhshari", "الكشاف · Al-Zamakhshari"], ["tafsir-ibn-abi-hatim", "تفسير ابن أبي حاتم"], ["tafsir-ibn-al-qayyim", "تفسير ابن القيم"], ["tafsir-ibn-al-jawzi", "زاد المسير · Ibn al-Jawzi"], ["tafsir-al-nasafi", "تفسير النسفي"], ["ar-tafsir-al-mukhtasar", "المختصر في التفسير"]]],
+  ["Other languages", [["tr-tafsir-ibne-kathir", "Ibn Kathir (Turkish)"], ["ru-tafsir-ibne-kahtir", "Ibn Kathir (Russian)"], ["id-tafsir-as-saadi", "As-Sa'di (Indonesian)"], ["in-tafsir-jalalayn", "Jalalayn (Indonesian)"], ["french-mokhtasar", "Al-Mukhtasar (French)"], ["spanish-mokhtasar", "Al-Mukhtasar (Spanish)"], ["persian-mokhtasar", "Al-Mukhtasar (Persian)"], ["chinese-mokhtasar", "Al-Mukhtasar (Chinese)"]]]
+];
+const TAF_RTL = /^(ar-|ur-|tafsir-al|tafsir-ibn|al-|adwa|fath|persian|tafsir-al-)/;
+const TCDN = "https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir/";
+const HCDN = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/";
+const HADITH = [["bukhari", "Sahih al-Bukhari", "eng urd ara ben"], ["muslim", "Sahih Muslim", "eng urd ara ben"], ["abudawud", "Sunan Abu Dawud", "eng urd ara ben"], ["tirmidhi", "Jami at-Tirmidhi", "eng urd ara ben"], ["nasai", "Sunan an-Nasa'i", "eng urd ara ben"], ["ibnmajah", "Sunan Ibn Majah", "eng urd ara ben"], ["malik", "Muwatta Malik", "eng urd ara ben"], ["nawawi", "Forty Hadith of an-Nawawi", "eng ara ben"], ["qudsi", "Forty Hadith Qudsi", "eng ara"], ["dehlawi", "Forty Hadith of Shah Waliullah", "eng ara"]];
+const LANGN = {eng: "English", urd: "اردو Urdu", ara: "العربية Arabic", ben: "বাংলা Bengali"};
+const lib = {open: false, tab: "tafsir", activeAt: 0, loading: 0};
+(function fillLibrary(){
+  const ts = $("libTafsir");
+  TAFSIRS.forEach(([lang, list]) => { const og = document.createElement("optgroup"); og.label = lang; list.forEach(([slug, name]) => { const o = document.createElement("option"); o.value = slug; o.textContent = name; og.appendChild(o); }); ts.appendChild(og); });
+  ts.value = store.get("veed-lib-tafsir", "malayalam-mokhtasar");
+  const ss = $("libSurah");
+  SURAHS.forEach(([tr, ar, n], i) => { const o = document.createElement("option"); o.value = i + 1; o.textContent = (i + 1) + ". " + tr + " · " + ar; ss.appendChild(o); });
+  ss.value = store.get("veed-lib-surah", 1);
+  const hs = $("libBook"); HADITH.forEach(([k, name]) => { const o = document.createElement("option"); o.value = k; o.textContent = name; hs.appendChild(o); }); hs.value = store.get("veed-lib-book", "nawawi");
+  fillAyahs(+store.get("veed-lib-ayah", 1)); fillLangs();
+  $("libHadithN").value = store.get("veed-lib-hn", 1);
+})();
+function fillAyahs(keep){
+  const n = SURAHS[(+$("libSurah").value || 1) - 1][2], sel = $("libAyah"); sel.textContent = "";
+  for (let i = 1; i <= n; i++){ const o = document.createElement("option"); o.value = i; o.textContent = "Verse " + i; sel.appendChild(o); }
+  sel.value = Math.min(keep || 1, n);
+}
+function fillLangs(){
+  const b = HADITH.find(h => h[0] === $("libBook").value) || HADITH[0], sel = $("libLang"), cur = store.get("veed-lib-hlang", "eng"); sel.textContent = "";
+  b[2].split(" ").forEach(l => { const o = document.createElement("option"); o.value = l; o.textContent = LANGN[l]; sel.appendChild(o); });
+  sel.value = b[2].includes(cur) ? cur : "eng";
+}
+function openLibrary(tab){
+  lib.open = true; lib.activeAt = performance.now(); $("library").hidden = false;
+  libTab(tab || lib.tab);
+}
+function closeLibrary(){ lib.open = false; $("library").hidden = true; store.set("veed-qread", Math.floor(qread)); view.focus({preventScroll: true}); }
+$("libClose").addEventListener("click", closeLibrary);
+document.querySelectorAll("#libTabs [data-t]").forEach(b => b.addEventListener("click", () => libTab(b.dataset.t)));
+["scroll", "pointerdown", "keydown", "wheel", "touchstart"].forEach(ev => $("library").addEventListener(ev, () => lib.activeAt = performance.now(), {passive: true, capture: true}));
+function libTab(t){
+  lib.tab = t;
+  document.querySelectorAll("#libTabs [data-t]").forEach(b => b.classList.toggle("primary", b.dataset.t === t));
+  ["tafsir", "tafheem", "hadith", "books"].forEach(k => $("lib_" + k).hidden = k !== t);
+  if (t === "tafsir") loadTafsir(); else if (t === "hadith") loadHadith();
+}
+$("libTafsir").addEventListener("change", () => { store.set("veed-lib-tafsir", $("libTafsir").value); loadTafsir(); });
+$("libSurah").addEventListener("change", () => { store.set("veed-lib-surah", +$("libSurah").value); fillAyahs(1); loadTafsir(); });
+$("libAyah").addEventListener("change", () => loadTafsir());
+$("libPrev").addEventListener("click", () => stepAyah(-1)); $("libNext").addEventListener("click", () => stepAyah(1));
+function stepAyah(d){
+  let s = +$("libSurah").value, a = +$("libAyah").value + d;
+  if (a < 1){ if (s > 1){ s--; $("libSurah").value = s; fillAyahs(SURAHS[s - 1][2]); } else return; }
+  else if (a > SURAHS[s - 1][2]){ if (s < 114){ s++; $("libSurah").value = s; fillAyahs(1); } else return; }
+  else $("libAyah").value = a;
+  store.set("veed-lib-surah", s); loadTafsir();
+}
+// show text that may contain simple HTML as safe paragraphs
+function richText(box, html, rtl){
+  const doc = new DOMParser().parseFromString("<div>" + String(html || "") + "</div>", "text/html"), root = doc.body.firstChild;
+  const blocks = [];
+  const walk = el => el.childNodes.forEach(n => {
+    if (n.nodeType === 3){ const t = n.textContent.trim(); if (t) blocks.push(["p", t]); }
+    else if (n.nodeType === 1){ const tag = n.tagName.toLowerCase(); if (/^(p|div|li|blockquote)$/.test(tag) && n.querySelector("p,div,li")) walk(n); else if (/^h\d$/.test(tag)) blocks.push(["h", n.textContent.trim()]); else { const t = n.textContent.trim(); if (t) blocks.push([tag === "br" ? "" : "p", t]); } }
+  });
+  if (root) walk(root);
+  const merged = [];
+  blocks.forEach(b => { if (b[1]) merged.push(b); });
+  merged.forEach(([k, t]) => t.split(/\n{2,}/).forEach(part => { const e = document.createElement(k === "h" ? "h3" : "p"); e.textContent = part; if (rtl){ e.dir = "rtl"; } box.appendChild(e); }));
+}
+async function loadTafsir(){
+  const slug = $("libTafsir").value, s = +$("libSurah").value || 1, a = +$("libAyah").value || 1, my = ++lib.loading;
+  store.set("veed-lib-ayah", a);
+  const out = $("libTafOut"); out.textContent = "";
+  const msg = document.createElement("p"); msg.className = "qnote"; msg.textContent = "Loading…"; out.appendChild(msg);
+  let verse = null, taf = null;
+  try { const ch = await getJSON(QCDN + s + ".json"); verse = ch.verses[a - 1]; } catch(e){}
+  try { taf = await getJSON(TCDN + slug + "/" + s + "/" + a + ".json"); } catch(e){ taf = null; }
+  if (my !== lib.loading) return;
+  out.textContent = "";
+  const head = document.createElement("div"); head.className = "qtitle";
+  const sm = document.createElement("small"); sm.textContent = SURAHS[s - 1][0] + " " + s + ":" + a + " · " + ($("libTafsir").selectedOptions[0] || {}).textContent; head.appendChild(sm); out.appendChild(head);
+  if (verse){ const ar = document.createElement("div"); ar.className = "ar libar"; ar.textContent = verse.text; out.appendChild(ar); }
+  const body = document.createElement("div"); body.className = "libtext"; out.appendChild(body);
+  if (!taf){ const p = document.createElement("p"); p.className = "qnote"; p.textContent = "This tafsir couldn't load. Check your internet connection, or choose another tafsir."; body.appendChild(p); }
+  else if (!String(taf.text || "").trim()){ const p = document.createElement("p"); p.className = "qnote"; p.textContent = "This tafsir explains this verse together with the verses around it. Go back a verse or two to read it."; body.appendChild(p); }
+  else richText(body, taf.text, TAF_RTL.test(slug));
+  const cr = document.createElement("p"); cr.className = "qnote"; cr.textContent = "Tafsir text from the open tafsir collection (spa5k/tafsir_api, from quran.com and other sources). Arabic verse: The Noble Qur'an Encyclopedia."; out.appendChild(cr);
+  $("libBody").scrollTop = 0;
+}
+$("libBook").addEventListener("change", () => { store.set("veed-lib-book", $("libBook").value); fillLangs(); $("libHadithN").value = 1; loadHadith(); });
+$("libLang").addEventListener("change", () => { store.set("veed-lib-hlang", $("libLang").value); loadHadith(); });
+$("libHadithN").addEventListener("change", () => loadHadith());
+$("libHPrev").addEventListener("click", () => { $("libHadithN").value = Math.max(1, (+$("libHadithN").value || 1) - 1); loadHadith(); });
+$("libHNext").addEventListener("click", () => { $("libHadithN").value = (+$("libHadithN").value || 1) + 1; loadHadith(); });
+async function loadHadith(){
+  const book = $("libBook").value, lang = $("libLang").value, n = Math.max(1, +$("libHadithN").value || 1), my = ++lib.loading;
+  store.set("veed-lib-hn", n);
+  const out = $("libHadOut"); out.textContent = "";
+  const msg = document.createElement("p"); msg.className = "qnote"; msg.textContent = "Loading…"; out.appendChild(msg);
+  let d = null;
+  try { d = await getJSON(HCDN + lang + "-" + book + "/" + n + ".json"); } catch(e){ try { d = await getJSON(HCDN + lang + "-" + book + "/" + n + ".min.json"); } catch(e2){ d = null; } }
+  if (my !== lib.loading) return;
+  out.textContent = "";
+  if (!d || !d.hadiths || !d.hadiths.length){ const p = document.createElement("p"); p.className = "qnote"; p.textContent = "There's no hadith " + n + " in this book. Try another number."; out.appendChild(p); return; }
+  const h = d.hadiths[0], md = d.metadata || {};
+  const head = document.createElement("div"); head.className = "qtitle";
+  const t1 = document.createElement("small"); t1.textContent = (md.name || "") + " · Hadith " + (h.hadithnumber || n) + (md.section ? " · " + Object.values(md.section)[0] : ""); head.appendChild(t1); out.appendChild(head);
+  const body = document.createElement("div"); body.className = "libtext"; out.appendChild(body);
+  richText(body, h.text, lang === "ara" || lang === "urd");
+  if (h.grades && h.grades.length){ const g = document.createElement("p"); g.className = "qnote"; g.textContent = "Grade: " + h.grades.map(x => x.grade + (x.name ? " (" + x.name + ")" : "")).join(" · "); out.appendChild(g); }
+  const cr = document.createElement("p"); cr.className = "qnote"; cr.textContent = "Hadith text from the open hadith collection (fawazahmed0/hadith-api)."; out.appendChild(cr);
+  $("libBody").scrollTop = 0;
+}
+$("libQuran").addEventListener("click", () => { closeLibrary(); openQuran(); });
+// time spent reading in the library counts toward the 20 minutes of Quran reading
+let libSave = 0;
+function tickLibrary(dt){
+  if (!lib.open || document.hidden || lib.tab === "books" || lib.tab === "tafheem") return;
+  if (performance.now() - lib.activeAt > 3 * 60 * 1000) return;
+  qread += dt;
+  if (qread >= QREAD_GOAL){ qread -= QREAD_GOAL; addGold(15, "20 minutes of Quran study"); }
+  libSave += dt; if (libSave > 5){ libSave = 0; store.set("veed-qread", Math.floor(qread)); const s = Math.floor(qread); $("libTime").textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") + " / 20:00"; }
+}
+interact.push({pos: new THREE.Vector3(LIB.desk.x, 0, LIB.desk.z), r: 2.4, label: () => player.mode === "walk" ? "Browse the library" : null, act: () => openLibrary()});
+interact.push({pos: new THREE.Vector3((LIB.x0 + LIB.x1) / 2, 0, LIB.z1 - 1.2), r: 3.5, label: () => player.mode === "walk" ? "Browse the books" : null, act: () => openLibrary()});
+NPCS.forEach(n => { if (n.role === "librarian") interact.push({pos: new THREE.Vector3(n.x, 0, n.z - 1.6), r: 1.2, label: () => player.mode === "walk" ? "Say salam to the librarian" : null, act: () => { npcSay(n, "Wa alaikum assalam! Every tafsir is on these shelves.", 4500); sayAloud("Wa alaikum assalam", false, "وعليكم السلام"); }}); });
+
+
 /* ---------- panel controls: sky, weather, music, salams ---------- */
 {
   const sel = $("skySel");
@@ -5161,7 +5595,7 @@ function renderWeather(){
 }
 fillGoto();
 // when someone joins, tell them about a meal waiting on the table
-function moreWelcome(p){ if (plate.visible && plateBy === me.name) net.act.serve.send({op: "plate", by: me.name}, {target: p.id}); }
+function moreWelcome(p){ if (plate.visible && plateBy === me.name) net.act.serve.send({op: "plate", by: me.name}, {target: p.id}); coupleWelcome(p); }
 
 /* ---------- everything that moves each frame ---------- */
 let skyT = 0, lightT = 0, weatherT = 0;
@@ -5174,7 +5608,8 @@ function tickMore(dt){
   if (!tickMore.init){ tickMore.init = true; nightLightsFor(QUAL.mode !== "smooth"); }
   tickRain(dt); tickSwings(dt); tickSwim(); tickKids(dt); tickCat(dt); tickTraffic(dt); tickPolice(dt); tickCrossers(dt);
   tickKisanic(dt); tickClass(); tickGames(dt); updateRoseBtn(); tickKneel();
-  musicPlay(entered && player.mode === "car");
+  musicPlay(entered && ((player.mode === "car" && coupleOn()) || dance.on));
+  tickExtra(dt);
   // sky decorations follow the camera
   stars.position.copy(camera.position);
   if (moon.material.opacity > 0 && moon.userData.dir) moon.position.copy(camera.position).addScaledVector(moon.userData.dir, 900);
@@ -5204,6 +5639,7 @@ function netTick(dt){
     [p.tag, p.ring, p.bub].forEach(o => { if (o && o.parent !== B.root) B.root.add(o); });
     if (!p.cur) p.cur = {x: p.t.x, y: p.t.y, z: p.t.z, yaw: p.t.yaw};
     const pose = placeAvatar(B, p.t, p.cur, dt);
+    if (pose === "shower") B.root.visible = false;     // behind the steamed-up glass
     const hy = pose === "sleep" ? .9 : pose === "sit" || pose === "drive" ? 1.45 : 2.02;
     if (p.tag) p.tag.position.set(0, hy, 0); if (p.ring) p.ring.position.set(0, hy - .26, 0);
     if (p.bub) p.bub.position.y = hy + .3;
@@ -5251,7 +5687,7 @@ function tick(){
     const st = myState(); st.sp = player.speed;
     const B = bodyFor(me, me.look, player.swim);
     placeAvatar(B, st, null, dt);
-    B.root.visible = !((firstPerson || cinemaSeat() || classSeat()) && player.mode !== "car") || topView;
+    B.root.visible = (!((firstPerson || cinemaSeat() || classSeat()) && player.mode !== "car") || topView) && player.mode !== "shower";
   }
   tickAnimals(dt); tickHearts(dt); tickLife(dt); tickMore(dt);
   fireParts.forEach((f, i) => { f.scale.y = .8 + Math.random() * .45; f.scale.x = f.scale.z = .9 + Math.random() * .15; });
