@@ -1862,7 +1862,7 @@ function tickCinema(dt){
 // Relay (TURN) for networks that block direct connections, such as mobile data or guests abroad.
 // Paste the USERNAME and PASSWORD of your Metered TURN credential (TURN Server > Credentials) between the quotes.
 // Never put the Metered "Secret Key" here.
-const TURN_USER = "PASTE_USERNAME_HERE", TURN_PASS = "PASTE_PASSWORD_HERE";
+const TURN_USER = "8a679914236634889d6fb556", TURN_PASS = "FUXh6ifJOPeY1h96";
 const RELAY_SERVERS = /PASTE_/.test(TURN_USER + TURN_PASS) ? [] : [
   {urls: "turn:global.relay.metered.ca:80", username: TURN_USER, credential: TURN_PASS},
   {urls: "turn:global.relay.metered.ca:80?transport=tcp", username: TURN_USER, credential: TURN_PASS},
