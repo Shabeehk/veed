@@ -265,6 +265,7 @@ body.driving #runBtn{display:none!important}
   <p id="movieMsg">Paste a YouTube link to play it on the big screen.</p>
   <button class="btn primary" id="watchBtn" type="button" hidden>Watch a video</button>
   <form id="movieForm" hidden><input id="movieIn" placeholder="https://youtu.be/…" autocomplete="off" aria-label="YouTube link"><button class="btn primary" type="submit">Play</button></form>
+  <button class="btn primary" id="mvSound" type="button" hidden>Turn on sound</button>
   <div class="row" id="movieCtl" hidden>
     <button class="btn" id="mvBack" type="button">−10 s</button>
     <button class="btn primary" id="mvPlay" type="button">Pause</button>
@@ -2191,7 +2192,7 @@ function ensureScreen(){
   css.r.setSize(view.clientWidth, view.clientHeight);
   css.scene = new THREE.Scene();
   const div = document.createElement("div"); div.style.cssText = "width:1280px;height:720px;background:#000";
-  const holder = document.createElement("div"); holder.id = "ytHolder"; div.appendChild(holder);
+  const holder = document.createElement("div"); holder.id = "ytHolder"; div.appendChild(holder); css.holder = holder;
   css.obj = new THREE.CSS3DObject(div);
   css.obj.position.copy(cinema.screen.pos); css.obj.rotation.y = cinema.screen.rotY; css.obj.scale.setScalar(cinema.screen.w / 1280);
   css.scene.add(css.obj);
@@ -2204,12 +2205,13 @@ async function startMovie(vid, t, playing, broadcast){
   cinema.hole.visible = true; cinema.placeholder.visible = false;
   ytApplying = true;
   if (!yt){
-    yt = new YT.Player("ytHolder", {width: 1280, height: 720, videoId: vid, playerVars: {autoplay: 1, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, start: Math.floor(movie.t), iv_load_policy: 3},
+    // Pass the element itself: the screen isn't in the page until the first 3D frame draws it, so an id lookup would find nothing.
+    yt = new YT.Player(css.holder, {width: 1280, height: 720, videoId: vid, playerVars: {autoplay: 1, controls: 0, rel: 0, modestbranding: 1, playsinline: 1, start: Math.floor(movie.t), iv_load_policy: 3, origin: location.origin},
       events: {
-        onReady: () => { applyMovieToPlayer(); },
+        onReady: () => { applyMovieToPlayer(); checkAutoplay(); },
         onError: e => { toast(e.data === 101 || e.data === 150 ? "This video's owner doesn't allow it to play outside YouTube. Try another link." : "That video couldn't play. Check the link and try again."); }
       }});
-  } else applyMovieToPlayer(true);
+  } else { applyMovieToPlayer(true); checkAutoplay(); }
   setTimeout(() => ytApplying = false, 1500);
   renderMoviePanel();
   if (broadcast) sendMovie();
@@ -2226,6 +2228,23 @@ function applyMovieToPlayer(load){
     yt.setVolume(inHall ? 100 : 0);
   } catch(e){}
 }
+// Phones (and a guest whose video was started by the other person) block videos that play with sound
+// until the viewer taps. If it hasn't started, play it muted and offer a "Turn on sound" button.
+let ytMuted = false, autoTimer = 0;
+function checkAutoplay(){
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    try {
+      if (!yt || !yt.getPlayerState || !movie.playing) return;
+      const st = yt.getPlayerState();
+      if (st !== 1 && st !== 3){ yt.mute(); ytMuted = true; yt.playVideo(); renderMoviePanel(); }
+    } catch(e){}
+  }, 2500);
+}
+function unmuteMovie(){
+  try { if (yt && yt.unMute){ yt.unMute(); yt.setVolume(inHall ? 100 : 0); if (movie.playing) yt.playVideo(); } } catch(e){}
+  ytMuted = false; renderMoviePanel();
+}
 function sendMovie(){ const pid = partner(); if (net.room && pid) net.act.movie.send({vid: movie.vid, playing: movie.playing, t: Math.round(movieTime() * 10) / 10}, {target: pid}); }
 function onMovie(d){
   if (!d || !d.vid || !/^[\w-]{6,20}$/.test(d.vid)) return;
@@ -2239,7 +2258,10 @@ function renderMoviePanel(){
   $("movieCtl").hidden = !has || open;
   $("movieMsg").textContent = open ? "Paste a YouTube link, then press Play. It plays for both of you." : has ? (movie.playing ? "Now playing on the big screen." : "Paused.") : seated ? "Comfortable? Press Watch to choose a video." : "Take a seat to watch a video together.";
   $("mvPlay").textContent = movie.playing ? "Pause" : "Play";
+  $("mvSound").hidden = !has || open || !ytMuted;
+  if (has && !open && ytMuted) $("movieMsg").textContent = "Playing without sound. Tap Turn on sound to hear it.";
 }
+$("mvSound").addEventListener("click", unmuteMovie);
 $("watchBtn").addEventListener("click", () => { $("movieForm").dataset.open = "1"; renderMoviePanel(); $("movieIn").focus(); });
 $("movieForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -2257,7 +2279,7 @@ let hallFlick = 0;
 function tickCinema(dt){
   const zn = zoneAt(player.mode === "car" ? car.x : player.pos.x, player.mode === "car" ? car.z : player.pos.z);
   const nowIn = !!(zn && zn.hall) && player.mode !== "car" && !topView;
-  if (nowIn !== inHall){ inHall = nowIn; $("movie").hidden = !inHall; renderMoviePanel(); try { yt && yt.setVolume && yt.setVolume(inHall ? 100 : 0); } catch(e){} }
+  if (nowIn !== inHall){ inHall = nowIn; $("movie").hidden = !inHall; if (inHall) loadYT(); renderMoviePanel(); try { yt && yt.setVolume && yt.setVolume(inHall ? 100 : 0); } catch(e){} }
   const showCss = css.r && movie.vid && Math.abs(player.pos.x - cinema.x) < 40 && player.pos.z > 48 && !topView;
   if (css.r) css.r.domElement.style.display = showCss ? "" : "none";
   hallFlick += dt;
