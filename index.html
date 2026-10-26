@@ -118,9 +118,10 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .toast{position:fixed;z-index:30;top:calc(60px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);max-width:min(380px,calc(100% - 24px));background:var(--ink);color:var(--panel);font-size:13.5px;padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .banner{position:fixed;z-index:7;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:max-content;max-width:min(460px,calc(100% - 24px));background:var(--ink);color:var(--panel);border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.4;display:flex;align-items:center;gap:10px}
 .banner .btn{padding:6px 10px;background:var(--panel);color:var(--ink);flex:none}
-.knock{position:fixed;z-index:8;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(340px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px}
-.knock-row{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.knock{position:fixed;z-index:45;top:calc(50px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:min(340px,calc(100% - 24px));display:flex;flex-direction:column;gap:8px}
+.knock-row{box-shadow:0 0 0 3px #d9a520,0 10px 30px rgba(0,0,0,.35);animation:knockIn .4s ease-out;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .knock-row p{margin:0;font-size:14px}
+@keyframes knockIn{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
 .knock-row .btn.primary{flex:1}
 @media (max-width:760px){.classp{top:auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));max-height:45%}.card{max-height:42%}.life{top:auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));right:max(12px,env(safe-area-inset-right,0px));width:180px;min-width:0}.coarse .life{bottom:calc(200px + env(safe-area-inset-bottom,0px))}}
 
@@ -309,9 +310,9 @@ html,body{overscroll-behavior:none}
 .uitoggle{position:fixed;z-index:9;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:38px;height:30px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 .uitoggle svg{width:20px;height:20px;fill:currentColor}
 .place{top:calc(48px + env(safe-area-inset-top,0px))}
-body.hideui #card,body.hideui #lifePanel,body.hideui #chat,body.hideui #hint,body.hideui #movie,body.hideui #classPanel,body.hideui .knock,body.hideui .praying{display:none!important}
+body.hideui #card,body.hideui #lifePanel,body.hideui #chat,body.hideui #hint,body.hideui #movie,body.hideui #classPanel,body.hideui .praying{display:none!important}
 body.hideui .uitoggle{opacity:.55}
-body.theater #card,body.theater #lifePanel,body.theater #chat,body.theater #hint,body.theater #movie,body.theater #classPanel,body.theater .knock,body.theater .praying,body.theater .uitoggle,body.theater #joy,body.theater #actions,body.theater #place,body.theater #runBtn,body.theater #azanBar,body.theater #banner{display:none!important}
+body.theater #card,body.theater #lifePanel,body.theater #chat,body.theater #hint,body.theater #movie,body.theater #classPanel,body.theater .praying,body.theater .uitoggle,body.theater #joy,body.theater #actions,body.theater #place,body.theater #runBtn,body.theater #azanBar,body.theater #banner{display:none!important}
 .theaterbar{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:60;display:flex;gap:8px;opacity:.25;transition:opacity .3s}
 .theaterbar:hover,.theaterbar:focus-within,.theaterbar.show{opacity:1}
 .theaterbar[hidden]{display:none}
@@ -3080,6 +3081,8 @@ function startNet(T){
   net.act.hug.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onHug(d); };
   net.act.movie.onMessage = (d, meta) => { if (allowed(meta.peerId)) onMovie(d); };
   sendHi();
+  // while a guest waits at the door, knock again every few seconds in case the first knock got lost
+  if (!net.isOwner && net.invite) setInterval(() => { if (net.ownerId && !net.admitted && net.peers[net.ownerId] && !net.declined) sendHi(net.ownerId); }, 5000);
   if (!net.isOwner && net.invite) setTimeout(() => { if (!net.ownerId) banner("The owner isn't home right now. You can look around, and you'll knock automatically when they arrive."); }, 6000);
   status();
 }
@@ -3118,7 +3121,8 @@ async function onHi(id, d){
     if (why !== "ok"){ net.act.admit.send({ok: false, why}, {target: id}); return; }
     // someone you already let in with this link comes straight back in
     if (invites[p.invite] && invites[p.invite].guest === p.name){ decide(id, true); return; }
-    if (!p.knocking){ p.knocking = true; showKnocks(); renderPeople(); }
+    if (!p.knocking){ p.knocking = true; showKnocks(); renderPeople(); knockAlert(p.name); }
+    else showKnocks();
   } else {
     if (!d.owner) return;                                   // guests only deal with the owner
     if (ID.ok || (window.crypto && crypto.subtle)){
@@ -3134,6 +3138,15 @@ async function onHi(id, d){
     if (net.invite) banner("Knocking… waiting for " + p.name + " to let you in.");
     status();
   }
+}
+// someone at the door: a doorbell, a buzz on phones and a message, so the owner never misses it
+function knockAlert(name){
+  toast(name + " is at the door. Press Let in.", 6000);
+  try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch(e){}
+  try {
+    const c = ensureCtx(); if (c){ const t = c.currentTime; [[660, 0], [520, .28]].forEach(([f, d]) => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.setValueAtTime(0, t + d); g.gain.linearRampToValueAtTime(.18, t + d + .02); g.gain.exponentialRampToValueAtTime(.001, t + d + .6); o.connect(g).connect(c.destination); o.start(t + d); o.stop(t + d + .65); }); }
+  } catch(e){}
+  const old = document.title; document.title = "🔔 " + name + " is knocking"; setTimeout(() => document.title = old, 8000);
 }
 function showKnocks(){
   const box = $("knock"); box.textContent = "";
@@ -3179,7 +3192,7 @@ function onAdmit(id, d){
   const owner = peer(id);
   if (d.ok){ net.admitted = true; banner(""); welcome(owner); toast(owner.name + " let you in. Welcome!"); }
   else {
-    net.admitted = false;
+    net.admitted = false; net.declined = true;
     const why = {full: "The house is full. Only two people can be inside at a time.", expired: "This invite link isn't valid. Ask for a new one.",
       used: "This invite link was already used by someone else. Ask for a new one.", noinvite: "You need an invite link to go inside. Ask the owner for one."}[d.why];
     banner(why || owner.name + " didn't let you in this time.", d.why === "declined");
@@ -3207,7 +3220,7 @@ function peerLeft(id){
 function banner(text, retry){ $("banner").hidden = !text; $("bannerText").textContent = text || ""; $("knockAgain").hidden = !retry; }
 $("knockAgain").addEventListener("click", () => {
   if (!net.ownerId){ banner("The owner isn't home right now."); return; }
-  sendHi(net.ownerId); banner("Knocking… waiting for " + peer(net.ownerId).name + " to let you in.");
+  net.declined = false; sendHi(net.ownerId); banner("Knocking… waiting for " + peer(net.ownerId).name + " to let you in.");
 });
 function status(){
   let t;
