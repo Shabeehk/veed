@@ -2965,7 +2965,22 @@ function checkInvite(tok, name){
 const params = new URL(location.href).searchParams;
 const visitHome = (params.get("home") || "").replace(/[^a-f0-9]/g, "").slice(0, 12);
 net.invite = (params.get("invite") || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
-const ready = loadIdentity().then(() => {
+const ready = loadIdentity().then(async () => {
+  // Opening an invite link to the same home id you own: if you made this link, it's simply your own home.
+  // If you didn't, this account was given a copy of someone else's home earlier (same phone, or a "move home" link),
+  // so it gets a home of its own and you go in as the guest.
+  if (visitHome && net.invite && visitHome === ID.homeId){
+    const mine = store.get("veed-invites", {}) || {};
+    if (mine[net.invite]) toast("This is your own invite link. Send it to your guest; they open it on their phone.", 7000);
+    else if (window.crypto && crypto.subtle){
+      try {
+        const kp = await crypto.subtle.generateKey(EC, true, ["sign", "verify"]), jwk = await crypto.subtle.exportKey("jwk", kp.privateKey);
+        store.set("veed-home-key-shared-copy", store.get("veed-home-key", null)); store.set("veed-home-key", jwk);
+        ID.priv = kp.privateKey; ID.jwk = jwk; ID.pub = {x: jwk.x, y: jwk.y}; ID.homeId = (await sha256hex(jwk.x + "." + jwk.y)).slice(0, 12); ID.ok = true;
+        store.set("veed-invites", {}); store.set("veed-planner-shared", []);
+      } catch(e){}
+    }
+  }
   net.isOwner = !visitHome || visitHome === ID.homeId;
   net.homeId = net.isOwner ? ID.homeId : visitHome;
   if (net.isOwner){   // keep everything already planted; new beds and land start empty
@@ -3217,6 +3232,8 @@ function peerLeft(id){
   }
   showKnocks(); renderPeople(); status();
 }
+// coming back to the app (after sending the link on WhatsApp, say): say hello again so the other person finds you straight away
+document.addEventListener("visibilitychange", () => { if (!document.hidden && net.room && entered) try { sendHi(); if (!net.isOwner && net.ownerId && !net.admitted && !net.declined) sendHi(net.ownerId); } catch(e){} });
 function banner(text, retry){ $("banner").hidden = !text; $("bannerText").textContent = text || ""; $("knockAgain").hidden = !retry; }
 $("knockAgain").addEventListener("click", () => {
   if (!net.ownerId){ banner("The owner isn't home right now."); return; }
