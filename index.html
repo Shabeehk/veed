@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1d5c3a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Veed">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Veed</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Amiri&display=swap">
@@ -183,6 +191,34 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .ayah .num{display:inline-grid;place-items:center;min-width:30px;height:30px;border:1.5px solid #c9a54c;border-radius:50%;font:600 13px var(--font);margin:0 6px;vertical-align:middle;direction:ltr}
 .ayah .tr{font-size:15px;line-height:1.6;opacity:.88}
 .qnote{font-size:12px;opacity:.7;text-align:center}
+.planner{background:#f3f5f7;color:#1d2833}
+@media (prefers-color-scheme: dark){.planner{background:#12171c;color:#e6edf3}}
+.planner header{border-bottom-color:rgba(60,90,120,.25)}
+.planner .spacer,.planedit .spacer{flex:1}
+.plangrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.plancard{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:14px;background:rgba(255,255,255,.85);border:1px solid rgba(60,90,120,.18);box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:5px solid #1e5a7a}
+@media (prefers-color-scheme: dark){.plancard{background:rgba(255,255,255,.06)}}
+.plancard:focus-visible{outline:2px solid #1e5a7a;outline-offset:2px}
+.plancard b{font-size:15.5px;line-height:1.3}
+.plancard.done{opacity:.6;border-left-color:#3c9d5d}.plancard.done b{text-decoration:line-through}
+.plancard.late{border-left-color:#d1495b}
+.planmeta,.plancard small{font-size:12px;opacity:.75}
+.plannote{font-size:13px;opacity:.85;white-space:pre-line;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.planprog{height:6px;border-radius:4px;background:rgba(60,90,120,.15);overflow:hidden}.planprog i{display:block;height:100%;background:#3c9d5d}
+.planempty{display:flex;flex-direction:column;gap:6px;text-align:center;padding:40px 10px;opacity:.8}
+.planedit{display:flex;flex-direction:column;gap:10px}
+.planedit .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.planedit label{display:flex;gap:6px;align-items:center;font-size:13px}
+.planedit input,.planedit select,.planedit textarea{font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid rgba(60,90,120,.3);background:rgba(255,255,255,.9);color:inherit}
+@media (prefers-color-scheme: dark){.planedit input,.planedit select,.planedit textarea{background:rgba(255,255,255,.07)}}
+.planedit .ptitle{font-size:20px;font-weight:650}
+.planedit textarea{resize:vertical;min-height:110px}
+.pitems{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pitems li{display:flex;gap:8px;align-items:center}.pitems li input:not([type]){flex:1;min-width:0}
+.pitems li.d input:not([type]){text-decoration:line-through;opacity:.6}
+.pitems input[type=checkbox],.pdone input{width:20px;height:20px;accent-color:#3c9d5d}
+#pAddForm input{flex:1;min-width:0}
+.btn.danger{color:#b3202f}
 .drive{position:fixed;z-index:6;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:10px}
 .drive.l{left:max(16px,env(safe-area-inset-left,0px))}
 .drive.r{right:max(16px,env(safe-area-inset-right,0px));flex-direction:column}
@@ -252,6 +288,36 @@ body.driving #runBtn{display:none!important}
 .libcard{border:1px solid rgba(120,100,60,.25);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
 .libcard h3{margin:0;font-size:16px}.libcard p{margin:0;font-size:13px;line-height:1.45;opacity:.85}
 .libcard a{align-self:flex-start;text-decoration:none}
+.who{margin:0;font-size:13.5px}
+.acctf{display:flex;flex-direction:column;gap:6px}
+.enter-card input[type=password]{font:500 14px var(--font);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.acctbtns .btn{flex:1;justify-content:center;padding:11px 12px}
+.acctmsg{margin:0;font-size:13px;color:#c0392b;font-weight:600}
+html,body{overscroll-behavior:none}
+.minbtn{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:8px;border:0;background:var(--chip);color:var(--ink);font:700 15px var(--font);cursor:pointer;z-index:2;display:grid;place-items:center}
+.life{padding-right:38px}
+.minlabel{display:none;margin:0;font:600 12.5px var(--font)}
+.panel.mini > *:not(.mini-keep){display:none!important}
+.panel.mini .minlabel{display:block;padding-right:30px}
+.panel.mini{padding:8px 10px;width:auto!important;min-width:0!important}
+.life.mini{padding-right:40px}
+.life.mini .lifebar{min-width:120px}
+.chatmin{top:auto;bottom:4px;right:auto;left:-34px;background:var(--panel);border:1px solid var(--line)}
+.chat.mini > *:not(.mini-keep){display:none!important}
+.chat.mini{width:auto}
+.chat.mini .chatmin{position:static}
+.uitoggle{position:fixed;z-index:9;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);width:38px;height:30px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.uitoggle svg{width:20px;height:20px;fill:currentColor}
+.place{top:calc(48px + env(safe-area-inset-top,0px))}
+body.hideui #card,body.hideui #lifePanel,body.hideui #chat,body.hideui #hint,body.hideui #movie,body.hideui #classPanel,body.hideui .knock,body.hideui .praying{display:none!important}
+body.hideui .uitoggle{opacity:.55}
+body.theater #card,body.theater #lifePanel,body.theater #chat,body.theater #hint,body.theater #movie,body.theater #classPanel,body.theater .knock,body.theater .praying,body.theater .uitoggle,body.theater #joy,body.theater #actions,body.theater #place,body.theater #runBtn,body.theater #azanBar,body.theater #banner{display:none!important}
+.theaterbar{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:60;display:flex;gap:8px;opacity:.25;transition:opacity .3s}
+.theaterbar:hover,.theaterbar:focus-within,.theaterbar.show{opacity:1}
+.theaterbar[hidden]{display:none}
+body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;background:currentColor;transform:rotate(-30deg)}
+@media (max-width:640px){.uitoggle{left:auto;right:max(12px,env(safe-area-inset-right,0px));transform:none}}
+@media (max-width:760px){.btn{padding:10px 12px}.act{padding:13px 18px;font-size:15px}.card{width:min(280px,calc(100% - 24px))}.life{bottom:calc(150px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -283,6 +349,8 @@ body.driving #runBtn{display:none!important}
         <button class="btn" id="mapBtn" type="button" aria-pressed="false">Map</button>
         <button class="btn" id="resetBtn" type="button">Back to start</button>
         <button class="btn" id="gamesBtn" type="button">Games</button>
+        <button class="btn" id="kidsBtn" type="button">Take the kids along</button>
+        <button class="btn" id="fsBtn" type="button">Full screen</button>
       </div>
       <p class="note">Salams to people you pass: <b id="salamCount">0/100</b> toward a golden point.</p>
     </div>
@@ -291,15 +359,20 @@ body.driving #runBtn{display:none!important}
       <div class="ptimes" id="ptimes"></div>
       <label class="toggle"><input type="checkbox" id="azanOn" checked> Play the azan from the masjid</label>
     </div>
+    <div class="sect" id="acctPanel" hidden>
+      <div class="field"><span>Account: <b id="acctPanelName"></b></span><button class="linkbtn" id="acctOut" type="button">Log out</button></div>
+      <p class="note" id="acctSync"></p>
+    </div>
     <div class="sect" id="ownerSect" hidden>
-      <p class="note">Invite links work for 5 minutes and let in one guest. You still choose who comes in.</p>
+      <p class="note">Each invite link is for one guest. You let them in the first time; after that they come straight back in if they get disconnected.</p>
       <button class="linkbtn" id="moveHome" type="button">Use my home on another device</button>
     </div>
   </div>
 </section>
 
 <section class="life panel" id="lifePanel" aria-label="Life and basket">
-  <div class="lifebar" title="Life">
+  <button class="minbtn mini-keep" type="button" data-min="lifePanel" aria-label="Minimise">–</button>
+  <div class="lifebar mini-keep" title="Life">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C.8 8.1 3.1 4 7 4c2.1 0 3.6 1.1 5 2.8C13.4 5.1 14.9 4 17 4c3.9 0 6.2 4.1 4.6 7.7C19.5 16.4 12 21 12 21z"/></svg>
     <div class="meter" role="meter" aria-label="Life" aria-valuemin="0" aria-valuemax="100" id="lifeMeter"><i id="lifeFill"></i></div>
     <span class="pct" id="lifePct">100%</span>
@@ -312,17 +385,21 @@ body.driving #runBtn{display:none!important}
 </section>
 
 <div class="place" id="place" aria-live="polite"></div>
+<button class="uitoggle" id="uiToggle" type="button" aria-pressed="false" aria-label="Hide all panels" title="Hide all panels"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.1 1.5 12c1.2 2.9 5 7 10.5 7s9.3-4.1 10.5-7C21.3 9.1 17.5 5 12 5zm0 11.5a4.5 4.5 0 110-9 4.5 4.5 0 010 9zm0-2.3a2.2 2.2 0 100-4.4 2.2 2.2 0 000 4.4z"/></svg></button>
 <div class="actions" id="actions"><button class="act" id="act" hidden></button><button class="act hug" id="hugBtn" hidden></button><button class="act rose" id="roseBtn" hidden></button></div>
 <div class="hint panel" id="hint"></div>
 <div id="joy" aria-hidden="true"><div id="knob"></div></div>
 <button class="btn" id="runBtn" type="button" aria-pressed="false">Run</button>
 
 <div class="chat" id="chat" hidden>
+  <button class="minbtn mini-keep chatmin" type="button" data-min="chat" aria-label="Minimise chat">–</button>
   <div class="chat-log" id="chatLog" aria-live="polite"></div>
   <form class="chat-form" id="chatForm"><input id="chatIn" maxlength="200" placeholder="Say something…" autocomplete="off" aria-label="Chat message"><button class="btn" type="submit">Send</button></form>
 </div>
 
 <section class="movie panel" id="movie" hidden aria-label="Cinema">
+  <button class="minbtn mini-keep" type="button" data-min="movie" aria-label="Minimise">–</button>
+  <p class="minlabel mini-keep">Cinema</p>
   <p id="movieMsg">Paste a YouTube link to play it on the big screen.</p>
   <button class="btn primary" id="watchBtn" type="button" hidden>Watch a video</button>
   <form id="movieForm" hidden><input id="movieIn" placeholder="https://youtu.be/…" autocomplete="off" aria-label="YouTube link"><button class="btn primary" type="submit">Play</button></form>
@@ -332,18 +409,22 @@ body.driving #runBtn{display:none!important}
     <button class="btn primary" id="mvPlay" type="button">Pause</button>
     <button class="btn" id="mvFwd" type="button">+10 s</button>
     <button class="btn" id="mvNew" type="button">Change video</button>
+    <button class="btn" id="mvFull" type="button">⛶ Full screen</button>
   </div>
 </section>
 
 <section class="classp panel" id="classPanel" hidden aria-label="Class">
+  <button class="minbtn mini-keep" type="button" data-min="classPanel" aria-label="Minimise">–</button>
+  <p class="minlabel mini-keep">Class notes</p>
   <p id="classMsg">Starting a TEDx talk…</p>
-  <div class="row"><button class="btn primary" id="classSound" type="button" hidden>Turn on sound</button><button class="btn" id="classNext" type="button">Next talk</button></div>
+  <div class="row"><button class="btn primary" id="classSound" type="button" hidden>Turn on sound</button><button class="btn" id="classNext" type="button">Next talk</button><button class="btn" id="classFull" type="button">⛶ Full screen</button></div>
   <label class="label" for="notesIn">My notes</label>
   <textarea id="notesIn" placeholder="Write what you learn…" aria-label="My notes"></textarea>
   <div class="row"><button class="btn" id="notesCopy" type="button">Copy notes</button><small id="notesSaved">Notes save by themselves</small></div>
 </section>
 <div class="ginvite panel" id="gameInvite" hidden><p id="gameInviteText"></p><div class="row"><button class="btn primary" id="gameJoin" type="button">Play</button><button class="btn" id="gameNo" type="button">Not now</button></div></div>
 <div class="knock" id="knock" hidden aria-live="assertive"></div>
+<div class="theaterbar" id="theaterBar" hidden><button class="btn" id="thPlay" type="button">Pause</button><button class="btn primary" id="thExit" type="button">Exit full screen</button></div>
 <div class="banner" id="banner" hidden aria-live="polite"><span id="bannerText"></span><button class="btn" type="button" id="knockAgain" hidden>Knock again</button></div>
 <div class="toast" id="toast" hidden role="status"></div>
 
@@ -452,6 +533,16 @@ body.driving #runBtn{display:none!important}
     </div>
   </div>
 </section>
+<section class="quran planner" id="planner" hidden aria-label="Planner">
+  <header>
+    <h2>📁 Our planner</h2>
+    <div class="row" id="planTabs"><button class="btn" type="button" data-t="shared">Our home plans</button><button class="btn" type="button" data-t="mine">My private plans</button></div>
+    <button class="btn primary" type="button" id="planNew">＋ New plan</button>
+    <button class="btn" type="button" id="planClose">Close</button>
+    <div class="qprog"><span id="planSub"></span><span class="spacer"></span><label id="planDoneWrap"><input type="checkbox" id="planDone"> Show finished</label></div>
+  </header>
+  <div class="qbody"><div class="qinner" id="planBody"></div></div>
+</section>
 <section class="quran" id="quran" hidden aria-label="Quran reader">
   <header>
     <h2>The Holy Quran</h2>
@@ -474,15 +565,23 @@ body.driving #runBtn{display:none!important}
 <div class="enter" id="enter">
   <form class="enter-card panel" id="enterForm">
     <h2 id="enterTitle">Welcome to Veed</h2>
-    <p id="enterSub">This is your own home. Invite one guest at a time with a link that works for 5 minutes.</p>
-    <label class="l" for="nameIn">Your name</label>
-    <input id="nameIn" maxlength="24" autocomplete="nickname" required>
+    <p id="enterSub">This is your own home. Invite one guest at a time with an invite link.</p>
+    <p class="who" id="acctWho" hidden>Logged in as <b id="acctName"></b> · <button class="linkbtn" id="acctSwitch" type="button">Switch user</button></p>
+    <div id="acctFields" class="acctf">
+      <label class="l" for="nameIn">Your name</label>
+      <input id="nameIn" maxlength="24" autocomplete="username" autocapitalize="words" required>
+      <label class="l" for="passIn">Password</label>
+      <input id="passIn" type="password" maxlength="64" autocomplete="current-password" required>
+    </div>
     <fieldset class="looks">
       <legend>Choose your look</legend>
       <label class="look"><input type="radio" name="look" value="abaya" checked><svg viewBox="0 0 56 96" aria-hidden="true"><path d="M28 20 L17 38 L9 92 L47 92 L39 38 Z" fill="#141417"/><path d="M17 36 L6 66 L14 67 L21 44 Z M39 36 L50 66 L42 67 L35 44 Z" fill="#26262b"/><g fill="#f4f1ea"><circle cx="10" cy="58" r=".9"/><circle cx="13" cy="52" r=".9"/><circle cx="12" cy="62" r=".9"/><circle cx="16" cy="47" r=".9"/><circle cx="46" cy="58" r=".9"/><circle cx="43" cy="52" r=".9"/><circle cx="44" cy="62" r=".9"/><circle cx="40" cy="47" r=".9"/></g><rect x="19" y="44" width="18" height="3" fill="#2b2b30"/><ellipse cx="28" cy="15" rx="9" ry="10" fill="#141417"/><path d="M19 18 Q28 34 37 18 L37 26 Q28 36 19 26 Z" fill="#141417"/><ellipse cx="28" cy="15" rx="5.5" ry="7" fill="#c58b62"/></svg><span>Abaya</span></label>
       <label class="look"><input type="radio" name="look" value="bandhgala"><svg viewBox="0 0 56 96" aria-hidden="true"><rect x="20" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="29" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="18" y="88" width="9" height="5" rx="2" fill="#3a271c"/><rect x="29" y="88" width="9" height="5" rx="2" fill="#3a271c"/><path d="M17 26 Q28 22 39 26 L41 60 L15 60 Z" fill="#1f4a36"/><rect x="11" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><rect x="39" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><g fill="#c9a54c"><circle cx="28" cy="31" r="1.2"/><circle cx="28" cy="38" r="1.2"/><circle cx="28" cy="45" r="1.2"/><circle cx="28" cy="52" r="1.2"/></g><rect x="31" y="33" width="5" height="2.5" fill="#3d6e6a"/><rect x="25" y="20" width="6" height="5" fill="#c58b62"/><circle cx="28" cy="14" r="8" fill="#c58b62"/><path d="M20 13 Q28 3 36 13 L36 10 Q28 2 20 10 Z" fill="#1b1512"/><path d="M21 16 Q28 26 35 16 L35 19 Q28 27 21 19 Z" fill="#1b1512"/><rect x="21" y="12" width="14" height="3" rx="1" fill="#0e0e0e"/></svg><span>Bandhgala</span></label>
     </fieldset>
-    <button class="btn primary" type="submit" id="enterBtn">Enter home</button>
+    <p class="acctmsg" id="acctMsg" hidden role="alert"></p>
+    <div class="row acctbtns"><button class="btn primary" type="submit" id="acctLogin">Log in</button><button class="btn" type="button" id="acctCreate">Create account</button></div>
+    <button class="btn primary" type="submit" id="enterBtn" hidden>Enter home</button>
+    <p class="fine" id="acctNote"></p>
     <p class="fine" id="enterFine">Two people can be inside a home at a time. Once inside, you can see each other, chat, and talk when your mic is on. Headphones stop your speakers echoing into the mic.</p>
   </form>
 </div>
@@ -503,9 +602,12 @@ try {
 const $ = id => document.getElementById(id);
 const coarse = matchMedia("(pointer: coarse)").matches;
 if (coarse) document.body.classList.add("coarse");
+// who is logged in on this device; each account keeps its own saves (and they sync online when set up)
+const ACCT = (() => { const o = {user: "", display: ""}; try { o.user = (localStorage.getItem("veed-current-user") || "").toLowerCase(); o.display = localStorage.getItem("veed-current-display") || o.user; } catch(e){} return o; })();
 const store = {
-  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+  pfx: ACCT.user ? "u:" + ACCT.user + ":" : "", dirty: false,
+  get(k, d){ try { const v = localStorage.getItem(this.pfx + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(this.pfx + k, JSON.stringify(v)); if (this.pfx){ localStorage.setItem(this.pfx + "__savedAt", String(Date.now())); this.dirty = true; } } catch(e){} }
 };
 let toastTimer;
 function toast(msg, ms){ const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, ms || 5000); }
@@ -604,6 +706,21 @@ const TEX = {
   }),
   paddock: canvasTex(256, (g, s) => { g.fillStyle = "#8a7a52"; g.fillRect(0, 0, s, s); speckle(g, s, 6000, ["#9a8a60", "#7a6b45", "#6d8a45", "#a59468"], 3); })
 };
+// a rippling normal map for water (the pond, the sea and the river move with it)
+const WATER_NS = [];   // every water normal map, scrolled a little each frame
+const WATER_N = (() => {
+  const s = 256, c = document.createElement("canvas"); c.width = c.height = s; const g = c.getContext("2d"), img = g.createImageData(s, s), H = new Float32Array(s * s);
+  const waves = [[3, 1, .9], [1, 4, .7], [5, -2, .5], [-3, 6, .35], [7, 3, .25], [2, -7, .2]];
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){ let h = 0; waves.forEach(([a, b, amp]) => h += Math.sin((a * x + b * y) / s * Math.PI * 2 + a * b) * amp); H[y * s + x] = h; }
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){
+    const dx = H[y * s + (x + 1) % s] - H[y * s + (x + s - 1) % s], dy = H[((y + 1) % s) * s + x] - H[((y + s - 1) % s) * s + x], n = Math.hypot(dx, dy, .6), i = (y * s + x) * 4;
+    img.data[i] = (-dx / n * .5 + .5) * 255; img.data[i + 1] = (-dy / n * .5 + .5) * 255; img.data[i + 2] = (.6 / n * .5 + .5) * 255; img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); return t;
+})();
+WATER_NS.push(WATER_N);
+function waterNormal(rx, ry){ const t = WATER_N.clone(); t.needsUpdate = true; t.repeat.set(rx, ry); WATER_NS.push(t); return t; }
 function rep(t, x, y){ const c = t.clone(); c.needsUpdate = true; c.repeat.set(x, y == null ? x : y); return c; }
 // world-scale UVs on a box, so textures don't stretch on long walls
 function boxUV(geo, w, h, d, s){
@@ -635,7 +752,7 @@ const M = {
   leaf: mat(0x3f6e33, .9), leafLight: mat(0x5b8a3f, .9), bark: mat(0x6f5a44, 1), stone: mat(0xa8a196, .95),
   rustic: mat(0x8a6a48, .9), post: mat(0x6b5038, .95),
   glow: new THREE.MeshStandardMaterial({color: 0xfff3d6, emissive: 0xffe2a8, emissiveIntensity: .9}),
-  water: new THREE.MeshStandardMaterial({color: 0x2f7f96, roughness: .06, metalness: .15, transparent: true, opacity: .88}),
+  water: new THREE.MeshStandardMaterial({color: 0x2f7f96, roughness: .06, metalness: .15, transparent: true, opacity: .88, normalMap: WATER_N, normalScale: new THREE.Vector2(.3, .3)}),
   tin: new THREE.MeshStandardMaterial({color: 0x9aa3a8, roughness: .45, metalness: .55}),
   white: mat(0xf4f1ea, .85), green: mat(0x2c8a5c, .5), gold: new THREE.MeshStandardMaterial({color: 0xc9a54c, roughness: .3, metalness: .8})
 };
@@ -1474,6 +1591,125 @@ function buildJunctions(){
     {look: "youngMan", name: "", x0: -150, x1: 60, z: ROAD.z1 + .65}, {look: "mother", name: "", x0: 100, x1: 340, z: ROAD.z0 - .65});
 }
 
+/* ---------- coconut palms: a few shapes shared by every palm (curved trunk, drooping fronds, coconuts) ---------- */
+let palmKit = null;
+function coconutPalms(list, R){
+  if (!palmKit){
+    // one frond: a bent strip with a leaflet texture
+    const tex = canvasTex(128, (g, s) => { g.clearRect(0, 0, s, s); g.strokeStyle = "#5a7d2a"; g.lineWidth = 4; g.beginPath(); g.moveTo(s / 2, 0); g.lineTo(s / 2, s); g.stroke();
+      for (let i = 0; i < 26; i++){ const y = i / 26 * s, l = s * .48 * Math.sin(Math.PI * (i + 2) / 30); g.strokeStyle = i % 2 ? "#3f7a2c" : "#4d8a33"; g.lineWidth = 3.2; [-1, 1].forEach(d => { g.beginPath(); g.moveTo(s / 2, y); g.lineTo(s / 2 + d * l, y + s * .07); g.stroke(); }); } }, true);
+    const fg = new THREE.PlaneGeometry(1.3, 3.4, 1, 8); fg.translate(0, 1.7, 0);
+    const P = fg.attributes.position; for (let i = 0; i < P.count; i++){ const t = P.getY(i) / 3.4; P.setZ(i, -t * t * 1.9 + t * .5); P.setX(i, P.getX(i) * (1 - t * .55)); }
+    fg.computeVertexNormals();
+    palmKit = {frondG: fg, frondM: new THREE.MeshStandardMaterial({map: tex, alphaTest: .45, side: THREE.DoubleSide, roughness: .8}), trunkM: mat(0x8a7558, .95), nutM: mat(0x6a5a2a, .7)};
+  }
+  const K = palmKit, trunkG = [], frondI = [], nuts = [], col = [];
+  list.forEach(p => {
+    // trunk: a gentle curve from the base to the crown
+    const pts = []; for (let i = 0; i <= 6; i++){ const t = i / 6; pts.push(new THREE.Vector3(Math.sin(p.yaw) * p.lean * p.h * t * t * .5, p.h * t, Math.cos(p.yaw) * p.lean * p.h * t * t * .5)); }
+    const curve = new THREE.CatmullRomCurve3(pts), top = pts[6];
+    const tg = new THREE.TubeGeometry(curve, 8, .17, 7, false);
+    const tp = tg.attributes.position; for (let i = 0; i < tp.count; i++){ const y = tp.getY(i) / p.h, c = curve.getPoint(Math.min(1, Math.max(0, y))); tp.setX(i, c.x + (tp.getX(i) - c.x) * (1.15 - y * .45)); tp.setZ(i, c.z + (tp.getZ(i) - c.z) * (1.15 - y * .45)); }
+    tg.translate(p.x, 0, p.z); trunkG.push(tg);
+    const crown = new THREE.Vector3(p.x + top.x, top.y, p.z + top.z);
+    const n = 11; for (let k = 0; k < n; k++) frondI.push({pos: crown, yaw: k / n * Math.PI * 2 + R() * .4, tilt: -.25 - R() * .55, s: .85 + R() * .3});
+    for (let k = 0; k < 5; k++) nuts.push(new THREE.Vector3(crown.x + Math.cos(k * 1.3) * .22, crown.y - .2 - (k % 2) * .1, crown.z + Math.sin(k * 1.3) * .22));
+    // an invisible post so you don't walk through the trunk
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, 2.4, 6), M.bark); post.position.set(p.x, 1.2, p.z); post.visible = false; post.userData.colOnly = true; world.add(post);
+  });
+  // all trunks as one mesh
+  let vc = 0; trunkG.forEach(g => vc += g.attributes.position.count);
+  const pos = new Float32Array(vc * 3), nor = new Float32Array(vc * 3), idx = []; let o = 0;
+  trunkG.forEach(g => { g.computeVertexNormals(); pos.set(g.attributes.position.array, o * 3); nor.set(g.attributes.normal.array, o * 3); g.index.array.forEach(i => idx.push(i + o)); o += g.attributes.position.count; g.dispose(); });
+  const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(pos, 3)); tg.setAttribute("normal", new THREE.BufferAttribute(nor, 3)); tg.setIndex(idx);
+  const trunks = new THREE.Mesh(tg, K.trunkM); trunks.castShadow = true; trunks.receiveShadow = true; trunks.userData.noCollide = true; scene.add(trunks);
+  const fr = new THREE.InstancedMesh(K.frondG, K.frondM, frondI.length), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(0, 0, 0, "YXZ"), c = new THREE.Color();
+  frondI.forEach((f, i) => { e.set(f.tilt - .75, f.yaw, 0); q.setFromEuler(e); m4.compose(f.pos, q, new THREE.Vector3(f.s, f.s, f.s)); fr.setMatrixAt(i, m4); fr.setColorAt(i, c.setHSL(.24 + R() * .05, .5, .55 + R() * .2)); });
+  fr.castShadow = true; fr.userData.noCollide = true; scene.add(fr);
+  const nm = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 7, 5), K.nutM, nuts.length);
+  nuts.forEach((v, i) => { m4.makeTranslation(v.x, v.y, v.z); nm.setMatrixAt(i, m4); }); nm.userData.noCollide = true; scene.add(nm);
+}
+
+/* ---------- the river: banks, a bridge on the Junction road, a jetty, houseboats and Chinese fishing nets ---------- */
+const RIVER = {x0: -440, x1: 440, z0: -114, z1: -86, top: 0, bed: -1.35, wy: -.55, bankW: 3.2};
+let riverWater = null;
+function buildRiver(){
+  const {x0, x1, z0, z1, bed, wy, bankW} = RIVER, L = x1 - x0, cx = (x0 + x1) / 2;
+  const mud = mat(0xffffff, 1, {map: rep(canvasTex(128, (g, s) => { g.fillStyle = "#6f5b3e"; g.fillRect(0, 0, s, s); speckle(g, s, 3000, ["#7d6a4a", "#5e4c33", "#8a7752", "#4f8a3a"], 3); }), L / 4, 1)});
+  // sloping banks from the grass down to the riverbed, and the bed itself
+  const bank = (zTop, zBot) => {
+    const g = new THREE.BufferGeometry(), pos = [x0, 0, zTop, x1, 0, zTop, x0, bed, zBot, x1, bed, zBot];
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute([0, 1, 1, 1, 0, 0, 1, 0], 2));
+    g.setIndex(zTop > zBot ? [0, 1, 2, 1, 3, 2] : [0, 2, 1, 1, 2, 3]); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, mud); m.receiveShadow = true; world.add(m); return m;
+  };
+  bank(z1, z1 - bankW); bank(z0, z0 + bankW);
+  const bedM = addMesh(new THREE.PlaneGeometry(L, z1 - z0 - bankW * 2), mat(0x3d3a2c, 1), cx, bed, (z0 + z1) / 2, {noShadow: true}); bedM.rotation.x = -Math.PI / 2;
+  riverWater = new THREE.Mesh(new THREE.PlaneGeometry(L, z1 - z0 - .4), new THREE.MeshStandardMaterial({color: 0x1b5552, roughness: .16, metalness: .55, transparent: true, opacity: .94, normalMap: waterNormal(L / 9, (z1 - z0) / 9), normalScale: new THREE.Vector2(.35, .35)}));
+  riverWater.rotation.x = -Math.PI / 2; riverWater.position.set(cx, wy, (z0 + z1) / 2); riverWater.userData.noCollide = true; riverWater.receiveShadow = true; world.add(riverWater);
+  addZone("The river", x0, z0 - 4, x1, z1 + 4);
+  // the bridge carries the Junction road over the river
+  const bx = 75;
+  box(9.6, .6, z1 - z0 + 1, bx, -.6, (z0 + z1) / 2, M.stone);
+  const rail = mat(0xeeeae0, .8), pier = mat(0x9a9488, .95);
+  [bx - 4.82, bx + 4.82].forEach(x => {
+    box(.22, .12, z1 - z0 + 1, x, .82, (z0 + z1) / 2, rail); box(.22, .16, z1 - z0 + 1, x, .1, (z0 + z1) / 2, rail);
+    for (let z = z0 - .4; z <= z1 + .4; z += .55) box(.09, .56, .09, x, .26, z, rail, {noShadow: true});
+    for (let z = z0 - .5; z <= z1 + .5; z += 7.25) box(.34, 1.1, .34, x, 0, z, pier);
+    const lamp = cyl(.04, .05, 2.6, x, .94, (z0 + z1) / 2, M.metal, null, 8);
+    addMesh(new THREE.SphereGeometry(.13, 12, 8), new THREE.MeshStandardMaterial({color: 0xfff1cc, emissive: 0xffd98a, emissiveIntensity: .6}), x, 3.6, (z0 + z1) / 2, {noCollide: true, noShadow: true});
+  });
+  const nameP = textPlane(["Veed River Bridge"], 2.6, .32, {bg: "#1d5c3a", fg: "#ffffff"}); nameP.position.set(bx - 4.94, .62, z1 + .2); nameP.rotation.y = -Math.PI / 2; world.add(nameP);
+  [bx - 3, bx + 3].forEach(x => box(1.2, 1.2, 1.2, x, bed, (z0 + z1) / 2, M.stone));
+  // a wooden jetty on the near bank, where the boat waits
+  const jx = 40;
+  box(2.2, .12, 6.5, jx, -.12, z1 - 2.9, M.woodLight);
+  for (let z = z1 - .2; z > z1 - 6.2; z -= 1.5) [jx - 1, jx + 1].forEach(x => cyl(.08, .08, 1.6, x, bed, z, M.post, {noCollide: true}, 6));
+  RIVER.jetty = {x: jx, z: z1 - 6.6};
+  RIVER.obst = [{x: jx, z: z1 - 2.9, hx: 1.1, hz: 3.3}, {x: bx - 3, z: (z0 + z1) / 2, hx: .6, hz: .6}];
+  // palms and reeds along both banks
+  const R = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const palmSpots = [];
+  for (let x = x0 + 8; x < x1; x += 9 + R() * 12){ if (Math.abs(x - bx) < 10 || Math.abs(x - jx) < 4) continue; palmSpots.push([x, z1 + 1.6 + R() * 3.5, Math.PI + (R() - .5) * .8]); palmSpots.push([x + R() * 6, z0 - 1.6 - R() * 3.5, (R() - .5) * .8]); }
+  coconutPalms(palmSpots.map(([x, z, yaw]) => ({x, z, yaw, h: 7 + R() * 3.5, lean: .25 + R() * .35})), R);
+  // reeds in clumps along the water's edge
+  const NR = 2400, reed = new THREE.InstancedMesh(new THREE.ConeGeometry(.022, 1, 3), mat(0xffffff, .9), NR), m4 = new THREE.Matrix4(), rc = new THREE.Color();
+  let cx0 = 0, cz0 = 0, side = 0;
+  for (let i = 0; i < NR; i++){
+    if (i % 12 === 0){ side = R() < .5 ? 1 : 0; cx0 = x0 + R() * L; cz0 = side ? z1 - .7 - R() * 1.5 : z0 + .7 + R() * 1.5; }
+    const x = cx0 + (R() - .5) * 1.4, z = cz0 + (R() - .5) * .7, h = .5 + R() * .8;
+    if (Math.abs(x - bx) < 6 || Math.abs(x - jx) < 2.5){ m4.makeScale(0, 0, 0); reed.setMatrixAt(i, m4); continue; }
+    const ground = -(side ? (z1 - z) : (z - z0)) / bankW * -bed;
+    m4.compose(new THREE.Vector3(x, ground + h / 2, z), new THREE.Quaternion().setFromEuler(new THREE.Euler((R() - .5) * .35, R() * 3, (R() - .5) * .35)), new THREE.Vector3(1, h, 1)); reed.setMatrixAt(i, m4);
+    reed.setColorAt(i, rc.setHSL(.2 + R() * .06, .45 + R() * .2, .26 + R() * .14));
+  }
+  reed.userData.noCollide = true; scene.add(reed);
+  // lotus pads and flowers in the shallows
+  const pad = new THREE.InstancedMesh(new THREE.CircleGeometry(.32, 10, .3, Math.PI * 1.85), mat(0x3f7f3a, .7), 260);
+  for (let i = 0; i < 260; i++){ const s = R() < .5, x = x0 + R() * L, z = s ? z1 - 1.5 - R() * 1.8 : z0 + 1.5 + R() * 1.8; if (Math.abs(x - bx) < 6 || Math.abs(x - jx) < 3 || x < 69.6 && x > -10 && !s){ m4.makeScale(0, 0, 0); pad.setMatrixAt(i, m4); continue; }
+    m4.compose(new THREE.Vector3(x, wy + .02, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, R() * 6)), new THREE.Vector3(1, 1, 1).multiplyScalar(.6 + R() * .8)); pad.setMatrixAt(i, m4); }
+  pad.userData.noCollide = true; scene.add(pad);
+  // Kerala houseboats moored along the far bank
+  [[-60, z0 + 4.5, .05], [-190, z0 + 4.8, -.04], [180, z0 + 4.6, .03]].forEach(([x, z, r]) => {
+    RIVER.obst.push({x, z, hx: 8.4, hz: 1.9});
+    const g = new THREE.Group(); g.position.set(x, wy, z); g.rotation.y = r + Math.PI / 2; world.add(g);
+    const add = (geo, m, px, py, pz) => { const o = new THREE.Mesh(geo, m); o.position.set(px, py, pz); o.castShadow = true; o.userData.noCollide = true; g.add(o); return o; };
+    const hull = add(new THREE.CylinderGeometry(1.6, 1.2, 16, 14, 1, false, Math.PI / 2, Math.PI), mat(0x4a2f1c, .7), 0, .3, 0); hull.rotation.x = Math.PI / 2;
+    for (let k = 0; k < 5; k++){ const a = add(new THREE.CylinderGeometry(1.75, 1.75, 2.7, 14, 1, true, 0, Math.PI), mat(0xc9a86a, .9), 0, 1.0, -5.4 + k * 2.7); a.rotation.set(Math.PI / 2, Math.PI / 2, 0); a.material.side = THREE.DoubleSide; }
+    add(new THREE.BoxGeometry(2.6, .9, 13), mat(0x6b4a2b, .8), 0, .75, 0);
+    add(new THREE.ConeGeometry(.5, 2.4, 6), mat(0x4a2f1c, .7), 0, .8, -8.6).rotation.x = -Math.PI / 2;
+  });
+  // Chinese fishing nets (cheena vala) on the far bank
+  [[-20, z0 - 1.6], [120, z0 - 1.8]].forEach(([x, z]) => {
+    const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g);
+    const pole = (len, rx, ry) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, len, 6), M.bark); o.rotation.set(rx, ry, 0); o.translateY(len / 2); o.castShadow = true; o.userData.noCollide = true; g.add(o); return o; };
+    pole(9, -.75, 0); pole(9, -.75, .5); pole(9, -.75, -.5); pole(5, .6, 0);
+    const net = new THREE.Mesh(new THREE.PlaneGeometry(5, 5, 4, 4), new THREE.MeshStandardMaterial({color: 0x2a2a2a, wireframe: true})); net.position.set(0, 1.6, 6.4); net.rotation.x = -Math.PI / 2 + .25; net.userData.noCollide = true; g.add(net);
+    box(1.2, .3, 1.2, 0, 0, 0, M.stone, {parent: g});
+  });
+  PLACES.push({name: "River & boats", x: jx, z: z1 + 1.2, y: 0, yaw: 0});
+}
+
 
 /* ---------- people: jointed bodies dressed from a style table; walk, sit, sleep, hug, drive, pray ---------- */
 const AV = {
@@ -1824,8 +2060,12 @@ function tickHearts(dt){
 
 
 /* ---------- build everything ---------- */
-{ const ground = addMesh(new THREE.PlaneGeometry(1400, 1400), mat(0xffffff, 1, {map: rep(TEX.grass, 350)}), 0, 0, 0, {noShadow: true}); ground.rotation.x = -Math.PI / 2; }
-buildHouse(); buildGarden(); buildTown();
+{ // the ground, in two halves with the river running between them
+  const gm = mat(0xffffff, 1, {map: rep(TEX.grass, 350, 350 * (700 + RIVER.z0) / 1400)}), gs = mat(0xffffff, 1, {map: rep(TEX.grass, 350, 350 * (700 - RIVER.z1) / 1400)});
+  const n = addMesh(new THREE.PlaneGeometry(1400, 700 + RIVER.z0), gm, 0, 0, (-700 + RIVER.z0) / 2, {noShadow: true}); n.rotation.x = -Math.PI / 2;
+  const s = addMesh(new THREE.PlaneGeometry(1400, 700 - RIVER.z1), gs, 0, 0, (700 + RIVER.z1) / 2, {noShadow: true}); s.rotation.x = -Math.PI / 2;
+}
+buildHouse(); buildGarden(); buildTown(); buildRiver();
 // beds and fruit trees on the land plots exist from the start, but only show once something is built there
 LANDS.forEach(L => {
   for (let k = 0; k < 6; k++){ const col = k % 2, row = Math.floor(k / 2); BEDS.push({x: L.x0 + 5 + col * 8, z: L.z0 + 4 + row * 5, w: 3.6, d: 1.1, i: BEDS.length, land: L.i}); }
@@ -1840,7 +2080,9 @@ function makeVehicle(id, park, opt){ return Object.assign({id, x: park.x, z: par
 const car = makeVehicle("car", CARPARK, {name: "car", seats: {d: new THREE.Vector3(.36, .62, .3), p: new THREE.Vector3(-.36, .62, .3)}, maxV: 24, wb: 2.4, offs: [-.7, 0, .7], camDist: 7, camY: 1.3, front: 2.0});
 const BIKEPARK = {x: 3.0, z: 30.4, yaw: Math.PI};
 const bike = makeVehicle("bike", BIKEPARK, {name: "bike", seats: {d: new THREE.Vector3(0, .84, .1), p: new THREE.Vector3(0, .9, .64)}, maxV: 20, wb: 1.45, offs: [-.25, 0, .25], camDist: 4.6, camY: 1.25, front: 1.0});
-const VEHS = [car, bike], VEH = {car, bike};
+const BOATPARK = {x: RIVER.jetty.x + 2.1, z: RIVER.z1 - 4.4, yaw: 0};
+const boat = makeVehicle("boat", BOATPARK, {name: "boat", seats: {d: new THREE.Vector3(0, .32, 1.15), p: new THREE.Vector3(0, .32, -.95)}, maxV: 4.6, minV: -2, wb: 3.2, offs: [], camDist: 6.5, camY: RIVER.wy + 1.4, front: 2.2, water: true, oars: []});
+const VEHS = [car, bike, boat], VEH = {car, bike, boat};
 const UPV = new THREE.Vector3(0, 1, 0);
 (function buildBike(){
   const g = bike.g; scene.add(g);
@@ -1904,8 +2146,41 @@ const UPV = new THREE.Vector3(0, 1, 0);
   g.traverse(o => { o.userData.noCollide = true; });
   car.wheels.forEach(w => compactGroup(w)); compactGroup(g);
 })();
+(function buildBoat(){
+  // a Kerala country boat (vallam): long and narrow with upswept ends, two plank seats, a pair of oars and a little canopy
+  const g = boat.g; scene.add(g);
+  const woodD = new THREE.MeshStandardMaterial({color: 0x5a3a22, roughness: .7}), woodL = new THREE.MeshStandardMaterial({color: 0x9a6a3e, roughness: .65}), trim = new THREE.MeshStandardMaterial({color: 0xc9a54c, roughness: .4, metalness: .5});
+  const add = (geo, m, x, y, z, p) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; (p || g).add(o); return o; };
+  // hull: a half-cylinder squashed into a boat shape, with each end swept up
+  const hg = new THREE.CylinderGeometry(.62, .62, 3.6, 18, 8, true, Math.PI / 2, Math.PI); hg.rotateX(Math.PI / 2);
+  const P = hg.attributes.position;
+  for (let i = 0; i < P.count; i++){ const z = P.getZ(i), t = Math.abs(z) / 1.8, k = 1 - t * t * .78; P.setX(i, P.getX(i) * k); P.setY(i, P.getY(i) * (.75 - t * .25) + t * t * .38); }
+  hg.computeVertexNormals();
+  const hull = add(hg, woodD, 0, .3, 0); hull.material.side = THREE.DoubleSide;
+  [-1, 1].forEach(s => { const tip = add(new THREE.ConeGeometry(.12, .9, 8), woodD, 0, .72, s * 2.05); tip.rotation.x = s * .8; add(new THREE.SphereGeometry(.06, 8, 6), trim, 0, 1.02, s * 2.3); });
+  [-.6, .6].forEach(x => { const r = add(new THREE.BoxGeometry(.05, .05, 3.3), trim, x * .97, .32, 0); r.rotation.y = 0; });
+  add(new THREE.BoxGeometry(1.0, .06, .32), woodL, 0, .26, 1.15); add(new THREE.BoxGeometry(1.0, .06, .32), woodL, 0, .26, -.95);
+  add(new THREE.BoxGeometry(.7, .02, 2.8), woodL, 0, .02, 0);
+  // a small woven canopy over the middle, held on four thin poles
+  const cg = new THREE.CylinderGeometry(.56, .56, .95, 14, 1, true, Math.PI / 2, Math.PI); cg.rotateX(Math.PI / 2);
+  add(cg, new THREE.MeshStandardMaterial({color: 0xb8925a, roughness: .95, side: THREE.DoubleSide}), 0, .72, .1);
+  [-.47, .58].forEach(z => { const r = add(new THREE.TorusGeometry(.56, .025, 5, 14, Math.PI), woodL, 0, .72, z); });
+  // oars pivot at the rower's seat
+  [-1, 1].forEach(s => { const piv = new THREE.Group(); piv.position.set(s * .6, .42, 1.0); g.add(piv);
+    const shaft = add(new THREE.CylinderGeometry(.025, .025, 2.2, 6), woodL, s * .75, -.15, 0, piv); shaft.rotation.z = s * 1.25;
+    const blade = add(new THREE.BoxGeometry(.04, .42, .16), woodL, s * 1.75, -.53, 0, piv); blade.rotation.z = s * 1.25;
+    boat.oars.push({piv, s}); });
+  g.traverse(o => { o.userData.noCollide = true; });
+  g.position.set(boat.x, RIVER.wy, boat.z); g.rotation.y = boat.yaw;
+})();
+// the car and the bike stay out of the river except on the bridge; the boat stays on the water, west of the bridge
+function riverBlocks(x, z){ return z > RIVER.z0 - .4 && z < RIVER.z1 + .4 && (x < 70.7 || x > 79.3); }
+function boatBlocks(x, z){
+  if (x < -425 || x > 67.8 || z < RIVER.z0 + 1.9 || z > RIVER.z1 - 1.9) return true;
+  return RIVER.obst.some(o => Math.abs(x - o.x) < o.hx + .6 && Math.abs(z - o.z) < o.hz + .6);
+}
 function carSeatWorld(which, V){ V = V || car; V.g.updateMatrixWorld(true); return V.g.localToWorld(V.seats[which].clone()); }
-HOME_PLACES.push({name: "Car", car: true, veh: "car"}, {name: "Bike", car: true, veh: "bike"});
+HOME_PLACES.push({name: "Car", car: true, veh: "car"}, {name: "Bike", car: true, veh: "bike"}, {name: "Boat (river jetty)", car: true, veh: "boat"});
 // where you are: your vehicle when you're in one
 function bodyPos(){ return player.mode === "car" && player.veh ? {x: player.veh.x, y: 0, z: player.veh.z} : player.pos; }
 
@@ -1937,13 +2212,25 @@ addEventListener("keyup", e => { keys[e.code] = false; });
 addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
 const el = renderer.domElement;
 let drag = null;
+// pinch with two fingers (or the mouse wheel) to move the camera closer or further
+let camZoom = Math.max(.45, Math.min(2.4, +store.get("veed-zoom", 1) || 1));
+const touches = new Map(); let pinch = null;
 el.addEventListener("pointerdown", e => {
+  touches.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (touches.size === 2){ const [a, b] = [...touches.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y) || 1, z: camZoom, top: topHeight}; drag = null; return; }
   view.focus({preventScroll: true});
   if (net.ctx && net.ctx.state === "suspended") net.ctx.resume();
   drag = {id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY};
   el.setPointerCapture(e.pointerId);
 });
 el.addEventListener("pointermove", e => {
+  if (touches.has(e.pointerId)) touches.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (pinch && touches.size >= 2){
+    const [a, b] = [...touches.values()], d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    if (topView) topHeight = Math.max(8, Math.min(700, pinch.top * pinch.d / d));
+    else { camZoom = Math.max(.45, Math.min(2.4, pinch.z * pinch.d / d)); store.set("veed-zoom", Math.round(camZoom * 100) / 100); }
+    return;
+  }
   if (!drag || drag.id !== e.pointerId) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
   const k = coarse ? .006 : .0045;
@@ -1951,9 +2238,11 @@ el.addEventListener("pointermove", e => {
   if ((firstPerson || cinemaSeat() || classSeat()) && player.mode !== "car"){ player.yaw -= dx * k; player.pitch = Math.max(-1.45, Math.min(1.45, player.pitch - dy * k)); }
   else { player.camYaw -= dx * k; player.camPitch = Math.max(-.15, Math.min(1.25, player.camPitch + dy * k)); player.camDragAt = performance.now(); }
 });
+const touchEnd = e => { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; };
+el.addEventListener("pointerup", touchEnd); el.addEventListener("pointercancel", touchEnd);
 el.addEventListener("pointerup", e => { if (drag && topView && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) mapTeleport(e); drag = null; });
 el.addEventListener("pointercancel", () => drag = null);
-el.addEventListener("wheel", e => { if (!topView) return; e.preventDefault(); topHeight = Math.max(8, Math.min(700, topHeight * (e.deltaY > 0 ? 1.12 : .89))); }, {passive: false});
+el.addEventListener("wheel", e => { e.preventDefault(); if (topView) topHeight = Math.max(8, Math.min(700, topHeight * (e.deltaY > 0 ? 1.12 : .89))); else { camZoom = Math.max(.45, Math.min(2.4, camZoom * (e.deltaY > 0 ? 1.08 : .93))); store.set("veed-zoom", Math.round(camZoom * 100) / 100); } }, {passive: false});
 const joy = $("joy"), knob = $("knob"); let jv = {x: 0, y: 0}, jid = null;
 function joyMove(e){
   const r = joy.getBoundingClientRect(), R = r.width / 2;
@@ -1984,7 +2273,8 @@ function followFloor(dt){
   _from.set(player.pos.x, player.pos.y + KNEE + .05, player.pos.z);
   ray.set(_from, DOWN); ray.far = 30;
   const hits = ray.intersectObjects(near(player.pos.x, player.pos.z, 1).concat(floors), false);
-  const y = player.swim ? 0 : hits.length ? Math.max(0, hits[0].point.y) : 0;
+  const bank = player.pos.z > RIVER.z0 - .2 && player.pos.z < RIVER.z1 + .2;
+  const y = player.swim ? (player.swimY || 0) : hits.length ? Math.max(bank ? -2 : 0, hits[0].point.y) : 0;
   player.pos.y += (y - player.pos.y) * Math.min(1, dt * (y > player.pos.y ? 14 : 9));
 }
 function cinemaSeat(){ return player.mode === "sit" && player.spot && player.spot.cinema; }
@@ -2204,11 +2494,11 @@ TREES.forEach((t, i) => interact.push({
 }));
 if (cookSpot) interact.push({pos: cookSpot, r: 1.6, label: () => vegCount() >= 3 ? "Cook a meal (uses 3 vegetables)" : {info: "Kitchen · cook with 3 vegetables"}, act: cook});
 VEHS.forEach(V => interact.push({
-  pos: new THREE.Vector3(), r: V === car ? 3.0 : 2.2, dist: p => Math.hypot(p.x - V.x, p.z - V.z) - (V === car ? .8 : .1), isCar: true,
+  pos: new THREE.Vector3(), r: V === car ? 3.0 : V === boat ? 3.2 : 2.2, dist: p => Math.hypot(p.x - V.x, p.z - V.z) - (V === car ? .8 : V === boat ? 1.0 : .1), isCar: true,
   label: () => {
     if (player.mode !== "walk" || player.swim) return null;
-    if (!V.driver) return V === car ? "Drive the car" : "Ride the bike";
-    if (V.driver !== net.selfId && !V.pass) return (V === car ? "Ride with " : "Ride pillion with ") + (peerName(V.driver) || "them");
+    if (!V.driver) return V === car ? "Drive the car" : V === boat ? "Row the boat" : "Ride the bike";
+    if (V.driver !== net.selfId && !V.pass) return (V === car ? "Ride with " : V === boat ? "Ride in the boat with " : "Ride pillion with ") + (peerName(V.driver) || "them");
     return null;
   },
   act: () => requestSeat(!V.driver ? "d" : "p", V)
@@ -2243,7 +2533,7 @@ function doAct(){
 }
 function updateActs(){
   const b = $("act"); let t = "", info = false;
-  if (player.mode === "car") t = player.veh === bike ? "Get off the bike" : "Get out of the car";
+  if (player.mode === "car") t = player.veh === bike ? "Get off the bike" : player.veh === boat ? "Get out of the boat" : "Get out of the car";
   else if (player.mode === "pray") t = "Stop praying";
   else if (player.mode === "shower") t = "Finish the shower";
   else if (player.mode === "sit") t = "Stand up";
@@ -2299,6 +2589,7 @@ function goTo(pl){
   if (player.mode === "pray") endPrayer(false);
   standUp(); if (topView) setTop(false);
   if (player.mode === "car") requestSeat("out");
+  if (pl.car && pl.veh === "boat"){ player.pos.set(RIVER.jetty.x, 0, RIVER.z1 - 1.5); player.yaw = player.camYaw = 0; return; }
   if (pl.car){ const V = VEH[pl.veh] || car, d = new THREE.Vector3(1, 0, 0).applyAxisAngle(UPV, V.yaw); player.pos.set(V.x + d.x * (V === car ? 2.2 : 1.4), 0, V.z + d.z * (V === car ? 2.2 : 1.4)); player.yaw = player.camYaw = V.yaw + Math.PI / 2; return; }
   player.pos.set(pl.x, pl.y || 0, pl.z); player.yaw = player.camYaw = pl.yaw || 0; player.pitch = -.08;
   view.focus({preventScroll: true});
@@ -2317,10 +2608,11 @@ function updateCamera(dt){
     const V = player.veh || car;
     if (performance.now() - player.camDragAt > 2500 && V.driver === net.selfId){ let d = V.yaw - player.camYaw; d = Math.atan2(Math.sin(d), Math.cos(d)); player.camYaw += d * Math.min(1, dt * 2.5); }
     _t.set(V.x, V.camY, V.z);
-    const dist = V.camDist, cp = Math.max(.12, player.camPitch * .6);
+    const dist = V.camDist * camZoom, cp = Math.max(.12, player.camPitch * .6);
     _cp.set(_t.x + Math.sin(player.camYaw) * Math.cos(cp) * dist, _t.y + Math.sin(cp) * dist + .6, _t.z + Math.cos(player.camYaw) * Math.cos(cp) * dist);
     camera.position.lerp(_cp, Math.min(1, dt * 8)); camera.lookAt(_t); return;
   }
+  if (theaterCam()) return;
   const seated = player.mode === "sit" || player.mode === "sleep";
   if (firstPerson || cinemaSeat() || classSeat()){
     if (seated){ const p = player.spot.pos; camera.position.set(p.x, p.y + (player.mode === "sleep" ? .3 : .78), p.z); }
@@ -2330,7 +2622,7 @@ function updateCamera(dt){
   if (seated){ const p = player.spot.pos; _t.set(p.x, p.y + (player.mode === "sleep" ? .45 : .85), p.z); }
   else _t.set(player.pos.x, player.pos.y + 1.55, player.pos.z);
   const zn = zoneAt(player.pos.x, player.pos.z);
-  let dist = zn && zn.indoor ? 2.3 : zn && zn.hall ? 2.8 : 3.6;
+  let dist = (zn && zn.indoor ? 2.3 : zn && zn.hall ? 2.8 : 3.6) * camZoom;
   const cp = player.camPitch;
   _dir.set(Math.sin(player.camYaw) * Math.cos(cp), Math.sin(cp), Math.cos(player.camYaw) * Math.cos(cp));
   ray.set(_t, _dir); ray.far = dist + .3;
@@ -2349,25 +2641,28 @@ function stepVeh(V, dt){
     if (f > 0) V.v += f * (V.v < 0 ? 12 : 7) * dt;
     else if (f < 0) V.v += f * (V.v > 0 ? 12 : 5) * dt;
     else V.v -= Math.sign(V.v) * Math.min(Math.abs(V.v), 2.2 * dt);
-    V.v *= 1 - .12 * dt; V.v = Math.max(-5, Math.min(V.maxV, V.v));
+    V.v *= 1 - (V.water ? .5 : .12) * dt; V.v = Math.max(V.minV || -5, Math.min(V.maxV, V.v));
     if (V.frozen > 0){ V.frozen -= dt; V.v = 0; }
     const st = -s * .55 * (1 - Math.min(.6, Math.abs(V.v) / 40));
     V.steer += (st - V.steer) * Math.min(1, dt * 6);
     V.yaw += V.v * Math.tan(V.steer) / V.wb * dt;
+    if (V.water) V.yaw -= s * .5 * dt * (1 - Math.min(1, Math.abs(V.v) / 3));   // a rowing boat can turn on the spot
     const dx = -Math.sin(V.yaw) * V.v * dt, dz = -Math.cos(V.yaw) * V.v * dt;
     if (Math.abs(V.v) > .01){
       const dir = Math.sign(V.v);
       _dir.set(-Math.sin(V.yaw) * dir, 0, -Math.cos(V.yaw) * dir);
       let hit = false;
-      for (const off of V.offs){
+      if (V.water){ const fx = -Math.sin(V.yaw) * 2.0 * dir, fz = -Math.cos(V.yaw) * 2.0 * dir; hit = boatBlocks(V.x + dx + fx, V.z + dz + fz) || boatBlocks(V.x + dx, V.z + dz); }
+      else if (riverBlocks(V.x + dx - Math.sin(V.yaw) * V.front * dir, V.z + dz - Math.cos(V.yaw) * V.front * dir)) hit = true;
+      if (!hit) for (const off of V.offs){
         _from.set(V.x + Math.cos(V.yaw) * off, .6, V.z - Math.sin(V.yaw) * off);
         ray.set(_from, _dir); ray.far = Math.abs(V.v * dt) + V.front;
         if (ray.intersectObjects(near(V.x, V.z, 6), false).length){ hit = true; break; }
       }
-      if (!hit && trafficBlocks(V, dir)) hit = true;
+      if (!hit && !V.water && trafficBlocks(V, dir)) hit = true;
       if (hit){ if (Math.abs(V.v) > 6) toast("Bump! Drive carefully.", 1800); V.v = -V.v * .2; }
       else { V.x = Math.max(ROAD.x0 + 3, Math.min(ROAD.x1 - 3, V.x + dx)); V.z = Math.max(-175, Math.min(240, V.z + dz)); }
-      vehHitPeople(V);
+      if (!V.water) vehHitPeople(V);
     }
     V.tx = V.x; V.tz = V.z; V.tyaw = V.yaw;
   } else {
@@ -2376,6 +2671,12 @@ function stepVeh(V, dt){
     let d = V.tyaw - V.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); V.yaw += d * k;
   }
   V.g.position.set(V.x, 0, V.z); V.g.rotation.y = V.yaw;
+  if (V.water){   // the boat bobs and rocks gently; the oars sweep while it moves
+    const t = performance.now() / 1000;
+    V.g.position.y = RIVER.wy - .08 + Math.sin(t * 1.3) * .035; V.g.rotation.z = Math.sin(t * .9) * .03; V.g.rotation.x = Math.sin(t * 1.1 + 1) * .015;
+    V.row = (V.row || 0) + Math.abs(V.v) * dt * 1.6;
+    V.oars.forEach(o => { const a = Math.abs(V.v) > .15 ? Math.sin(V.row) : 0; o.piv.rotation.y = o.s * a * .55; o.piv.rotation.z = Math.abs(V.v) > .15 ? Math.max(0, Math.cos(V.row)) * .18 * o.s : 0; });
+  }
   if (V === bike){
     const lean = V.driver ? -V.steer * Math.min(1, Math.abs(V.v) / 7) * .55 : .1;   // leans into turns; rests on its stand when parked
     V.g.rotation.z += (lean - V.g.rotation.z) * Math.min(1, dt * 5);
@@ -2404,11 +2705,17 @@ function seatsChanged(){
     if (player.mode !== "car") standUp();
     if (player.swim) setSwim(false);
     player.mode = "car"; player.veh = V; player.camYaw = V.yaw; player.camPitch = .35;
-    showPlace(V.driver === net.selfId ? (V === car ? "You're driving" : "You're riding the bike") : (V === car ? "You're riding along" : "You're riding pillion"));
+    showPlace(V === boat ? (V.driver === net.selfId ? "You're rowing · W A S D" : "Enjoy the river") : V.driver === net.selfId ? (V === car ? "You're driving" : "You're riding the bike") : (V === car ? "You're riding along" : "You're riding pillion"));
   } else if (!V && player.mode === "car"){
     const P = player.veh || car;
     const side = new THREE.Vector3(P === car ? 1.5 : 1.0, 0, 0).applyAxisAngle(UPV, P.yaw);
     player.pos.set(P.x + side.x, 0, P.z + side.z); player.yaw = player.camYaw = P.yaw; player.mode = "walk"; player.veh = null;
+    if (P === boat){   // step out onto the jetty if it's close, otherwise onto the nearer bank
+      const J = RIVER.jetty;
+      if (Math.hypot(P.x - J.x, P.z - (RIVER.z1 - 3)) < 9) player.pos.set(J.x, 0, RIVER.z1 - 1.2);
+      else player.pos.set(P.x, 0, P.z > (RIVER.z0 + RIVER.z1) / 2 ? RIVER.z1 + 1.2 : RIVER.z0 - 1.2);
+      player.yaw = player.camYaw = P.z > (RIVER.z0 + RIVER.z1) / 2 ? Math.PI : 0;
+    }
     if (Math.abs(P.x - P.park.x) < 2.2 && Math.abs(P.z - P.park.z) < 3.5) showPlace("Parked at home");
   }
   renderDrive();
@@ -2611,20 +2918,19 @@ async function verifyOwner(pub, sig, text){
   } catch(e){ return false; }
 }
 
-/* ---------- invite links: 5 minutes, one guest each ---------- */
-const INVITE_MS = 5 * 60 * 1000;
+/* ---------- invite links: no time limit; each link belongs to the first guest who uses it, and they can come back any time ---------- */
 let invites = store.get("veed-invites", {}); if (!invites || typeof invites !== "object") invites = {};
 let currentInvite = "";
 function randTok(n){ const a = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789", r = crypto.getRandomValues(new Uint8Array(n)); return [...r].map(x => a[x % a.length]).join(""); }
-function pruneInvites(){ const t = Date.now(); for (const k in invites) if (invites[k].exp < t - 60000) delete invites[k]; store.set("veed-invites", invites); }
+function pruneInvites(){ store.set("veed-invites", invites); }
 function inviteLink(tok){ return location.origin + location.pathname + "?home=" + net.homeId + "&invite=" + tok; }
 function createInvite(){
   pruneInvites();
   for (const k in invites) if (!invites[k].guest) delete invites[k];       // a new link replaces older unused ones
   currentInvite = randTok(10);
-  invites[currentInvite] = {exp: Date.now() + INVITE_MS, guest: null};
+  invites[currentInvite] = {made: Date.now(), guest: null};
   store.set("veed-invites", invites);
-  copyText(inviteLink(currentInvite), "Invite link copied. It works for 5 minutes, for one guest.");
+  copyText(inviteLink(currentInvite), "Invite link copied. It's for one guest, and they can come back with it any time.");
   renderInvite();
 }
 function copyText(text, okMsg){
@@ -2635,10 +2941,9 @@ function renderInvite(){
   const box = $("inviteInfo");
   if (!net.isOwner || !currentInvite || !invites[currentInvite]){ box.hidden = true; return; }
   box.hidden = false;
-  const left = invites[currentInvite].exp - Date.now(), used = invites[currentInvite].guest;
+  const used = invites[currentInvite].guest;
   if (used){ $("inviteText").textContent = "Invite used by " + used; $("inviteCopy").hidden = true; }
-  else if (left <= 0){ $("inviteText").textContent = "Invite link expired"; $("inviteCopy").hidden = true; }
-  else { const m = Math.floor(left / 60000), s = Math.floor(left % 60000 / 1000); $("inviteText").innerHTML = ""; $("inviteText").append("Invite link · ", Object.assign(document.createElement("b"), {textContent: m + ":" + String(s).padStart(2, "0")}), " left"); $("inviteCopy").hidden = false; }
+  else { $("inviteText").textContent = "Invite link ready · waiting for your guest"; $("inviteCopy").hidden = false; }
 }
 $("inviteBtn").addEventListener("click", createInvite);
 $("inviteCopy").addEventListener("click", () => { if (currentInvite) copyText(inviteLink(currentInvite), "Invite link copied."); });
@@ -2652,7 +2957,6 @@ function checkInvite(tok, name){
   if (!tok) return "noinvite";
   if (!inv) return "expired";
   if (inv.guest && inv.guest !== name) return "used";
-  if (Date.now() > inv.exp) return "expired";
   return "ok";
 }
 
@@ -2671,14 +2975,14 @@ const ready = loadIdentity().then(() => {
   updateGardenVisual(); refreshLands();
   if (!net.isOwner){
     $("enterTitle").textContent = "You're invited";
-    $("enterSub").textContent = net.invite ? "Choose your name and look, then knock. The owner lets you in." : "This link has no invite. Ask the owner for a new invite link.";
+    $("enterSub").textContent = net.invite ? (ACCT.user ? "Choose your look, then knock. The owner lets you in." : "Log in or create your account, then knock. The owner lets you in.") : "This link has no invite. Ask the owner for a new invite link.";
     $("enterBtn").textContent = "Knock on the door";
   }
   $("ownerSect").hidden = !net.isOwner; $("inviteBtn").hidden = !net.isOwner;
   $("loading").hidden = true;
 });
 try {
-  $("nameIn").value = store.get("veed-name", "");
+  $("nameIn").value = ACCT.display || "";
   const lk = store.get("veed-look", "");
   if (lk === "abaya" || lk === "bandhgala") document.querySelector('input[name="look"][value="' + lk + '"]').checked = true;
 } catch(e){}
@@ -2690,7 +2994,8 @@ function ensureCtx(){
 }
 $("enterForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const n = $("nameIn").value.trim().slice(0, 24); if (!n) return;
+  if (!ACCT.user){ acctSubmit(e.submitter && e.submitter.id === "acctCreate" ? "create" : "login"); return; }   // log in first
+  const n = (ACCT.display || ACCT.user).slice(0, 24); if (!n) return;
   const chosen = document.querySelector('input[name="look"]:checked');
   me.name = n; me.look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
   { const o = store.get("veed-outfit", ""); if (OUTFIT_KEYS.has(o) && !!STYLES[o].female === (me.look === "abaya")) me.look = o; }
@@ -2728,7 +3033,9 @@ function startNet(T){
   let room;
   try { room = T.joinRoom(cfg, "veed2-" + net.homeId, {onJoinError: netIssue}); } catch(e){ netFailed(); return; }
   net.room = room; net.selfId = T.selfId || "me";
-  ["hi", "admit", "st", "chat", "garden", "gift", "car", "seat", "hug", "movie", "serve", "rose", "hit", "game", "couple"].forEach(k => net.act[k] = room.makeAction(k));
+  ["hi", "admit", "st", "chat", "garden", "gift", "car", "seat", "hug", "movie", "serve", "rose", "hit", "game", "couple", "world", "plan"].forEach(k => net.act[k] = room.makeAction(k));
+  net.act.world.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onWorldMsg(d); };
+  net.act.plan.onMessage = (d, meta) => { if (allowed(meta.peerId) && d) onPlanMsg(d, meta.peerId); };
   room.onPeerJoin = id => { peer(id); sendHi(id); };
   room.onPeerLeave = id => peerLeft(id);
   room.onPeerStream = (stream, id) => { const p = peer(id); p.stream = stream; if (allowed(id)) attachAudio(p, stream); };
@@ -2802,9 +3109,15 @@ async function onHi(id, d){
     if (d.owner) return;                                    // your own home open on another device
     p.invite = String(d.invite || "").slice(0, 16);
     if (id === net.guestId){ ensureAvatar(p, true); renderPeople(); return; }
-    if (net.guestId && net.peers[net.guestId]){ net.act.admit.send({ok: false, why: "full"}, {target: id}); return; }
+    if (net.guestId && net.peers[net.guestId]){
+      const g = net.peers[net.guestId];
+      if (g.invite === p.invite && g.name === p.name) peerLeft(net.guestId);     // the same guest reconnected: drop the old connection
+      else { net.act.admit.send({ok: false, why: "full"}, {target: id}); return; }
+    }
     const why = checkInvite(p.invite, p.name);
     if (why !== "ok"){ net.act.admit.send({ok: false, why}, {target: id}); return; }
+    // someone you already let in with this link comes straight back in
+    if (invites[p.invite] && invites[p.invite].guest === p.name){ decide(id, true); return; }
     if (!p.knocking){ p.knocking = true; showKnocks(); renderPeople(); }
   } else {
     if (!d.owner) return;                                   // guests only deal with the owner
@@ -2816,6 +3129,7 @@ async function onHi(id, d){
     if (net.ownerId && net.ownerId !== id && net.peers[net.ownerId]) return;
     net.ownerId = id;
     $("homeTitle").textContent = p.name + "'s home";
+    if (p.pendingAdmit && !net.admitted){ const pa = p.pendingAdmit; p.pendingAdmit = null; onAdmit(id, pa); return; }
     if (net.admitted){ ensureAvatar(p, true); renderPeople(); return; }
     if (net.invite) banner("Knocking… waiting for " + p.name + " to let you in.");
     status();
@@ -2840,7 +3154,7 @@ function decide(id, ok){
   const p = net.peers[id]; if (!p) return;
   p.knocking = false;
   if (ok && net.guestId && net.peers[net.guestId] && net.guestId !== id){ ok = false; toast("Only two people can be inside. " + net.peers[net.guestId].name + " is already here."); }
-  if (ok && checkInvite(p.invite, p.name) !== "ok"){ ok = false; toast("That invite link has expired. Create a new one and send it again."); }
+  if (ok && checkInvite(p.invite, p.name) !== "ok"){ ok = false; toast("That invite link isn't valid any more. Create a new one and send it again."); }
   net.act.admit.send({ok, why: ok ? "" : "declined"}, {target: id});
   if (ok){
     net.guestId = id; invites[p.invite].guest = p.name; store.set("veed-invites", invites); renderInvite();
@@ -2860,12 +3174,13 @@ function welcome(p){
   moreWelcome(p);
 }
 function onAdmit(id, d){
-  if (net.isOwner || (net.ownerId && id !== net.ownerId) || !peer(id).isOwner) return;
+  if (net.isOwner || (net.ownerId && id !== net.ownerId)) return;
+  if (!peer(id).isOwner){ peer(id).pendingAdmit = d; return; }     // arrived before we checked it's really the owner: use it once we have
   const owner = peer(id);
   if (d.ok){ net.admitted = true; banner(""); welcome(owner); toast(owner.name + " let you in. Welcome!"); }
   else {
     net.admitted = false;
-    const why = {full: "The house is full. Only two people can be inside at a time.", expired: "This invite link has expired. Invite links work for 5 minutes: ask for a new one.",
+    const why = {full: "The house is full. Only two people can be inside at a time.", expired: "This invite link isn't valid. Ask for a new one.",
       used: "This invite link was already used by someone else. Ask for a new one.", noinvite: "You need an invite link to go inside. Ask the owner for one."}[d.why];
     banner(why || owner.name + " didn't let you in this time.", d.why === "declined");
   }
@@ -2938,7 +3253,7 @@ function goToPeer(id){
 /* ---------- my state, other person's avatar ---------- */
 function myPose(){
   if (player.mode === "pray") return prayer.pose;
-  if (player.mode === "car"){ const V = player.veh || car; if (V === car) return V.driver === net.selfId ? "drive" : "sit"; return V.driver === net.selfId ? "ride" : (me.H && me.H.female ? "sit" : "ridep"); }
+  if (player.mode === "car"){ const V = player.veh || car; if (V === car) return V.driver === net.selfId ? "drive" : "sit"; if (V === boat) return "sit"; return V.driver === net.selfId ? "ride" : (me.H && me.H.female ? "sit" : "ridep"); }
   if (player.swim) return "swim";
   if (player.fallUntil && performance.now() < player.fallUntil) return "sleep";
   if (player.mode === "shower") return "shower";
@@ -2960,8 +3275,9 @@ function placeAvatar(H, st, cur, dt){
   H.root.rotation.x = 0;
   if (st.seat === "d" || st.seat === "p"){
     const V = VEH[st.vid] || car, w = carSeatWorld(st.seat, V); H.root.position.set(w.x, w.y - seatOffset(H), w.z); H.root.rotation.y = V.yaw;
-    pose = V === car ? (st.seat === "d" ? "drive" : "sit") : (st.seat === "d" ? "ride" : (H.female ? "sit" : "ridep"));
+    pose = V === car ? (st.seat === "d" ? "drive" : "sit") : V === boat ? "sit" : (st.seat === "d" ? "ride" : (H.female ? "sit" : "ridep"));
     if (V === bike && st.seat === "p" && H.female) H.root.rotation.y = V.yaw + Math.PI / 2;
+    if (V === boat && st.seat === "p") H.root.rotation.y = V.yaw + Math.PI;   // face each other in the boat
     if (cur){ cur.x = w.x; cur.z = w.z; }
   } else if (pose === "sit" || pose === "eat"){
     let x = st.x, y = st.y, z = st.z, yaw = st.yaw;
@@ -3711,6 +4027,128 @@ function watchFps(dt){
   }
 }
 
+/* ---------- accounts: a name and password; your game saves to your account and continues next time ---------- */
+// Online accounts (any device): paste your Supabase project URL and its public (anon / publishable) key below.
+// Until then, accounts work on this device only.
+const CLOUD = {url: "https://gqjprimzkaxosufvavkx.supabase.co", key: "sb_publishable_TsJQcq7m5mbl6XrnejAWFQ_7A41V2h7"};
+const cloudOn = () => /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(CLOUD.url) && CLOUD.key.length > 20 && !/^PASTE_/.test(CLOUD.key);
+async function rpc(fn, args, keepalive){
+  const h = {"Content-Type": "application/json", apikey: CLOUD.key};
+  if (/^eyJ/.test(CLOUD.key)) h.Authorization = "Bearer " + CLOUD.key;
+  const r = await fetch(CLOUD.url.replace(/\/$/, "") + "/rest/v1/rpc/" + fn, {method: "POST", headers: h, body: JSON.stringify(args), keepalive: !!keepalive});
+  let j = null; try { j = await r.json(); } catch(e){}
+  if (!r.ok) throw new Error((j && (j.message || j.hint || j.error)) || ("Error " + r.status));
+  return j;
+}
+const LS = {get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch(e){} }, del(k){ try { localStorage.removeItem(k); } catch(e){} }};
+function acctToken(){ return LS.get("veed-token:" + ACCT.user) || ""; }
+// every save of this account, as {key: text}
+function acctCollect(pfx){
+  const out = {};
+  try { for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && k.startsWith(pfx)) out[k.slice(pfx.length)] = localStorage.getItem(k); } } catch(e){}
+  return out;
+}
+function acctImport(pfx, data){
+  try {
+    const old = []; for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && k.startsWith(pfx)) old.push(k); }
+    old.forEach(k => localStorage.removeItem(k));
+    Object.entries(data || {}).forEach(([k, v]) => { if (typeof v === "string") localStorage.setItem(pfx + k, v); });
+  } catch(e){}
+}
+// the first account made on this device takes over the home and saves that were already here
+function acctMigrateLegacy(pfx){
+  if (LS.get("veed-legacy-claimed")) return;
+  const have = acctCollect(pfx); if (Object.keys(have).length > 2) return;
+  try { for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && /^veed-/.test(k) && !/^veed-(current-|token:|acct:|legacy-)/.test(k)) localStorage.setItem(pfx + k, localStorage.getItem(k)); } } catch(e){}
+  LS.set(pfx + "__savedAt", String(Date.now()));
+  LS.set("veed-legacy-claimed", "1");
+}
+async function pbkdf(pass, salt){
+  const k = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: new TextEncoder().encode(salt), iterations: 120000, hash: "SHA-256"}, k, 256);
+  return [...new Uint8Array(bits)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+function acctBusy(on, msg){ ["acctLogin", "acctCreate"].forEach(id => $(id).disabled = on); $("acctMsg").textContent = msg || ""; $("acctMsg").hidden = !msg; }
+async function acctSubmit(mode){
+  const name = $("nameIn").value.trim().replace(/\s+/g, " ").slice(0, 24), pass = $("passIn").value, id = name.toLowerCase();
+  if (name.length < 2){ acctBusy(false, "Type your name (at least 2 letters)."); return; }
+  if (pass.length < 4){ acctBusy(false, "Type a password (at least 4 characters)."); return; }
+  const chosen = document.querySelector('input[name="look"]:checked'), look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
+  const pfx = "u:" + id + ":";
+  acctBusy(true, mode === "create" ? "Creating your account…" : "Logging in…");
+  try {
+    if (cloudOn()){
+      const r = await rpc(mode === "create" ? "veed_register" : "veed_login", {p_name: name, p_pass: pass});
+      if (mode === "create"){ acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look)); }
+      else acctImport(pfx, r.data || {});
+      LS.set("veed-token:" + id, r.token);
+      LS.set("veed-current-display", r.name || name);
+    } else {
+      const rec = JSON.parse(LS.get("veed-acct:" + id) || "null");
+      if (mode === "create"){
+        if (rec) throw new Error("That name already has an account on this device. Log in instead.");
+        const salt = id + ":" + Math.random().toString(36).slice(2);
+        LS.set("veed-acct:" + id, JSON.stringify({salt, hash: await pbkdf(pass, salt), display: name}));
+        acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look));
+        LS.set("veed-current-display", name);
+      } else {
+        if (!rec || rec.hash !== await pbkdf(pass, rec.salt)) throw new Error("Wrong name or password.");
+        LS.set("veed-current-display", rec.display || name);
+      }
+    }
+    LS.set("veed-current-user", id);
+    sessionStorage.setItem("veed-just-logged", "1");
+    location.reload();
+  } catch(e){
+    acctBusy(false, /fetch|network/i.test(String(e.message)) ? "Couldn't reach the account server. Check your internet connection." : String(e.message || e));
+  }
+}
+$("acctCreate").addEventListener("click", e => { e.preventDefault(); acctSubmit("create"); });
+function acctLogout(){
+  const tok = acctToken(), user = ACCT.user;
+  if (cloudOn() && tok){ acctSave(true); rpc("veed_logout", {p_name: user, p_token: tok}, true).catch(() => {}); }
+  LS.del("veed-current-user"); LS.del("veed-current-display"); LS.del("veed-token:" + user);
+  setTimeout(() => location.reload(), 400);
+}
+$("acctOut").addEventListener("click", acctLogout); $("acctSwitch").addEventListener("click", e => { e.preventDefault(); acctLogout(); });
+// show the right parts of the welcome card
+(function acctUI(){
+  const inn = !!ACCT.user;
+  $("acctFields").hidden = inn; $("acctWho").hidden = !inn; $("enterBtn").hidden = !inn; $("acctLogin").hidden = inn; $("acctCreate").hidden = inn;
+  $("nameIn").required = !inn; $("passIn").required = !inn;
+  if (inn){ $("acctName").textContent = ACCT.display; $("acctPanelName").textContent = ACCT.display; }
+  $("acctPanel").hidden = !inn;
+  $("acctNote").textContent = cloudOn() ? "Your game saves to your account, so you can continue on any phone or computer." : "Your game saves to your account on this device.";
+  if (!inn) $("enterSub").textContent = net && !visitHome ? "Log in, or create an account with your name and a password. Your game is saved and continues next time." : $("enterSub").textContent;
+  if (inn && sessionStorage.getItem("veed-just-logged")){ sessionStorage.removeItem("veed-just-logged"); toast("Welcome, " + ACCT.display + "! Your game is saved to your account.", 4000); }
+})();
+// save online every so often, and when the app is put away
+let acctSaving = false, acctLastErr = 0;
+async function acctSave(keepalive){
+  if (!ACCT.user || !cloudOn() || acctSaving) return;
+  const tok = acctToken(); if (!tok) return;
+  acctSaving = true; const was = store.dirty; store.dirty = false;
+  try { await rpc("veed_save", {p_name: ACCT.user, p_token: tok, p_data: acctCollect(store.pfx)}, keepalive); $("acctSync").textContent = "Saved online"; }
+  catch(e){ store.dirty = store.dirty || was; $("acctSync").textContent = "Not saved online yet"; if (/log in again/i.test(e.message) && Date.now() - acctLastErr > 60000){ acctLastErr = Date.now(); toast("Please log in again to keep saving online.", 6000); } }
+  acctSaving = false;
+}
+setInterval(() => { if (store.dirty) acctSave(); }, 20000);
+document.addEventListener("visibilitychange", () => { if (document.hidden && store.dirty) acctSave(true); });
+addEventListener("pagehide", () => { if (store.dirty) acctSave(true); });
+// opening the game: if this account was played more recently on another device, bring those saves here first
+(async function acctPull(){
+  if (!ACCT.user || !cloudOn() || !acctToken() || sessionStorage.getItem("veed-pulled")) { if (ACCT.user) $("acctSync").textContent = cloudOn() ? "Saved online" : "Saved on this device"; return; }
+  sessionStorage.setItem("veed-pulled", "1");
+  try {
+    const r = await rpc("veed_load", {p_name: ACCT.user, p_token: acctToken()});
+    const remote = r && r.data || {}, rt = +remote.__savedAt || 0, lt = +(LS.get(store.pfx + "__savedAt") || 0);
+    if (rt > lt + 2000){ acctImport(store.pfx, remote); location.reload(); return; }
+    if (lt > rt) store.dirty = true;
+    $("acctSync").textContent = "Saved online";
+  } catch(e){ if (/log in again/i.test(e.message)){ toast("Please log in again.", 5000); LS.del("veed-current-user"); setTimeout(() => location.reload(), 1500); } }
+})();
+
+
 /* ====================================================================================
    More life in Veed: Kisanic, the beach and the hill, traffic and police, kids and a cat,
    day and night, rain, swimming, swings, roses, meals, eggs and milk, salams, class with
@@ -3760,9 +4198,7 @@ const DINE_SEATS = [];
   box(.42, .45, .42, x, y0, z, M.woodLight); box(.42, .5, .05, x, y0 + .45, z + (yaw ? .19 : -.19), M.woodLight);
   DINE_SEATS.push(addSpot({type: "sit", pos: new THREE.Vector3(x, y0 + .45, z), yaw: yaw ? 0 : Math.PI, group: null, what: "dining chair"}));
 });
-// sleeping mats and prayer mats for the children in the living room
-const KID_SLEEP = [{x: -4.0, z: 2.95, yaw: Math.PI / 2}, {x: -4.0, z: 3.8, yaw: Math.PI / 2}];
-KID_SLEEP.forEach(m => { box(1.5, .06, .62, m.x, SCENE.P, m.z, mat(0x7a9cc6, .95), {noCollide: true}); box(.3, .1, .45, m.x + .58, SCENE.P + .06, m.z, M.linen, {noCollide: true}); });
+// prayer mats for the children in the living room (they don't sleep: they're always up and about)
 const KID_PRAY = [{x: -4.35, z: 5.4}, {x: -3.5, z: 5.4}];
 KID_PRAY.forEach(m => box(.62, .015, 1.15, m.x, SCENE.P, m.z, mat(0xffffff, .9, {map: rep(TEX.prayer, .5, 1)}), {noCollide: true}));
 // a rose bed beside the pond
@@ -3903,7 +4339,7 @@ let seaFoam = null, lighthouseBeam = null, seaMat = null;
   box(W, .12, 3, cx, 0, prom + 1.5, mat(0xffffff, .9, {map: rep(TEX.concrete, W / 2, 2)}), {noShadow: true});
   const sandT = canvasTex(256, (g, s) => { g.fillStyle = "#e6d3a3"; g.fillRect(0, 0, s, s); speckle(g, s, 7000, ["#efdfb4", "#d9c48f", "#f4e7c4", "#cdb57e"], 2); });
   addMesh(new THREE.PlaneGeometry(W + 40, shore - sand0 + 14), mat(0xffffff, 1, {map: rep(sandT, (W + 40) / 6, (shore - sand0 + 14) / 6)}), cx, .035, (sand0 + shore + 14) / 2, {noCollide: true, noShadow: true}).rotation.x = -Math.PI / 2;
-  seaMat = new THREE.MeshStandardMaterial({color: 0x1f7aa0, roughness: .12, metalness: .2, transparent: true, opacity: .93});
+  seaMat = new THREE.MeshStandardMaterial({color: 0x1f7aa0, roughness: .12, metalness: .2, transparent: true, opacity: .93, normalMap: waterNormal(1400 / 14, 470 / 14), normalScale: new THREE.Vector2(.5, .5)});
   const sea = addMesh(new THREE.PlaneGeometry(1400, 470), seaMat, 0, .05, shore + 235, {noCollide: true, noShadow: true}); sea.rotation.x = -Math.PI / 2;
   const shallow = addMesh(new THREE.PlaneGeometry(W + 40, 12), new THREE.MeshStandardMaterial({color: 0x46b6c4, roughness: .1, transparent: true, opacity: .55}), cx, .06, shore + 4, {noCollide: true, noShadow: true}); shallow.rotation.x = -Math.PI / 2;
   seaFoam = new THREE.Mesh(new THREE.PlaneGeometry(W + 40, 1.4), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: .7}));
@@ -4065,6 +4501,56 @@ let fairy = null, lampPools = null, poolMat = null, fairyMat = null;
   lampPools.userData.noCollide = true; lampPools.renderOrder = 1; scene.add(lampPools);
 }
 
+/* ---------- scenery far away: mountains on the horizon (not over the sea) and drifting clouds ---------- */
+const SCENERY = {mtn: [], clouds: [], drift: 0};
+(function buildScenery(){
+  const R = rng(hashStr("veed-mountains"));
+  [[1080, 120, 0x5f7f9c, 0], [930, 75, 0x47654a, 1.7]].forEach(([rad, peak, col, ph]) => {
+    const N = 220, pos = [], colA = [], idx = [];
+    for (let i = 0; i <= N; i++){
+      const a = i / N * Math.PI * 2, dx = Math.sin(a), dz = Math.cos(a);
+      const open = smooth(.05, .4, dz);                      // no mountains over the sea to the south
+      let h = 0; [[3, .5], [7, .28], [13, .14], [29, .07]].forEach(([f, w]) => h += w * (Math.sin(a * f + ph + R() * .2) * .5 + .5));
+      h = (peak * .25 + peak * h * h * 1.3) * (1 - open) - 30 * open;
+      pos.push(dx * rad, -30, dz * rad, dx * rad, Math.max(-30, h), dz * rad);
+      colA.push(.55, .55, .55, 1, 1, 1);
+      if (i < N){ const b = i * 2; idx.push(b, b + 2, b + 1, b + 1, b + 2, b + 3); }
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(colA, 3)); g.setIndex(idx);
+    const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color: col, vertexColors: true, fog: false, side: THREE.DoubleSide}));
+    m.renderOrder = -9; m.frustumCulled = false; m.userData.base = new THREE.Color(col); scene.add(m); SCENERY.mtn.push(m);
+  });
+  // soft cumulus puffs drawn once on a canvas
+  const puff = canvasTex(256, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    const blobs = [[.5, .58, .3], [.32, .62, .2], [.68, .63, .22], [.42, .45, .2], [.6, .46, .18], [.2, .68, .13], [.8, .68, .14]];
+    blobs.forEach(([x, y, r]) => { const gr = g.createRadialGradient(x * s, y * s, 0, x * s, y * s, r * s); gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(.6, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, s, s); });
+  }, true);
+  const CR = rng(hashStr("veed-clouds"));
+  for (let i = 0; i < 34; i++){
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: puff, transparent: true, depthWrite: false, fog: false, opacity: .9}));
+    const w = 140 + CR() * 200; sp.scale.set(w, w * (.38 + CR() * .15), 1);
+    sp.userData = {x: (CR() - .5) * 1800, z: (CR() - .5) * 1800, y: 170 + CR() * 120};
+    sp.renderOrder = -8; scene.add(sp); SCENERY.clouds.push(sp);
+  }
+})();
+const _cc = new THREE.Color();
+function updateScenery(U, goldK, rain){
+  const day = SKY.dayK, night = SKY.nightK;
+  SCENERY.mtn.forEach((m, i) => { m.material.color.copy(m.userData.base).multiplyScalar(.18 + .82 * day).lerp(U.low.value, i ? .16 : .34).lerp(U.mid.value, rain * .5); });
+  _cc.setRGB(1, 1, 1).lerp(new THREE.Color(1, .66, .5), goldK * .8).multiplyScalar(.28 + .72 * day).lerp(new THREE.Color(.55, .57, .6), rain * .7);
+  SCENERY.clouds.forEach(c => { c.material.color.copy(_cc); c.material.opacity = (.85 - night * .55) * (1 + rain * .15); });
+}
+function tickScenery(dt){
+  const cam = camera.position;
+  SCENERY.mtn.forEach(m => m.position.set(cam.x, 0, cam.z));
+  SCENERY.drift += dt * 2.5;
+  SCENERY.clouds.forEach(c => {
+    const u = c.userData, wrap = v => ((v % 1800) + 2700) % 1800 - 900;
+    c.position.set(cam.x + wrap(u.x + SCENERY.drift - cam.x * .0), u.y, cam.z + wrap(u.z - cam.z * .0));
+  });
+}
+
 
 /* ---------- day and night follow the real sun in India; some days it rains ---------- */
 const SKY_MODES = {real: "Real time (India)", day: "Day", sunset: "Sunset", night: "Night", rain: "Rain"};
@@ -4149,6 +4635,7 @@ function updateSky(){
   M.glass.emissive.setHex(0xffc879); M.glass.emissiveIntensity = nightK * .9;
   fairyMat.color.setScalar(.35 + nightK * 1.4);
   if (lighthouseBeam) lighthouseBeam.material.opacity = nightK * .16;
+  updateScenery(U, goldK, rain);
   SKY.last = performance.now();
 }
 NIGHT_GLOW.forEach(m => m.userData.base = m.emissiveIntensity);
@@ -4162,7 +4649,7 @@ function tickNightLights(){
     NLIGHTS.forEach((l, i) => { const p = best[i] && best[i][0]; if (!p){ l.intensity = 0; return; } l.position.set(p[0], p[1], p[2]); l.intensity = nightK * 1.5; });
   }
   const V = player.mode === "car" ? player.veh : null;
-  headlight.visible = !!V && nightK > .05;
+  headlight.visible = !!V && !V.water && nightK > .05;
   if (headlight.visible){
     const fx = -Math.sin(V.yaw), fz = -Math.cos(V.yaw);
     headlight.position.set(V.x + fx * (V.front + 6.5), .06, V.z + fz * (V.front + 6.5)); headlight.rotation.y = V.yaw;
@@ -4224,6 +4711,7 @@ function inWater(x, z){
   const px = (x - POND.x) / (POND.rx - .25), pz = (z - POND.z) / (POND.rz - .2);
   if (px * px + pz * pz < 1) return "pond";
   if (z > BEACH.shore + 2.5 && z < BEACH.shore + 70 && x > BEACH.x0 && x < BEACH.x1) return "sea";
+  if (z > RIVER.z0 + 1.4 && z < RIVER.z1 - 1.4 && (x < 69.6 || x > 80.4) && !(Math.abs(x - RIVER.jetty.x) < 1.25 && z > RIVER.z1 - 6.3)) return "river";
   return null;
 }
 function setSwim(on){
@@ -4237,6 +4725,7 @@ function tickSwim(){
   if (player.mode !== "walk"){ if (player.swim && player.mode !== "walk") setSwim(false); return; }
   const w = inWater(player.pos.x, player.pos.z);
   if (!!w !== player.swim) setSwim(!!w);
+  player.swimY = w === "river" ? RIVER.wy - .06 : 0;
   if (player.swim && player.pos.z > BEACH.shore + 68) player.pos.z = BEACH.shore + 68;
 }
 
@@ -4260,7 +4749,6 @@ const PLAYS = ["chase", "swing", "fire", "forest", "sofa", "chase", "pond"];
 function kidActivity(slot){
   const t = slot * KSLOT, d = new Date(t * 1000 + 5.5 * 3600e3), h = d.getUTCHours() + d.getUTCMinutes() / 60;
   const P = todayTimes();
-  if (h >= P.isha + .75 || h < P.fajr || (h >= P.fajr + .35 && h < 7)) return "sleep";
   for (const k of ["fajr", "dhuhr", "asr", "maghrib", "isha"]) if (h >= P[k] + .05 && h < P[k] + .3) return "pray";
   const R = rng(hashStr("kids" + slot));
   return PLAYS[Math.floor(R() * PLAYS.length)];
@@ -4289,7 +4777,6 @@ function kidState(k, t){
   const walkT = Math.max(0, tt - lag);
   if (walkT * speed < L){ const p = pathAt(nodes, walkT * speed); return {x: p.x + i * .35, z: p.z, yaw: p.yaw || 0, pose: "stand", speed: tt < lag ? 0 : speed, act: "walk"}; }
   const at = walkT - L / speed;
-  if (act === "sleep"){ const m = KID_SLEEP[i]; return {x: m.x, z: m.z, y: SCENE.P + .1, yaw: m.yaw, pose: "sleep", speed: 0, act}; }
   if (act === "pray"){
     const m = KID_PRAY[i], total = WORSHIP.reduce((a, s) => a + s[1], 0); let q = (t + 0) % (total + 4), pose = "jalsa";
     for (const [p, l] of WORSHIP){ if (q < l){ pose = p; break; } q -= l; }
@@ -4313,7 +4800,11 @@ function kidState(k, t){
 function tickKids(dt){
   const t = nowSec();
   let onSwing = false;
+  const L = kidsLeader ? leaderState() : null;
+  if (kidsLeader && !L && kidsLeader !== net.selfId && !net.peers[kidsLeader]) setKidsLeader(null, false);
   KIDS.forEach(k => {
+    if (L){ followLeader(k, L, dt); return; }
+    k.hidden = false;
     const s = kidState(k, t);
     if (s.act === "swing") onSwing = true;
     k.kact = s.act;
@@ -4326,12 +4817,67 @@ function tickKids(dt){
   });
   SWINGS[0].kids = onSwing;
 }
+/* ---------- take the children along: they follow you everywhere and join in ---------- */
+let kidsLeader = null;          // who they follow: your id or the other person's, or nobody (they stay home)
+const kidTrail = [];
+function setKidsLeader(id, mine){
+  if (id === kidsLeader) return;
+  kidsLeader = id; kidTrail.length = 0;
+  if (mine){ const pid = partner(); if (pid) net.act.world.send({kids: id === net.selfId ? "me" : id ? "you" : ""}, {target: pid}); }
+  renderKidsBtn();
+  if (id) KIDS.forEach(k => npcSay(k, k.idx ? "Yay, we're coming!" : "Let's go!", 2500));
+  if (!mine) toast(id === net.selfId ? "Ayaan and Inaya are coming with you now." : id ? "Ayaan and Inaya are going with " + peerName(id) + "." : "Ayaan and Inaya went back home.", 3500);
+}
+function renderKidsBtn(){ const b = $("kidsBtn"); if (b) b.textContent = kidsLeader ? "Leave the kids at home" : "Take the kids along"; }
+$("kidsBtn").addEventListener("click", () => { setKidsLeader(kidsLeader ? null : net.selfId, true); toast(kidsLeader ? "Ayaan and Inaya are coming with you everywhere." : "Ayaan and Inaya went back home to play.", 3000); view.focus({preventScroll: true}); });
+renderKidsBtn();
+function leaderState(){
+  if (kidsLeader === net.selfId){ const st = myState(), bp = bodyPos(); return {x: st.seat ? bp.x : st.x, y: st.y || 0, z: st.seat ? bp.z : st.z, yaw: st.yaw, pose: st.pose, seat: st.seat, me: true}; }
+  const p = net.peers[kidsLeader]; if (!p || !p.t || !p.cur) return null;
+  return {x: p.cur.x, y: p.cur.y, z: p.cur.z, yaw: p.cur.yaw, pose: p.t.pose, seat: p.t.seat, me: false};
+}
+const PRAY_POSES = {qiyam: 1, ruku: 1, sujood: 1, jalsa: 1, jalsaDua: 1, dua: 1};
+const _gd = new THREE.Vector3(0, -1, 0), _go = new THREE.Vector3();
+function groundAt(x, z, fromY){ _go.set(x, fromY + 1.2, z); ray.set(_go, _gd); ray.far = 4; const h = ray.intersectObjects(near(x, z, 1).concat(floors), false)[0]; return h ? Math.max(0, h.point.y) : 0; }
+function followLeader(k, L, dt){
+  const i = k.idx; k.kact = "follow";
+  // in a car, bike or boat they ride along out of sight
+  if (L.seat){ k.hidden = true; return; }
+  k.hidden = false;
+  const last = kidTrail[kidTrail.length - 1];
+  if (!last || Math.hypot(L.x - last.x, L.z - last.z) > .25){ if (last && Math.hypot(L.x - last.x, L.z - last.z) > 8) kidTrail.length = 0; kidTrail.push({x: L.x, z: L.z, y: L.y}); if (kidTrail.length > 80) kidTrail.shift(); }
+  const fx = -Math.sin(L.yaw), fz = -Math.cos(L.yaw), rx = -fz, rz = fx, side = i ? 1 : -1;
+  let tx, tz, ty = L.y, pose = "stand", yaw = null;
+  if (PRAY_POSES[L.pose]){ tx = L.x + rx * side * .9; tz = L.z + rz * side * .9; pose = L.pose; yaw = L.yaw; }
+  else if (L.pose === "sit" || L.pose === "eat" || L.pose === "sleep"){
+    // sit on a free seat nearby, or stand beside
+    const taken = new Set(KIDS.filter(o => o !== k && o.kseat).map(o => o.kseat));
+    const sp = spots.filter(s => s.type === "sit" && !s.taken && !taken.has(s) && Math.hypot(s.pos.x - L.x, s.pos.z - L.z) > .35 && Math.hypot(s.pos.x - L.x, s.pos.z - L.z) < 3.5 && Math.abs(s.pos.y - L.y) < 1.2)
+      .sort((a, b) => Math.hypot(a.pos.x - L.x, a.pos.z - L.z) - Math.hypot(b.pos.x - L.x, b.pos.z - L.z))[0];
+    if (sp){ k.kseat = sp; k.x = sp.pos.x; k.z = sp.pos.z; k.y = sp.pos.y; k.yaw = sp.yaw; k.pose = "sit"; k.speed = 0; placeNPC(k); return; }
+    tx = L.x + rx * side * 1.0 + fx * .4; tz = L.z + rz * side * 1.0 + fz * .4; yaw = L.yaw;
+  } else if (L.pose === "swim"){ const p = trailPoint(1.6 + i * 1.0, L); tx = p.x; tz = p.z; ty = L.y; pose = "swim"; }
+  else { const p = trailPoint(1.3 + i * .9, L); tx = p.x + rx * side * .35; tz = p.z + rz * side * .35; }
+  k.kseat = null;
+  const dx = tx - k.x, dz = tz - k.z, d = Math.hypot(dx, dz);
+  if (d > 14 || !isFinite(k.x)){ k.x = tx; k.z = tz; k.speed = 0; }
+  else if (d > .05){ const sp = Math.min(d * 3, pose === "swim" ? 2.2 : 4.5), s = Math.min(d, sp * dt); k.x += dx / d * s; k.z += dz / d * s; k.speed = d > .25 ? sp : 0; if (d > .25 && yaw == null) yaw = Math.atan2(-dx, -dz); }
+  else k.speed = 0;
+  k.pose = pose; if (yaw != null) k.yaw = yaw;
+  k.gT = (k.gT || 0) - dt; if (k.gT <= 0){ k.gT = .25; k.gy = pose === "swim" ? ty : groundAt(k.x, k.z, ty); }
+  k.y += ((k.gy != null ? k.gy : ty) + .02 - (k.y || 0)) * Math.min(1, dt * 10);
+  placeNPC(k); k.H.root.rotation.x = 0;
+}
+function trailPoint(dist, L){
+  let acc = 0, prev = {x: L.x, z: L.z};
+  for (let j = kidTrail.length - 1; j >= 0; j--){ const p = kidTrail[j], seg = Math.hypot(p.x - prev.x, p.z - prev.z); if (acc + seg >= dist){ const t = (dist - acc) / (seg || 1); return {x: prev.x + (p.x - prev.x) * t, z: prev.z + (p.z - prev.z) * t}; } acc += seg; prev = p; }
+  return {x: L.x + Math.sin(L.yaw) * dist, z: L.z + Math.cos(L.yaw) * dist};
+}
 const KID_LINES = ["Assalamu alaikum! Play with us!", "Can we go to the beach?", "I love you!", "Tell me a story tonight?", "Look, I can swing so high!", "Catch me if you can!"];
 KIDS.forEach(k => interact.push({pos: new THREE.Vector3(), r: 1.9, dist: p => Math.hypot(p.x - k.x, p.z - k.z) + (Math.abs((k.y || 0) - p.y) > 1.2 ? 9 : 0),
   label: () => {
     if (player.mode !== "walk" || player.swim) return null;
-    if (k.kact === "sleep") return {info: k.name + " is sleeping"};
-    if (k.kact === "pray") return {info: k.name + " is praying"};
+    if (k.kact === "pray" && !kidsLeader) return {info: k.name + " is praying"};
     return "Hug " + k.name;
   },
   act: () => {
@@ -4697,6 +5243,17 @@ function incident(victim, V){
   if (Math.abs(V.z - 44) > 12 && Math.abs(V.x - 75) < 14) axis.set(0, 0, 1);
   const side = new THREE.Vector3(-axis.z, 0, axis.x).multiplyScalar(2.8);
   police.start = at.clone().addScaledVector(axis, -75).add(side); police.stop = at.clone().addScaledVector(axis, -7).add(side); police.leave = at.clone().addScaledVector(axis, 110).add(side);
+  police.active = true; police.phase = "drive"; police.t = 0; police.remote = false;
+  police.jeep.g.position.copy(police.start); police.jeep.g.visible = true;
+  sirenOn(true);
+  // the other person sees the police come too
+  const pid = partner(); if (pid) net.act.hit.send({op: "police", vid: V.id, s: [police.start.x, police.start.z], st: [police.stop.x, police.stop.z], lv: [police.leave.x, police.leave.z], by: me.name}, {target: pid});
+}
+function policeRemote(d){
+  if (police.active || !Array.isArray(d.s)) return;
+  const V = VEH[d.vid] || car;
+  police.V = V; police.victim = null; police.remote = true;
+  police.start = new THREE.Vector3(d.s[0], 0, d.s[1]); police.stop = new THREE.Vector3(d.st[0], 0, d.st[1]); police.leave = new THREE.Vector3(d.lv[0], 0, d.lv[1]);
   police.active = true; police.phase = "drive"; police.t = 0;
   police.jeep.g.position.copy(police.start); police.jeep.g.visible = true;
   sirenOn(true);
@@ -4725,12 +5282,13 @@ function tickPolice(dt){
   else if (police.phase === "back"){
     const dx = J.position.x - O.x, dz = J.position.z - O.z, d = Math.hypot(dx, dz);
     if (d > .3){ O.x += dx / d * 1.5 * dt; O.z += dz / d * 1.5 * dt; O.yaw = Math.atan2(-dx, -dz); O.speed = 1.5; placeNPC(O); }
-    else { O.hidden = true; O.speed = 0; police.phase = "leave"; police.t = 0; V.frozen = 0; }
+    else { O.hidden = true; O.speed = 0; police.phase = "leave"; police.t = 0; if (!police.remote) V.frozen = 0; }
   } else if (police.phase === "leave"){
     if (moveTo(J, police.leave, 14, dt) || police.t > 14){ police.active = false; J.visible = false; sirenOn(false); }
   }
 }
 function fineNow(){
+  if (police.remote){ npcSay(police.officer, "You hit someone. That's a fine of ★2. Drive carefully!", 5000); return; }
   const v = police.victim, paid = Math.min(2, gold), who = v.npc ? "the person you hit" : peerName(v.peer);
   if (paid) addGold(-paid);
   npcSay(police.officer, paid ? "Fine: ★" + paid + " golden points, paid to " + (v.npc ? "them" : who) + ". Drive carefully!" : "No points to fine? A warning this time. Drive carefully!", 5000);
@@ -4739,6 +5297,7 @@ function fineNow(){
   if (v.npc) setTimeout(() => npcSay(v.npc, "Okay, I'm fine. Go slowly next time!", 3500), 2500);
 }
 function onHitMsg(d){
+  if (d.op === "police"){ policeRemote(d); return; }
   if (d.op === "hit"){ player.fallUntil = performance.now() + 3500; standUp(); toast(String(d.by || "They").slice(0, 24) + " hit you with their vehicle! The police are on the way.", 5000); }
   else if (d.op === "fine"){ addGold(Math.max(0, Math.min(2, d.gold | 0)), "Police fine paid to you by " + String(d.by || "them").slice(0, 24)); }
 }
@@ -5579,12 +6138,219 @@ interact.push({pos: new THREE.Vector3((LIB.x0 + LIB.x1) / 2, 0, LIB.z1 - 1.2), r
 NPCS.forEach(n => { if (n.role === "librarian") interact.push({pos: new THREE.Vector3(n.x, 0, n.z - 1.6), r: 1.2, label: () => player.mode === "walk" ? "Say salam to the librarian" : null, act: () => { npcSay(n, "Wa alaikum assalam! Every tafsir is on these shelves.", 4500); sayAloud("Wa alaikum assalam", false, "وعليكم السلام"); }}); });
 
 
+/* ---------- the planner on the bedroom desk: shared home plans (for both of you) and private plans (just yours) ---------- */
+const PLAN_CATS = [["home", "🏠 Home"], ["trip", "✈️ Trip"], ["money", "💰 Money"], ["shop", "🛒 Shopping"], ["ibadah", "🕌 Ibadah"], ["goal", "🎯 Goal"], ["event", "🎉 Event"], ["work", "💼 Work"], ["other", "📌 Other"]];
+const planner = {open: false, tab: "shared", edit: null, showDone: false, saveT: 0};
+const planStoreKey = () => net.isOwner ? "veed-planner-shared" : "veed-planner-visit-" + (net.homeId || "x");
+let sharedPlans = loadPlans(visitHome ? "veed-planner-visit-" + visitHome : "veed-planner-shared"), myPlans = loadPlans("veed-planner-mine");
+ready.then(() => { sharedPlans = loadPlans(planStoreKey()); });
+function loadPlans(k){ const v = store.get(k, []); return Array.isArray(v) ? v.filter(p => p && typeof p.id === "string").slice(0, 500) : []; }
+function cleanPlan(p){
+  if (!p || typeof p !== "object" || typeof p.id !== "string" || !/^[\w-]{4,40}$/.test(p.id)) return null;
+  const s = (v, n) => String(v == null ? "" : v).slice(0, n);
+  return {id: p.id, title: s(p.title, 120), date: /^\d{4}-\d{2}-\d{2}$/.test(p.date) ? p.date : "", time: /^\d{2}:\d{2}$/.test(p.time) ? p.time : "", cat: PLAN_CATS.some(c => c[0] === p.cat) ? p.cat : "other",
+    notes: s(p.notes, 6000), items: (Array.isArray(p.items) ? p.items : []).slice(0, 80).map(i => ({t: s(i && i.t, 200), d: !!(i && i.d)})), done: !!p.done, by: s(p.by, 30), at: +p.at || 0, del: !!p.del};
+}
+function savePlans(){ store.set(planStoreKey(), sharedPlans); store.set("veed-planner-mine", myPlans); }
+function listFor(tab){ return tab === "shared" ? sharedPlans : myPlans; }
+// put a plan into a list, newest edit wins; deletions are kept as markers so they don't come back
+function putPlan(list, p){
+  const i = list.findIndex(x => x.id === p.id);
+  if (i >= 0){ if ((list[i].at || 0) > p.at) return false; list[i] = p; } else list.push(p);
+  return true;
+}
+function sharedChanged(p){
+  savePlans();
+  const pid = partner(); if (!pid || !net.act.plan) return;
+  if (net.isOwner) net.act.plan.send({op: "put", p}, {target: pid});
+  else net.act.plan.send({op: "put", p}, {target: net.ownerId});
+}
+function onPlanMsg(d, peerId){
+  if (d.op === "all" && !net.isOwner && peerId === net.ownerId && Array.isArray(d.plans)){
+    sharedPlans = d.plans.map(cleanPlan).filter(Boolean); savePlans(); renderPlanner(); return;
+  }
+  if (d.op === "put"){
+    const p = cleanPlan(d.p); if (!p) return;
+    if (net.isOwner && sharedPlans.filter(x => !x.del).length >= 400 && !sharedPlans.some(x => x.id === p.id)) return;
+    if (putPlan(sharedPlans, p)){
+      savePlans();
+      if (net.isOwner && peerId !== net.selfId) {/* the guest already has it */}
+      if (planner.open && planner.tab === "shared" && (!planner.edit || planner.edit.id !== p.id)) renderPlanner();
+      if (!p.del && p.by && p.by !== me.name && planner.lastToast !== p.id + p.at){ planner.lastToast = p.id + p.at; toast(p.by + " updated the plan “" + (p.title || "Untitled") + "”", 3000); }
+    }
+  }
+}
+function planWelcome(p){ if (net.isOwner && net.act.plan) net.act.plan.send({op: "all", plans: sharedPlans}, {target: p.id}); }
+
+/* the desk: a planner file you can open */
+(function buildPlannerDesk(){
+  const y = SCENE.P + .78, x = 1.75, z = -1.35;
+  const cover = box(.34, .03, .44, x, y, z, mat(0x1e5a7a, .5), {noCollide: true}); cover.rotation.y = .12;
+  const pages = box(.32, .012, .42, x - .005, y + .03, z, mat(0xf6f1e4, .8), {noCollide: true}); pages.rotation.y = .12;
+  const pen = cyl(.006, .006, .16, x + .1, y + .045, z + .05, mat(0x222222, .4), {noCollide: true}, 6); pen.rotation.set(Math.PI / 2, 0, .9);
+  const tag = textPlane(["Planner"], .22, .06, {bg: "#1e5a7a", fg: "#ffffff"}); tag.position.set(x, y + .032, z - .12); tag.rotation.set(-Math.PI / 2, 0, .12); world.add(tag);
+})();
+interact.push({pos: new THREE.Vector3(1.3, SCENE.P, -1.0), r: 1.5, label: () => player.mode === "walk" || player.mode === "sit" ? "Open the planner" : null, act: () => openPlanner()});
+
+function openPlanner(tab){ planner.open = true; planner.edit = null; if (tab) planner.tab = tab; $("planner").hidden = false; renderPlanner(); }
+function closePlanner(){ flushPlanEdit(); planner.open = false; planner.edit = null; $("planner").hidden = true; view.focus({preventScroll: true}); }
+$("planClose").addEventListener("click", closePlanner);
+document.querySelectorAll("#planTabs [data-t]").forEach(b => b.addEventListener("click", () => { flushPlanEdit(); planner.tab = b.dataset.t; planner.edit = null; renderPlanner(); }));
+$("planNew").addEventListener("click", () => {
+  flushPlanEdit();
+  const p = {id: "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: "", date: "", time: "", cat: "home", notes: "", items: [], done: false, by: me.name, at: Date.now()};
+  planner.edit = p; planner.isNew = true; renderPlanner(); setTimeout(() => $("pTitle") && $("pTitle").focus(), 50);
+});
+$("planDone").addEventListener("change", e => { planner.showDone = e.target.checked; renderPlanner(); });
+$("planner").addEventListener("keydown", e => { if (e.key === "Escape"){ if (planner.edit){ flushPlanEdit(); planner.edit = null; renderPlanner(); } else closePlanner(); } e.stopPropagation(); });
+
+const fmtPlanDate = p => { if (!p.date) return "No date"; const d = new Date(p.date + "T" + (p.time || "12:00")); return d.toLocaleDateString(undefined, {weekday: "short", day: "numeric", month: "short", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric"}) + (p.time ? " · " + p.time : ""); };
+function renderPlanner(){
+  if (!planner.open) return;
+  document.querySelectorAll("#planTabs [data-t]").forEach(b => b.classList.toggle("primary", b.dataset.t === planner.tab));
+  const shared = planner.tab === "shared", host = net.isOwner ? "" : peerName(net.ownerId);
+  $("planSub").textContent = shared ? (net.isOwner ? (partner() ? "Shared with " + peerName(partner()) + ". You both see and edit these, and they're kept in your home." : "Plans for your home. When your partner visits, you both see and edit them.") : (partner() ? "Plans in " + (host || "your partner") + "'s home. You both see and edit them." : "You're offline from this home, so this is the last copy you saw.")) : "Only you can see these. They're saved to your account.";
+  const body = $("planBody"); body.textContent = "";
+  $("planNew").hidden = !!planner.edit; $("planDoneWrap").hidden = !!planner.edit;
+  if (planner.edit) return renderPlanEditor(body);
+  const today = new Date().toISOString().slice(0, 10);
+  const list = listFor(planner.tab).filter(p => !p.del && (planner.showDone || !p.done));
+  list.sort((a, b) => (a.done - b.done) || ((a.date || "9999") + (a.time || "")).localeCompare((b.date || "9999") + (b.time || "")) || b.at - a.at);
+  if (!list.length){
+    const e = document.createElement("div"); e.className = "planempty";
+    e.innerHTML = "<b>Nothing planned yet</b><span>Press <i>New plan</i> to add a trip, a shopping list, savings, a goal, an event — anything you want to remember.</span>";
+    body.appendChild(e); return;
+  }
+  const grid = document.createElement("div"); grid.className = "plangrid"; body.appendChild(grid);
+  list.forEach(p => {
+    const c = document.createElement("button"); c.type = "button"; c.className = "plancard" + (p.done ? " done" : "") + (p.date && p.date < today && !p.done ? " late" : "");
+    const n = p.items.length, k = p.items.filter(i => i.d).length, cat = PLAN_CATS.find(x => x[0] === p.cat);
+    const h = document.createElement("b"); h.textContent = p.title || "Untitled plan";
+    const meta = document.createElement("span"); meta.className = "planmeta"; meta.textContent = (cat ? cat[1] : "") + " · " + fmtPlanDate(p);
+    c.append(h, meta);
+    if (p.notes){ const s = document.createElement("span"); s.className = "plannote"; s.textContent = p.notes.slice(0, 140); c.appendChild(s); }
+    if (n){ const m = document.createElement("span"); m.className = "planprog"; m.innerHTML = "<i></i>"; m.firstChild.style.width = (k / n * 100) + "%"; const t = document.createElement("small"); t.textContent = k + " of " + n + " done"; c.append(m, t); }
+    if (shared && p.by){ const by = document.createElement("small"); by.className = "planby"; by.textContent = "Last edit: " + p.by; c.appendChild(by); }
+    c.addEventListener("click", () => { planner.edit = JSON.parse(JSON.stringify(p)); planner.isNew = false; renderPlanner(); });
+    grid.appendChild(c);
+  });
+}
+function renderPlanEditor(body){
+  const p = planner.edit, wrap = document.createElement("div"); wrap.className = "planedit"; body.appendChild(wrap);
+  wrap.innerHTML = `
+    <div class="row"><button class="btn" type="button" id="pBack">‹ All plans</button><span class="spacer"></span><small id="pSaved"></small></div>
+    <input id="pTitle" class="ptitle" maxlength="120" placeholder="What are you planning?" aria-label="Plan title">
+    <div class="row"><label>Date <input type="date" id="pDate"></label><label>Time <input type="time" id="pTime"></label><label>Type <select id="pCat"></select></label></div>
+    <label class="label" for="pNotes">Notes</label>
+    <textarea id="pNotes" rows="5" maxlength="6000" placeholder="Details, ideas, budget, places, people…"></textarea>
+    <label class="label">Checklist</label>
+    <ul class="pitems" id="pItems"></ul>
+    <form class="row" id="pAddForm"><input id="pAdd" maxlength="200" placeholder="Add a step or an item…" aria-label="New checklist item"><button class="btn" type="submit">Add</button></form>
+    <div class="row"><label class="pdone"><input type="checkbox" id="pDoneBox"> This plan is done</label><span class="spacer"></span><button class="btn danger" type="button" id="pDel">Delete plan</button></div>`;
+  $("pTitle").value = p.title; $("pDate").value = p.date; $("pTime").value = p.time; $("pNotes").value = p.notes; $("pDoneBox").checked = p.done;
+  PLAN_CATS.forEach(([k, n]) => { const o = document.createElement("option"); o.value = k; o.textContent = n; $("pCat").appendChild(o); }); $("pCat").value = p.cat;
+  const changed = () => { p.title = $("pTitle").value; p.date = $("pDate").value; p.time = $("pTime").value; p.cat = $("pCat").value; p.notes = $("pNotes").value; p.done = $("pDoneBox").checked; schedulePlanSave(); };
+  ["pTitle", "pNotes"].forEach(id => $(id).addEventListener("input", changed));
+  ["pDate", "pTime", "pCat", "pDoneBox"].forEach(id => $(id).addEventListener("change", changed));
+  const drawItems = () => {
+    const ul = $("pItems"); ul.textContent = "";
+    p.items.forEach((it, i) => {
+      const li = document.createElement("li"); if (it.d) li.className = "d";
+      const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = it.d; cb.setAttribute("aria-label", "Done");
+      cb.addEventListener("change", () => { it.d = cb.checked; li.classList.toggle("d", it.d); schedulePlanSave(); });
+      const tx = document.createElement("input"); tx.value = it.t; tx.maxLength = 200; tx.setAttribute("aria-label", "Item");
+      tx.addEventListener("input", () => { it.t = tx.value; schedulePlanSave(); });
+      const x = document.createElement("button"); x.type = "button"; x.className = "btn"; x.textContent = "✕"; x.setAttribute("aria-label", "Remove item");
+      x.addEventListener("click", () => { p.items.splice(i, 1); drawItems(); schedulePlanSave(); });
+      li.append(cb, tx, x); ul.appendChild(li);
+    });
+  };
+  drawItems();
+  $("pAddForm").addEventListener("submit", e => { e.preventDefault(); const v = $("pAdd").value.trim(); if (!v) return; if (p.items.length >= 80){ toast("A plan can have up to 80 items."); return; } p.items.push({t: v, d: false}); $("pAdd").value = ""; drawItems(); schedulePlanSave(); $("pAdd").focus(); });
+  $("pBack").addEventListener("click", () => { flushPlanEdit(); planner.edit = null; renderPlanner(); });
+  $("pDel").addEventListener("click", () => {
+    if (planner.delArm !== p.id){ planner.delArm = p.id; $("pDel").textContent = "Tap again to delete"; setTimeout(() => { if ($("pDel")){ planner.delArm = null; $("pDel").textContent = "Delete plan"; } }, 3000); return; }
+    planner.delArm = null; clearTimeout(planner.saveT);
+    if (!planner.isNew) commitPlan(Object.assign({}, p, {del: true, title: "", notes: "", items: [], at: Date.now(), by: me.name}));
+    planner.edit = null; renderPlanner(); toast("Plan deleted.", 1800);
+  });
+}
+function schedulePlanSave(){ clearTimeout(planner.saveT); $("pSaved") && ($("pSaved").textContent = "Saving…"); planner.saveT = setTimeout(flushPlanEdit, 600); }
+function flushPlanEdit(){
+  clearTimeout(planner.saveT);
+  const p = planner.edit; if (!p) return;
+  if (planner.isNew && !p.title.trim() && !p.notes.trim() && !p.items.length) return;   // an empty new plan isn't kept
+  planner.isNew = false;
+  commitPlan(Object.assign({}, p, {at: Date.now(), by: me.name, items: p.items.map(i => ({t: i.t, d: i.d}))}));
+  if ($("pSaved")) $("pSaved").textContent = planner.tab === "shared" && partner() ? "Saved for both of you" : "Saved";
+}
+function commitPlan(p){
+  p = cleanPlan(p); if (!p) return;
+  if (planner.tab === "shared"){ putPlan(sharedPlans, p); sharedChanged(p); }
+  else { putPlan(myPlans, p); savePlans(); }
+}
+
+
+/* ---------- phone-friendly: minimise any panel, hide them all, full screen, install as an app ---------- */
+document.querySelectorAll(".minbtn[data-min]").forEach(b => {
+  const id = b.dataset.min, panel = $(id);
+  const apply = mini => { panel.classList.toggle("mini", mini); b.textContent = mini ? (id === "chat" ? "💬" : "+") : "–"; b.setAttribute("aria-label", mini ? "Show" : "Minimise"); };
+  apply(!!store.get("veed-mini-" + id, coarse && innerWidth < 560 && (id === "lifePanel" || id === "chat")));
+  b.addEventListener("click", e => { e.stopPropagation(); const m = !panel.classList.contains("mini"); apply(m); store.set("veed-mini-" + id, m); view.focus({preventScroll: true}); });
+});
+// the eye button hides every panel so you can see the whole screen
+function setHideUI(on){ document.body.classList.toggle("hideui", on); $("uiToggle").setAttribute("aria-pressed", String(on)); $("uiToggle").title = on ? "Show panels" : "Hide all panels"; store.set("veed-hideui", on); }
+$("uiToggle").addEventListener("click", () => { setHideUI(!document.body.classList.contains("hideui")); view.focus({preventScroll: true}); });
+setHideUI(!!store.get("veed-hideui", false));
+// full screen (hides the browser bars on phones)
+function isFull(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function toggleFull(){
+  const d = document.documentElement;
+  try {
+    if (isFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (d.requestFullscreen || d.webkitRequestFullscreen).call(d, {navigationUI: "hide"});
+  } catch(e){ toast("Full screen isn't available in this browser. Add Veed to your home screen to play without the browser bars.", 6000); }
+}
+$("fsBtn").addEventListener("click", toggleFull);
+document.addEventListener("fullscreenchange", () => { $("fsBtn").textContent = isFull() ? "Exit full screen" : "Full screen"; setTimeout(resize, 100); });
+if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) $("fsBtn").hidden = true;
+// install as an app (works offline after the first visit)
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+addEventListener("orientationchange", () => setTimeout(resize, 300));
+
+/* ---------- theater: the cinema or class screen fills the whole display ---------- */
+function theaterScreen(){ return cinemaSeat() ? cinema.screen : classSeat() ? classScreen : null; }
+function setTheater(on){
+  if (on && !theaterScreen()){ toast("Take a seat in the cinema or the classroom first."); return; }
+  document.body.classList.toggle("theater", on); $("theaterBar").hidden = !on;
+  if (on){ if (!isFull()) toggleFull(); $("theaterBar").classList.add("show"); setTimeout(() => $("theaterBar").classList.remove("show"), 2500); renderTheaterBar(); toast("Full-screen theater. Tap the screen or press Esc to leave.", 3000); }
+  else if (isFull() && !store.get("veed-wasfull", false)) toggleFull();
+  view.focus({preventScroll: true});
+}
+function renderTheaterBar(){ const c = cinemaSeat(); $("thPlay").hidden = !c || !movie.vid; $("thPlay").textContent = movie.playing ? "Pause" : "Play"; }
+// the camera sits square in front of the screen, far enough back that the picture fills the display
+function theaterCam(){
+  if (!document.body.classList.contains("theater")) return false;
+  const S = theaterScreen(); if (!S){ setTheater(false); return false; }
+  const t = Math.tan(camera.fov * Math.PI / 360), d = Math.max(S.h / 2 / t, S.w / 2 / (t * camera.aspect)) * 1.01;
+  camera.position.set(S.pos.x, S.pos.y, S.pos.z - d); camera.lookAt(S.pos.x, S.pos.y, S.pos.z);
+  return true;
+}
+$("mvFull").addEventListener("click", () => { store.set("veed-wasfull", isFull()); setTheater(true); });
+$("classFull").addEventListener("click", () => { store.set("veed-wasfull", isFull()); setTheater(true); });
+$("thExit").addEventListener("click", () => setTheater(false));
+$("thPlay").addEventListener("click", () => { $("mvPlay").click(); renderTheaterBar(); });
+addEventListener("keydown", e => { if (e.code === "Escape" && document.body.classList.contains("theater")) setTheater(false); });
+document.addEventListener("fullscreenchange", () => { if (!isFull() && document.body.classList.contains("theater") && !store.get("veed-wasfull", false)) setTheater(false); });
+renderer.domElement.addEventListener("click", () => { if (document.body.classList.contains("theater")){ $("theaterBar").classList.add("show"); clearTimeout(renderTheaterBar.t); renderTheaterBar.t = setTimeout(() => $("theaterBar").classList.remove("show"), 3000); } });
+
+
 /* ---------- panel controls: sky, weather, music, salams ---------- */
 {
   const sel = $("skySel");
   Object.entries(SKY_MODES).forEach(([k, v]) => { const o = document.createElement("option"); o.value = k; o.textContent = v; sel.appendChild(o); });
   sel.value = skyMode;
-  sel.addEventListener("change", () => { skyMode = sel.value; store.set("veed-sky", skyMode); updateSky(); renderWeather(); view.focus({preventScroll: true}); });
+  sel.addEventListener("change", () => { setSky(sel.value, true); view.focus({preventScroll: true}); });
   $("musicOn").checked = music.on;
   $("musicOn").addEventListener("change", () => { music.on = $("musicOn").checked; store.set("veed-music", music.on); if (!music.on) musicPlay(false); });
   renderSalams();
@@ -5594,8 +6360,21 @@ function renderWeather(){
   $("weather").textContent = weatherText() + " · Sunrise " + fmtTime(t.sunrise) + " · Sunset " + fmtTime(t.maghrib);
 }
 fillGoto();
+// the sky is the same for both of you: whoever changes it changes it for the other person too
+function setSky(mode, mine, by){
+  if (!SKY_MODES[mode]) return;
+  skyMode = mode; store.set("veed-sky", mode); $("skySel").value = mode; updateSky(); renderWeather();
+  if (mine){ const pid = partner(); if (pid) net.act.world.send({sky: mode}, {target: pid}); }
+  else toast((by || "They") + " changed the sky to " + SKY_MODES[mode].replace(" (India)", "") + ".", 3000);
+}
+function onWorldMsg(d){
+  const pid = partner(); if (!pid) return;
+  if (d.sky && d.sky !== skyMode) setSky(d.sky, false, peerName(pid));
+  if ("kids" in d) setKidsLeader(d.kids === "you" ? net.selfId : d.kids === "me" ? pid : null, false);
+}
 // when someone joins, tell them about a meal waiting on the table
-function moreWelcome(p){ if (plate.visible && plateBy === me.name) net.act.serve.send({op: "plate", by: me.name}, {target: p.id}); coupleWelcome(p); }
+function moreWelcome(p){ if (plate.visible && plateBy === me.name) net.act.serve.send({op: "plate", by: me.name}, {target: p.id}); coupleWelcome(p); planWelcome(p);
+  if (net.isOwner) net.act.world.send({sky: skyMode, kids: kidsLeader === net.selfId ? "me" : kidsLeader ? "you" : ""}, {target: p.id}); }
 
 /* ---------- everything that moves each frame ---------- */
 let skyT = 0, lightT = 0, weatherT = 0;
@@ -5609,7 +6388,8 @@ function tickMore(dt){
   tickRain(dt); tickSwings(dt); tickSwim(); tickKids(dt); tickCat(dt); tickTraffic(dt); tickPolice(dt); tickCrossers(dt);
   tickKisanic(dt); tickClass(); tickGames(dt); updateRoseBtn(); tickKneel();
   musicPlay(entered && ((player.mode === "car" && coupleOn()) || dance.on));
-  tickExtra(dt);
+  tickExtra(dt); tickScenery(dt);
+  WATER_NS.forEach((n, i) => { n.offset.x += dt * (i ? .02 : .012); n.offset.y += dt * .006; });
   // sky decorations follow the camera
   stars.position.copy(camera.position);
   if (moon.material.opacity > 0 && moon.userData.dir) moon.position.copy(camera.position).addScaledVector(moon.userData.dir, 900);
