@@ -2913,15 +2913,23 @@ function tickCinema(dt){
 
 /* ---------- your own home: a key pair made on this device; the home id comes from the public key ---------- */
 // Relay (TURN) for networks that block direct connections, such as mobile data or guests abroad.
-// Paste the USERNAME and PASSWORD of your Metered TURN credential (TURN Server > Credentials) between the quotes.
-// Never put the Metered "Secret Key" here.
-const TURN_USER = "8a679914236634889d6fb556", TURN_PASS = "FUXh6ifJOPeY1h96";
-const RELAY_SERVERS = /PASTE_/.test(TURN_USER + TURN_PASS) ? [] : [
-  {urls: "turn:global.relay.metered.ca:80", username: TURN_USER, credential: TURN_PASS},
-  {urls: "turn:global.relay.metered.ca:80?transport=tcp", username: TURN_USER, credential: TURN_PASS},
-  {urls: "turn:global.relay.metered.ca:443", username: TURN_USER, credential: TURN_PASS},
-  {urls: "turns:global.relay.metered.ca:443?transport=tcp", username: TURN_USER, credential: TURN_PASS}
-];
+// It's free Cloudflare TURN: your Supabase helper "veed-turn" hands out a short-lived password to logged-in players,
+// so no relay password is ever written in this page.
+let RELAY_SERVERS = [];
+async function loadRelay(){
+  if (typeof cloudOn !== "function" || !cloudOn() || !ACCT.user || !acctToken()) return;
+  try {
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 5000);
+    const h = {"Content-Type": "application/json", apikey: CLOUD.key};
+    if (/^eyJ/.test(CLOUD.key)) h.Authorization = "Bearer " + CLOUD.key;
+    const r = await fetch(CLOUD.url.replace(/\/$/, "") + "/functions/v1/veed-turn", {method: "POST", headers: h, body: JSON.stringify({name: ACCT.user, token: acctToken()}), signal: ctl.signal});
+    clearTimeout(timer);
+    if (!r.ok) return;
+    const j = await r.json();
+    RELAY_SERVERS = (j.iceServers || []).filter(s => s && s.urls && s.username && s.credential);
+  } catch(e){}
+}
+
 const net = {room: null, act: {}, peers: {}, isOwner: true, homeId: "", ownerId: null, guestId: null, admitted: false,
   stream: null, muted: false, ctx: null, selfAn: null, selfBuf: null, selfId: "me", invite: ""};
 const ID = {priv: null, pub: null, homeId: "", ok: false};
@@ -3074,11 +3082,14 @@ function netIssue(){
   joinFails++;
   const n = $("netnote"); n.hidden = false;
   n.textContent = (joinFails === 1 ? "Someone tried to connect" : joinFails + " connection attempts failed") + ". " +
-    (RELAY_SERVERS.length ? "Ask them to reload the page, or to try Wi-Fi instead of mobile data." : "Their network blocks direct connections. Add your relay username and password to index.html so everyone can connect.");
+    (RELAY_SERVERS.length ? "Ask them to reload the page, or to try Wi-Fi instead of mobile data." : "Their network blocks direct connections. Set up the free Cloudflare relay (see the README) so everyone can connect.");
 }
 
 /* ---------- connecting ---------- */
-function startNet(T){
+async function startNet(T){
+  if (net.room) return;
+  await loadRelay();          // a relay password for tricky networks (takes a moment; works without it too)
+  if (net.room) return;
   const cfg = {appId: "veed-home-walkthrough-shabeehk"};
   if (RELAY_SERVERS.length) cfg.turnConfig = RELAY_SERVERS;
   let room;
