@@ -156,6 +156,18 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .enter-card p{margin:0;font-size:13.5px;line-height:1.45;color:var(--muted)}
 .enter-card label.l{font-size:12.5px;font-weight:600}
 .enter-card .fine{font-size:12px}
+.enter-card .links a{color:var(--muted)}
+.acctmsg.ok{color:#1d5c3a}
+.paybox{display:flex;flex-direction:column;gap:8px;background:var(--chip);border-radius:12px;padding:12px}
+.payhead{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:baseline;font-size:13.5px}
+.payhead .curr{font-size:12px;color:var(--muted)}
+.payhead .linkbtn.on{font-weight:700;color:var(--ink);text-decoration:none}
+.paybox .btn b{font-weight:800}
+.codeRow input{flex:1;min-width:0;font:600 13px var(--font);letter-spacing:.04em;text-transform:uppercase}
+.trialbar{position:fixed;z-index:8;left:50%;transform:translateX(-50%);top:calc(48px + env(safe-area-inset-top,0px));display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 8px 6px 14px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap}
+.trialbar .btn{padding:6px 10px;font-size:12.5px}
+@media (max-width:640px){.trialbar{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:12px;transform:none;max-width:calc(100% - 24px);white-space:normal}}
+body.theater .trialbar{display:none!important}
 .looks{border:0;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .looks legend{font-size:12.5px;font-weight:600;margin-bottom:6px;padding:0}
 .look{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px solid var(--line);border-radius:12px;padding:10px 6px 8px;cursor:pointer;background:var(--chip)}
@@ -441,6 +453,7 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
 </section>
 <div class="ginvite panel" id="gameInvite" hidden><p id="gameInviteText"></p><div class="row"><button class="btn primary" id="gameJoin" type="button">Play</button><button class="btn" id="gameNo" type="button">Not now</button></div></div>
 <div class="knock" id="knock" hidden aria-live="assertive"></div>
+<div class="trialbar" id="trialBar" hidden><span>Looking around · nothing is saved</span><button class="btn primary" type="button" id="trialEnd">Create my home</button></div>
 <div class="ginvite panel frcard" id="friendReq" hidden><p id="friendReqText"></p><div class="row"><button class="btn primary" id="friendYes" type="button">Accept</button><button class="btn" id="friendNo" type="button">Not now</button></div></div>
 <div class="ginvite panel frcard" id="friendCall" hidden><p id="friendCallText"></p><div class="row"><button class="btn primary" id="friendGo" type="button">Go</button><button class="btn" id="friendLater" type="button">Not now</button></div></div>
 <div class="theaterbar" id="theaterBar" hidden><button class="btn" id="thPlay" type="button">Pause</button><button class="btn primary" id="thExit" type="button">Exit full screen</button></div>
@@ -589,18 +602,37 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
     <div id="acctFields" class="acctf">
       <label class="l" for="nameIn">Your name</label>
       <input id="nameIn" maxlength="24" autocomplete="username" autocapitalize="words" required>
-      <label class="l" for="passIn">Password</label>
-      <input id="passIn" type="password" maxlength="64" autocomplete="current-password" required>
+      <div id="passWrap" class="acctf">
+        <label class="l" for="passIn">Password</label>
+        <input id="passIn" type="password" maxlength="64" autocomplete="current-password" required>
+      </div>
     </div>
+    <div class="row codeRow" id="codeRowNew" hidden><input id="codeIn" maxlength="16" placeholder="Couple code, if your partner sent one" autocapitalize="characters" autocomplete="off" aria-label="Couple code"><button class="btn" type="button" id="codeBtn">Use</button></div>
     <fieldset class="looks">
       <legend>Choose your look</legend>
       <label class="look"><input type="radio" name="look" value="abaya" checked><svg viewBox="0 0 56 96" aria-hidden="true"><path d="M28 20 L17 38 L9 92 L47 92 L39 38 Z" fill="#141417"/><path d="M17 36 L6 66 L14 67 L21 44 Z M39 36 L50 66 L42 67 L35 44 Z" fill="#26262b"/><g fill="#f4f1ea"><circle cx="10" cy="58" r=".9"/><circle cx="13" cy="52" r=".9"/><circle cx="12" cy="62" r=".9"/><circle cx="16" cy="47" r=".9"/><circle cx="46" cy="58" r=".9"/><circle cx="43" cy="52" r=".9"/><circle cx="44" cy="62" r=".9"/><circle cx="40" cy="47" r=".9"/></g><rect x="19" y="44" width="18" height="3" fill="#2b2b30"/><ellipse cx="28" cy="15" rx="9" ry="10" fill="#141417"/><path d="M19 18 Q28 34 37 18 L37 26 Q28 36 19 26 Z" fill="#141417"/><ellipse cx="28" cy="15" rx="5.5" ry="7" fill="#c58b62"/></svg><span>Abaya</span></label>
       <label class="look"><input type="radio" name="look" value="bandhgala"><svg viewBox="0 0 56 96" aria-hidden="true"><rect x="20" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="29" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="18" y="88" width="9" height="5" rx="2" fill="#3a271c"/><rect x="29" y="88" width="9" height="5" rx="2" fill="#3a271c"/><path d="M17 26 Q28 22 39 26 L41 60 L15 60 Z" fill="#1f4a36"/><rect x="11" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><rect x="39" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><g fill="#c9a54c"><circle cx="28" cy="31" r="1.2"/><circle cx="28" cy="38" r="1.2"/><circle cx="28" cy="45" r="1.2"/><circle cx="28" cy="52" r="1.2"/></g><rect x="31" y="33" width="5" height="2.5" fill="#3d6e6a"/><rect x="25" y="20" width="6" height="5" fill="#c58b62"/><circle cx="28" cy="14" r="8" fill="#c58b62"/><path d="M20 13 Q28 3 36 13 L36 10 Q28 2 20 10 Z" fill="#1b1512"/><path d="M21 16 Q28 26 35 16 L35 19 Q28 27 21 19 Z" fill="#1b1512"/><rect x="21" y="12" width="14" height="3" rx="1" fill="#0e0e0e"/></svg><span>Bandhgala</span></label>
     </fieldset>
     <p class="acctmsg" id="acctMsg" hidden role="alert"></p>
-    <div class="row acctbtns"><button class="btn primary" type="submit" id="acctLogin">Log in</button><button class="btn" type="button" id="acctCreate">Create account</button></div>
+    <div class="row acctbtns"><button class="btn primary" type="submit" id="acctLogin">Log in</button><button class="btn" type="button" id="acctCreate">Create my home</button></div>
+    <p class="fine" id="priceNote" hidden>One home is <b id="priceSingle">₹99</b>, once. No subscription. Pay after you choose your name.</p>
+    <button class="btn" type="button" id="trialBtn">Look around first (nothing is saved)</button>
     <button class="btn primary" type="submit" id="enterBtn" hidden>Enter home</button>
+    <div id="payBox" class="paybox" hidden>
+      <div class="payhead"><b>Your home is built. Pay once to open it.</b><span class="curr"><button type="button" class="linkbtn" id="currIn" data-c="INR">₹ India</button> · <button type="button" class="linkbtn" id="currUs" data-c="USD">$ Outside India</button></span></div>
+      <button class="btn primary" type="button" id="payBtn">Pay <b id="payPrice">₹99</b> · my home, forever</button>
+      <button class="btn" type="button" id="payCoupleBtn">Couple pack <b id="payCouplePrice">₹149</b> · two homes</button>
+      <p class="fine">UPI, cards and net banking through Razorpay. We never see your card details.</p>
+      <p class="fine">Have a couple code? Type it in the box above and press Use.</p>
+      <p class="acctmsg" id="payMsg" hidden role="alert"></p>
+    </div>
+    <div id="coupleCodeBox" class="paybox" hidden>
+      <b>Your couple code</b>
+      <div class="row codeRow"><input id="coupleCode" readonly aria-label="Couple code"><button class="btn" type="button" id="coupleCopy">Copy</button></div>
+      <p class="fine">Send it to your partner. They choose a name and password, then type this code instead of paying. It works once.</p>
+    </div>
     <p class="fine" id="acctNote"></p>
+    <p class="fine links"><a href="policies.html#terms" target="_blank" rel="noopener">Terms</a> · <a href="policies.html#privacy" target="_blank" rel="noopener">Privacy</a> · <a href="policies.html#refunds" target="_blank" rel="noopener">Refunds</a> · <a href="policies.html#contact" target="_blank" rel="noopener">Contact</a></p>
     <p class="fine" id="enterFine">Two people can be inside a home at a time. Once inside, you can see each other, chat, and talk when your mic is on. Headphones stop your speakers echoing into the mic.</p>
   </form>
 </div>
@@ -623,10 +655,12 @@ const coarse = matchMedia("(pointer: coarse)").matches;
 if (coarse) document.body.classList.add("coarse");
 // who is logged in on this device; each account keeps its own saves (and they sync online when set up)
 const ACCT = (() => { const o = {user: "", display: ""}; try { o.user = (localStorage.getItem("veed-current-user") || "").toLowerCase(); o.display = localStorage.getItem("veed-current-display") || o.user; } catch(e){} return o; })();
+// a look-around: play without an account; everything lives in memory and is gone when the tab closes
+const TRIAL = !ACCT.user && (() => { try { return sessionStorage.getItem("veed-trial") === "1"; } catch(e){ return false; } })();
 const store = {
-  pfx: ACCT.user ? "u:" + ACCT.user + ":" : "", dirty: false,
-  get(k, d){ try { const v = localStorage.getItem(this.pfx + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
-  set(k, v){ try { localStorage.setItem(this.pfx + k, JSON.stringify(v)); if (this.pfx){ localStorage.setItem(this.pfx + "__savedAt", String(Date.now())); this.dirty = true; this.at = Date.now(); } } catch(e){ if (!this.warned){ this.warned = true; setTimeout(() => toast("Storage on this browser is full, so some progress can not be saved. Free up space or use another browser.", 8000), 0); } } }
+  pfx: ACCT.user ? "u:" + ACCT.user + ":" : "", dirty: false, mem: TRIAL ? new Map() : null,
+  get(k, d){ if (this.mem) return this.mem.has(k) ? JSON.parse(this.mem.get(k)) : d; try { const v = localStorage.getItem(this.pfx + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ if (this.mem){ this.mem.set(k, JSON.stringify(v)); return; } try { localStorage.setItem(this.pfx + k, JSON.stringify(v)); if (this.pfx){ localStorage.setItem(this.pfx + "__savedAt", String(Date.now())); this.dirty = true; this.at = Date.now(); } } catch(e){ if (!this.warned){ this.warned = true; setTimeout(() => toast("Storage on this browser is full, so some progress can not be saved. Free up space or use another browser.", 8000), 0); } } }
 };
 let toastTimer;
 function toast(msg, ms){ const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, ms || 5000); }
@@ -3034,7 +3068,7 @@ const ready = loadIdentity().then(async () => {
   updateGardenVisual(); refreshLands();
   if (!net.isOwner){
     $("enterTitle").textContent = "You're invited";
-    $("enterSub").textContent = net.invite ? (ACCT.user ? "Choose your look, then knock. The owner lets you in." : "Log in or create your account, then knock. The owner lets you in.") : "This link has no invite. Ask the owner for a new invite link.";
+    $("enterSub").textContent = net.invite ? (ACCT.user ? "Choose your look, then knock. The owner lets you in." : TRIAL ? "Type a name to show your host, choose a look, then knock. Nothing is saved in a look-around." : "Log in or create your home, then knock. Or just look around first.") : "This link has no invite. Ask the owner for a new invite link.";
     $("enterBtn").textContent = "Knock on the door";
   }
   $("ownerSect").hidden = !net.isOwner; $("inviteBtn").hidden = !net.isOwner;
@@ -3053,8 +3087,9 @@ function ensureCtx(){
 }
 $("enterForm").addEventListener("submit", async e => {
   e.preventDefault();
-  if (!ACCT.user){ acctSubmit(e.submitter && e.submitter.id === "acctCreate" ? "create" : "login"); return; }   // log in first
-  const n = (ACCT.display || ACCT.user).slice(0, 24); if (!n) return;
+  if (!ACCT.user && !TRIAL){ acctSubmit(e.submitter && e.submitter.id === "acctCreate" ? "create" : "login"); return; }   // log in first
+  if (ACCT.user && !acctPaid()){ renderPay(); return; }                                                               // pay first
+  const n = (TRIAL ? $("nameIn").value.trim().replace(/\s+/g, " ") : (ACCT.display || ACCT.user)).slice(0, 24); if (!n){ $("nameIn").focus(); return; }
   const chosen = document.querySelector('input[name="look"]:checked');
   me.name = n; me.look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
   { const o = store.get("veed-outfit", ""); if (OUTFIT_KEYS.has(o) && !!STYLES[o].female === (me.look === "abaya")) me.look = o; }
@@ -3063,7 +3098,7 @@ $("enterForm").addEventListener("submit", async e => {
   await ready;
   me.H = buildHuman(me.look); scene.add(me.H.root);
   entered = true;
-  $("enter").hidden = true; $("chat").hidden = false;
+  $("enter").hidden = true; $("chat").hidden = false; $("trialBar").hidden = !TRIAL;
   if (!net.isOwner) $("homeTitle").textContent = "Visiting a home";
   status(); renderPeople(); renderBasket(); renderLife(); updateHint();
   if (!net.isOwner) banner(net.invite ? "Looking for the owner…" : "You need an invite link to go inside. Ask the owner for a new one.");
@@ -4148,7 +4183,7 @@ function acctImport(pfx, data){
 function acctMigrateLegacy(pfx){
   if (LS.get("veed-legacy-claimed")) return;
   const have = acctCollect(pfx); if (Object.keys(have).length > 2) return;
-  try { for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && /^veed-/.test(k) && !/^veed-(current-|token:|acct:|legacy-)/.test(k)) localStorage.setItem(pfx + k, localStorage.getItem(k)); } } catch(e){}
+  try { for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && /^veed-/.test(k) && !/^veed-(current-|token:|acct:|legacy-|paid:|couple-code:)/.test(k)) localStorage.setItem(pfx + k, localStorage.getItem(k)); } } catch(e){}
   LS.set(pfx + "__savedAt", String(Date.now()));
   LS.set("veed-legacy-claimed", "1");
 }
@@ -4167,7 +4202,8 @@ async function acctSubmit(mode){
   acctBusy(true, mode === "create" ? "Creating your account…" : "Logging in…");
   try {
     if (cloudOn()){
-      const r = await rpc(mode === "create" ? "veed_register" : "veed_login", {p_name: name, p_pass: pass});
+      const r = await rpc(mode === "create" ? "veed_register" : "veed_login", mode === "create" ? {p_name: name, p_pass: pass, p_code: ($("codeIn").value || "").trim().toUpperCase() || null} : {p_name: name, p_pass: pass});
+      LS.set("veed-paid:" + id, r.paid === false ? "0" : "1");
       if (mode === "create"){ acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look)); }
       else {
         // keep whichever copy is newer: the one online, or the one already on this device
@@ -4213,21 +4249,28 @@ async function acctLogout(){
 function confirmLeave(){ $("acctSync").textContent = "Not saved online yet"; if (confirmLeave.armed){ confirmLeave.armed = false; return true; } confirmLeave.armed = true; toast("Couldn't save online (check your internet). Your game is still saved on this device. Press Log out again to log out anyway.", 7000); return false; }
 $("acctOut").addEventListener("click", acctLogout); $("acctSwitch").addEventListener("click", e => { e.preventDefault(); acctLogout(); });
 // show the right parts of the welcome card
+function acctPaid(){ return !cloudOn() || !ACCT.user ? true : LS.get("veed-paid:" + ACCT.user) === "1"; }
 (function acctUI(){
-  const inn = !!ACCT.user;
-  $("acctFields").hidden = inn; $("acctWho").hidden = !inn; $("enterBtn").hidden = !inn; $("acctLogin").hidden = inn; $("acctCreate").hidden = inn;
-  $("nameIn").required = !inn; $("passIn").required = !inn;
+  const inn = !!ACCT.user, paid = inn && acctPaid();
+  $("acctFields").hidden = inn; $("acctWho").hidden = !inn; $("enterBtn").hidden = !(inn && paid || TRIAL); $("acctLogin").hidden = inn || TRIAL; $("acctCreate").hidden = inn || TRIAL;
+  $("passWrap").hidden = TRIAL; $("trialBtn").hidden = inn || TRIAL; $("priceNote").hidden = inn || TRIAL || !cloudOn(); $("codeRowNew").hidden = TRIAL || !cloudOn() || (inn && paid);
+  $("nameIn").required = !inn; $("passIn").required = !inn && !TRIAL;
   if (inn){ $("acctName").textContent = ACCT.display; $("acctPanelName").textContent = ACCT.display; }
   $("acctPanel").hidden = !inn;
-  $("acctNote").textContent = cloudOn() ? "Your game saves to your account, so you can continue on any phone or computer." : "Your game saves to your account on this device.";
-  if (!inn) $("enterSub").textContent = net && !visitHome ? "Log in, or create an account with your name and a password. Your game is saved and continues next time." : $("enterSub").textContent;
-  if (inn && sessionStorage.getItem("veed-just-logged")){ sessionStorage.removeItem("veed-just-logged"); toast("Welcome, " + ACCT.display + "! Your game is saved to your account.", 4000); }
+  $("acctNote").textContent = TRIAL ? "In a look-around nothing is saved: golden points, land and plans disappear when you close the tab." : cloudOn() ? "Your game saves to your account, so you can continue on any phone or computer." : "Your game saves to your account on this device.";
+  if (TRIAL){ $("enterSub").textContent = visitHome ? "Type a name to show your host, then knock." : "Walk round the village, try the boat and the cinema. Type a name to show to others."; $("enterBtn").textContent = visitHome ? "Knock" : "Look around"; }
+  else if (!inn) $("enterSub").textContent = net && !visitHome ? "Log in, or create your own home with a name and a password. It's saved and continues next time." : $("enterSub").textContent;
+  if (inn && !paid){ $("enterSub").textContent = "Welcome, " + ACCT.display + ". Your home is ready: pay once and it's yours."; setTimeout(renderPay, 0); }
+  if (inn && sessionStorage.getItem("veed-just-logged")){ sessionStorage.removeItem("veed-just-logged"); if (paid) toast("Welcome, " + ACCT.display + "! Your game is saved to your account.", 4000); }
 })();
+$("trialBtn").addEventListener("click", () => { try { sessionStorage.setItem("veed-trial", "1"); } catch(e){} location.reload(); });
+$("trialEnd").addEventListener("click", () => { try { sessionStorage.removeItem("veed-trial"); sessionStorage.setItem("veed-create", "1"); } catch(e){} location.reload(); });
+if (!TRIAL && !ACCT.user && sessionStorage.getItem("veed-create")){ sessionStorage.removeItem("veed-create"); setTimeout(() => $("nameIn").focus(), 400); }
 // save online every so often, and when the app is put away
 let acctSaving = null, acctAgain = false, acctLastErr = 0;
 // saves this account online; if a save is already running, another one follows it so nothing is skipped
 function acctSave(keepalive){
-  if (!ACCT.user || !cloudOn() || !acctToken()) return Promise.resolve(false);
+  if (!ACCT.user || !cloudOn() || !acctToken() || !acctPaid()) return Promise.resolve(false);
   if (acctSaving){ acctAgain = true; return acctSaving; }
   acctSaving = (async () => {
     let ok = false;
@@ -4256,16 +4299,92 @@ document.addEventListener("visibilitychange", () => { if (document.hidden && sto
 addEventListener("pagehide", () => { if (store.dirty) acctSave(true); });
 // opening the game: if this account was played more recently on another device, bring those saves here first
 (async function acctPull(){
-  if (!ACCT.user || !cloudOn() || !acctToken() || sessionStorage.getItem("veed-pulled")) { if (ACCT.user) $("acctSync").textContent = cloudOn() ? "Saved online" : "Saved on this device"; return; }
+  if (!ACCT.user || !cloudOn() || !acctToken()) { if (ACCT.user) $("acctSync").textContent = cloudOn() ? "Saved online" : "Saved on this device"; return; }
+  if (sessionStorage.getItem("veed-pulled") && acctPaid()) { $("acctSync").textContent = "Saved online"; return; }
   sessionStorage.setItem("veed-pulled", "1");
   try {
     const r = await rpc("veed_load", {p_name: ACCT.user, p_token: acctToken()});
+    if (r && typeof r.paid === "boolean" && (r.paid ? "1" : "0") !== LS.get("veed-paid:" + ACCT.user)){ LS.set("veed-paid:" + ACCT.user, r.paid ? "1" : "0"); location.reload(); return; }
     const remote = r && r.data || {}, rt = +remote.__savedAt || 0, lt = +(LS.get(store.pfx + "__savedAt") || 0);
     if (rt > lt + 2000){ acctImport(store.pfx, remote); location.reload(); return; }
     if (lt > rt) store.dirty = true;
     $("acctSync").textContent = "Saved online";
   } catch(e){ if (/log in again/i.test(e.message)){ toast("Please log in again.", 5000); LS.del("veed-current-user"); setTimeout(() => location.reload(), 1500); } }
 })();
+
+
+/* ---------- paying for a home: Razorpay checkout through the Supabase helper "veed-pay" ---------- */
+const PAY = {curr: /calcutta|kolkata/i.test((Intl.DateTimeFormat().resolvedOptions().timeZone || "")) || /^(en-IN|hi|ml|ta|te|kn|bn|mr|gu)/i.test(navigator.language || "") ? "INR" : "USD", busy: false};
+const PRICE_TEXT = {INR: {single: "₹99", couple: "₹149"}, USD: {single: "$1.99", couple: "$2.99"}};
+function payMsg(t, isErr){ const m = $("payMsg"); m.textContent = t || ""; m.hidden = !t; m.classList.toggle("ok", !isErr && !!t); }
+function renderPay(){
+  if (!ACCT.user) return;
+  const paid = acctPaid();
+  $("payBox").hidden = paid; $("enterBtn").hidden = !paid;
+  $("currIn").classList.toggle("on", PAY.curr === "INR"); $("currUs").classList.toggle("on", PAY.curr === "USD");
+  $("payPrice").textContent = PRICE_TEXT[PAY.curr].single; $("payCouplePrice").textContent = PRICE_TEXT[PAY.curr].couple;
+  const code = LS.get("veed-couple-code:" + ACCT.user);
+  $("coupleCodeBox").hidden = !code; if (code) $("coupleCode").value = code;
+}
+["currIn", "currUs"].forEach(id => $(id).addEventListener("click", e => { PAY.curr = e.currentTarget.dataset.c; renderPay(); }));
+$("priceSingle").textContent = PRICE_TEXT[PAY.curr].single;
+async function payFn(body){
+  const h = {"Content-Type": "application/json", apikey: CLOUD.key};
+  if (/^eyJ/.test(CLOUD.key)) h.Authorization = "Bearer " + CLOUD.key;
+  const r = await fetch(CLOUD.url.replace(/\/$/, "") + "/functions/v1/veed-pay", {method: "POST", headers: h, body: JSON.stringify(Object.assign({name: ACCT.user, token: acctToken()}, body))});
+  let j = null; try { j = await r.json(); } catch(e){}
+  if (!r.ok) throw new Error((j && j.error) || "Error " + r.status);
+  return j;
+}
+function loadRazorpay(){
+  if (window.Razorpay) return Promise.resolve(true);
+  return new Promise(res => { const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js"; s.onload = () => res(!!window.Razorpay); s.onerror = () => res(false); document.head.appendChild(s); });
+}
+async function startPay(plan){
+  if (PAY.busy) return; PAY.busy = true; payMsg("Getting ready…");
+  ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = true);
+  try {
+    const ok = await loadRazorpay(); if (!ok) throw new Error("Couldn't load the payment page. Check your internet connection and try again.");
+    const o = await payFn({action: "order", plan, currency: PAY.curr});
+    payMsg("");
+    const rz = new Razorpay({
+      key: o.key_id, amount: o.amount, currency: o.currency, order_id: o.order_id,
+      name: "Veed", description: plan === "couple" ? "Couple pack · two homes" : "Your home in Veed",
+      prefill: {name: ACCT.display}, notes: {user: ACCT.user, plan}, theme: {color: "#1d5c3a"},
+      handler: resp => confirmPay(resp, plan),
+      modal: {ondismiss: () => { PAY.busy = false; ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = false); payMsg("Payment cancelled. Your home is still waiting whenever you're ready."); }}
+    });
+    rz.on("payment.failed", r => { payMsg((r && r.error && r.error.description) || "The payment didn't go through. Please try again.", true); });
+    rz.open();
+  } catch(e){
+    PAY.busy = false; ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = false);
+    payMsg(/log in/i.test(e.message) ? "Please log in again." : String(e.message || e), true);
+  }
+}
+async function confirmPay(resp, plan){
+  payMsg("Confirming your payment…");
+  try {
+    const r = await payFn({action: "confirm", order_id: resp.razorpay_order_id, payment_id: resp.razorpay_payment_id, signature: resp.razorpay_signature});
+    if (!r.paid) throw new Error("The payment couldn't be confirmed. If money was taken, it will come back to you, or write to us with your payment id " + resp.razorpay_payment_id + ".");
+    LS.set("veed-paid:" + ACCT.user, "1");
+    if (r.code) LS.set("veed-couple-code:" + ACCT.user, r.code);
+    payMsg("Paid. Welcome home!"); renderPay();
+    if (r.code){ $("coupleCodeBox").hidden = false; $("coupleCode").value = r.code; }
+    toast("Your home is yours. ❤", 4000);
+  } catch(e){ payMsg(String(e.message || e), true); }
+  PAY.busy = false; ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = false);
+}
+$("payBtn").addEventListener("click", () => startPay("single"));
+$("payCoupleBtn").addEventListener("click", () => startPay("couple"));
+$("codeBtn").addEventListener("click", async () => {
+  const code = $("codeIn").value.trim().toUpperCase(); if (!code){ $("codeIn").focus(); return; }
+  if (!ACCT.user){ payMsg("Type your name and password and press Create my home first; the code is used then."); return; }
+  payMsg("Checking the code…");
+  try { const r = await rpc("veed_redeem", {p_name: ACCT.user, p_token: acctToken(), p_code: code}); if (r && r.ok){ LS.set("veed-paid:" + ACCT.user, "1"); payMsg("The code worked. Welcome home!"); renderPay(); } }
+  catch(e){ payMsg(String(e.message || e), true); }
+});
+$("coupleCopy").addEventListener("click", () => copyText($("coupleCode").value, "Code copied. Send it to your partner."));
+$("codeIn").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("codeBtn").click(); } });
 
 
 /* ====================================================================================
@@ -7211,6 +7330,7 @@ function friendKeyFor(name){
 function onFriendMsg(d, from){
   const name = peerName(from);
   if (d.op === "req"){
+    if (TRIAL || !ACCT.user){ net.act.friend.send({op: "no"}, {target: from}); return; }
     if (friendByName(name)){ net.act.friend.send({op: "already"}, {target: from}); return; }
     FR.pending = {from, user: String(d.user || "").slice(0, 40)};
     $("friendReqText").textContent = name + " wants to add you as a friend. Friends can visit each other and invite each other over without a link.";
@@ -7260,7 +7380,7 @@ function removeFriend(f, btn){
 }
 function renderFriends(){
   const pid = partner(), pname = pid ? peerName(pid) : "";
-  $("addFriendBtn").hidden = !pid || !!friendByName(pname);
+  $("addFriendBtn").hidden = !pid || !!friendByName(pname) || TRIAL || !ACCT.user;
   $("addFriendBtn").textContent = "Add " + pname + " as a friend";
   $("homeBtn").hidden = net.isOwner || !entered;
   const ul = $("friendList"); ul.textContent = "";
