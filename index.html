@@ -158,6 +158,10 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .enter-card .fine{font-size:12px}
 .enter-card .links a{color:var(--muted)}
 .acctmsg.ok{color:#1d5c3a}
+.recover input,.recovery input{font:600 14px var(--font);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.recovery{border:2px solid #d9a520}
+.recovery #recoveryCode{letter-spacing:.12em;font-size:16px;text-align:center}
+#reportDlg textarea{font:inherit;font-size:14px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);resize:vertical}
 .paybox{display:flex;flex-direction:column;gap:8px;background:var(--chip);border-radius:12px;padding:12px}
 .payhead{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:baseline;font-size:13.5px}
 .payhead .curr{font-size:12px;color:var(--muted)}
@@ -172,7 +176,13 @@ body.theater .trialbar{display:none!important}
 .looks legend{font-size:12.5px;font-weight:600;margin-bottom:6px;padding:0}
 .look{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px solid var(--line);border-radius:12px;padding:10px 6px 8px;cursor:pointer;background:var(--chip)}
 .look input{position:absolute;opacity:0;pointer-events:none}
+.wardrow{display:flex;gap:12px;align-items:flex-start}.wardrow canvas{width:112px;height:168px;flex:none;border-radius:10px;background:linear-gradient(180deg,#e9f1f4,#d4e2e8)}.wardrow .grid2{flex:1}
+@media (prefers-color-scheme:dark){.wardrow canvas{background:linear-gradient(180deg,#263238,#1a2328)}}
+.panel.share{max-width:380px}.panel.share img{display:block;width:100%;max-height:46vh;object-fit:contain;border-radius:12px;background:#1a2320;margin:6px 0 10px;min-height:120px}
 .look svg{width:56px;height:96px}
+.look canvas{width:112px;height:168px;border-radius:10px;background:linear-gradient(180deg,#e9f1f4,#d4e2e8)}
+@media (prefers-color-scheme:dark){.look canvas{background:linear-gradient(180deg,#263238,#1a2328)}}
+.look small{font-size:11px;color:var(--muted);font-weight:500}
 .look span{font-size:13px;font-weight:600}
 .look:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .look:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
@@ -370,7 +380,7 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
     </div>
     <div class="sect">
       <div class="field" hidden><label for="gotoSel">Go to</label><select id="gotoSel"><option value="">Choose…</option></select></div>
-      <div class="field" hidden><label for="gfxSel">Graphics</label><select id="gfxSel"><option value="smooth">Smooth (faster)</option><option value="detailed">Detailed (shadows)</option></select></div>
+      <div class="field" hidden><label for="gfxSel">Graphics</label><select id="gfxSel"><option value="low">Low (fastest)</option><option value="medium">Medium</option><option value="high">High (best looking)</option></select></div>
       <div class="field"><label for="skySel">Sky</label><select id="skySel"></select></div>
       <div class="weather" id="weather"></div>
       <label class="toggle"><input type="checkbox" id="musicOn" checked> Romantic music in the car and on the bike</label>
@@ -388,11 +398,13 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
     </div>
     <div class="sect" hidden><div class="label">Prayer times · India (IST)</div><div class="ptimes" id="ptimes"></div></div>
     <div class="sect" id="acctPanel" hidden>
-      <div class="field"><span>Account: <b id="acctPanelName"></b></span><button class="linkbtn" id="acctOut" type="button">Log out</button></div>
+      <div class="field"><span>Account: <b id="acctPanelName"></b></span><span><button class="linkbtn" id="shareBtn" type="button">Share</button> · <button class="linkbtn" id="acctOut" type="button">Log out</button></span></div>
       <p class="note" id="acctSync"></p>
+      <button class="linkbtn" id="recoveryNew" type="button">Get a new recovery code</button>
+      <div id="blockedBox" hidden><div class="label">Blocked people</div><ul class="plist" id="blockedList"></ul></div>
     </div>
     <div class="sect" id="ownerSect" hidden>
-      <p class="note">Each invite link is for one guest. You let them in the first time; after that they come straight back in if they get disconnected.</p>
+      <p class="note">Your home is invite-only. Each invite link is for one guest: you let them in the first time; after that they come straight back in if they get disconnected. Only two people can be inside at a time.</p>
       <button class="linkbtn" id="moveHome" type="button">Use my home on another device</button>
     </div>
   </div>
@@ -523,11 +535,28 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
   </div>
 </section>
 <div class="wildpick" id="wildPick" hidden><div class="panel" role="dialog" aria-label="Choose a colour"><b>Choose a colour</b><div class="row"><button type="button" data-c="r" style="background:#d63d3d" aria-label="Red"></button><button type="button" data-c="y" style="background:#e8b520" aria-label="Yellow"></button><button type="button" data-c="g" style="background:#3f9a4f" aria-label="Green"></button><button type="button" data-c="b" style="background:#2f6ec0" aria-label="Blue"></button></div></div></div>
+<div class="dialog" id="reportDlg" hidden><div class="panel" role="dialog" aria-labelledby="reportTitle">
+  <h2 id="reportTitle">Report <span id="reportWho"></span></h2>
+  <p class="note">Tell us what happened. Reports go to the people who run Veed.</p>
+  <label class="label" for="reportReason">Reason</label>
+  <select id="reportReason"><option value="harassment">Harassment or bullying</option><option value="abuse">Abusive or hateful language</option><option value="spam">Spam or scam</option><option value="inappropriate">Inappropriate behaviour</option><option value="other">Something else</option></select>
+  <textarea id="reportNote" rows="3" maxlength="500" placeholder="What happened? (optional)"></textarea>
+  <label class="toggle"><input type="checkbox" id="reportBlock" checked> Also block this person</label>
+  <div class="row"><button class="btn primary" type="button" id="reportSend">Send report</button><button class="btn" type="button" data-close>Cancel</button></div>
+</div></div>
 <div class="dialog" id="wardDlg" hidden><div class="panel" role="dialog" aria-labelledby="wardTitle">
   <h2 id="wardTitle">Change clothes</h2>
-  <p class="note">Pick something from the shelf.</p>
-  <div class="grid2" id="wardOpts"></div>
+  <p class="note">Pick something from the shelf. Hover or tap to try it on.</p>
+  <div class="wardrow"><canvas id="wardCv" width="224" height="336" aria-hidden="true"></canvas><div class="grid2" id="wardOpts"></div></div>
   <button class="btn" type="button" data-close>Close</button>
+</div></div>
+<div class="dialog" id="shareDlg" hidden><div class="panel share" role="dialog" aria-labelledby="shareTitle">
+  <h2 id="shareTitle">Share your Veed life</h2>
+  <p class="note">A picture of your village with your golden points, ready for Instagram. More friends in Veed means more to do here.</p>
+  <img id="shareImg" alt="Your Veed picture">
+  <div class="row"><button class="btn primary" type="button" id="shareIg">Share to Instagram</button><button class="btn" type="button" id="shareSave">Save picture</button></div>
+  <p class="fine" id="shareHint"></p>
+  <button class="btn" type="button" id="shareSkip">Close</button>
 </div></div>
 <section class="quran library" id="library" hidden aria-label="Library">
   <header>
@@ -568,7 +597,7 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
 <section class="quran planner" id="planner" hidden aria-label="Planner">
   <header>
     <h2>📁 Our planner</h2>
-    <div class="row" id="planTabs"><button class="btn" type="button" data-t="shared">Our home plans</button><button class="btn" type="button" data-t="mine">My private plans</button></div>
+    <div class="row" id="planTabs"><button class="btn" type="button" data-t="shared">Our home plans</button><button class="btn" type="button" data-t="mine">My private plans</button><button class="btn" type="button" data-t="couple">Couple</button></div>
     <button class="btn primary" type="button" id="planNew">＋ New plan</button>
     <button class="btn" type="button" id="planClose">Close</button>
     <div class="qprog"><span id="planSub"></span><span class="spacer"></span><label id="planDoneWrap"><input type="checkbox" id="planDone"> Show finished</label></div>
@@ -607,14 +636,23 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
         <input id="passIn" type="password" maxlength="64" autocomplete="current-password" required>
       </div>
     </div>
-    <div class="row codeRow" id="codeRowNew" hidden><input id="codeIn" maxlength="16" placeholder="Couple code, if your partner sent one" autocapitalize="characters" autocomplete="off" aria-label="Couple code"><button class="btn" type="button" id="codeBtn">Use</button></div>
+    <div class="row codeRow" id="codeRowNew" hidden><input id="codeIn" maxlength="24" placeholder="Couple code or coupon, if you have one" autocapitalize="characters" autocomplete="off" aria-label="Couple code or coupon"><button class="btn" type="button" id="codeBtn">Use</button></div>
+    <div id="recoverBox" class="paybox recover" hidden>
+      <b>Forgot your password?</b>
+      <p class="fine">Type your name above, then the recovery code you were given when you made your home, and a new password.</p>
+      <input id="recIn" maxlength="16" placeholder="Recovery code XXXX-XXXX-XXXX" autocapitalize="characters" autocomplete="off" aria-label="Recovery code">
+      <input id="recPass" type="password" maxlength="64" placeholder="New password" autocomplete="new-password" aria-label="New password">
+      <div class="row"><button class="btn primary" type="button" id="recBtn">Reset my password</button><button class="btn" type="button" id="recCancel">Cancel</button></div>
+      <p class="acctmsg" id="recMsg" hidden role="alert"></p>
+    </div>
     <fieldset class="looks">
-      <legend>Choose your look</legend>
-      <label class="look"><input type="radio" name="look" value="abaya" checked><svg viewBox="0 0 56 96" aria-hidden="true"><path d="M28 20 L17 38 L9 92 L47 92 L39 38 Z" fill="#141417"/><path d="M17 36 L6 66 L14 67 L21 44 Z M39 36 L50 66 L42 67 L35 44 Z" fill="#26262b"/><g fill="#f4f1ea"><circle cx="10" cy="58" r=".9"/><circle cx="13" cy="52" r=".9"/><circle cx="12" cy="62" r=".9"/><circle cx="16" cy="47" r=".9"/><circle cx="46" cy="58" r=".9"/><circle cx="43" cy="52" r=".9"/><circle cx="44" cy="62" r=".9"/><circle cx="40" cy="47" r=".9"/></g><rect x="19" y="44" width="18" height="3" fill="#2b2b30"/><ellipse cx="28" cy="15" rx="9" ry="10" fill="#141417"/><path d="M19 18 Q28 34 37 18 L37 26 Q28 36 19 26 Z" fill="#141417"/><ellipse cx="28" cy="15" rx="5.5" ry="7" fill="#c58b62"/></svg><span>Abaya</span></label>
-      <label class="look"><input type="radio" name="look" value="bandhgala"><svg viewBox="0 0 56 96" aria-hidden="true"><rect x="20" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="29" y="56" width="7" height="34" rx="2" fill="#cfbe9c"/><rect x="18" y="88" width="9" height="5" rx="2" fill="#3a271c"/><rect x="29" y="88" width="9" height="5" rx="2" fill="#3a271c"/><path d="M17 26 Q28 22 39 26 L41 60 L15 60 Z" fill="#1f4a36"/><rect x="11" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><rect x="39" y="27" width="6" height="28" rx="3" fill="#1f4a36"/><g fill="#c9a54c"><circle cx="28" cy="31" r="1.2"/><circle cx="28" cy="38" r="1.2"/><circle cx="28" cy="45" r="1.2"/><circle cx="28" cy="52" r="1.2"/></g><rect x="31" y="33" width="5" height="2.5" fill="#3d6e6a"/><rect x="25" y="20" width="6" height="5" fill="#c58b62"/><circle cx="28" cy="14" r="8" fill="#c58b62"/><path d="M20 13 Q28 3 36 13 L36 10 Q28 2 20 10 Z" fill="#1b1512"/><path d="M21 16 Q28 26 35 16 L35 19 Q28 27 21 19 Z" fill="#1b1512"/><rect x="21" y="12" width="14" height="3" rx="1" fill="#0e0e0e"/></svg><span>Bandhgala</span></label>
+      <legend>Who are you? (clothes can change at the bedroom wardrobe)</legend>
+      <label class="look"><input type="radio" name="look" value="floralF" checked><canvas class="lookCv" width="224" height="336" data-look="floralF" aria-hidden="true"></canvas><span>Her</span><small>hijab · long dress</small></label>
+      <label class="look"><input type="radio" name="look" value="thobeM"><canvas class="lookCv" width="224" height="336" data-look="thobeM" aria-hidden="true"></canvas><span>Him</span><small>thobe</small></label>
     </fieldset>
     <p class="acctmsg" id="acctMsg" hidden role="alert"></p>
     <div class="row acctbtns"><button class="btn primary" type="submit" id="acctLogin">Log in</button><button class="btn" type="button" id="acctCreate">Create my home</button></div>
+    <p class="fine" id="forgotRow" hidden><button class="linkbtn" type="button" id="forgotBtn">Forgot your password?</button></p>
     <p class="fine" id="priceNote" hidden>One home is <b id="priceSingle">₹99</b>, once. No subscription. Pay after you choose your name.</p>
     <button class="btn" type="button" id="trialBtn">Look around first (nothing is saved)</button>
     <button class="btn primary" type="submit" id="enterBtn" hidden>Enter home</button>
@@ -626,6 +664,12 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
       <p class="fine">Have a couple code? Type it in the box above and press Use.</p>
       <p class="acctmsg" id="payMsg" hidden role="alert"></p>
     </div>
+    <div id="recoveryShow" class="paybox recovery" hidden>
+      <b>Your recovery code</b>
+      <div class="row codeRow"><input id="recoveryCode" readonly aria-label="Recovery code"><button class="btn" type="button" id="recoveryCopy">Copy</button></div>
+      <p class="fine"><b>Write it down somewhere safe.</b> It's the only way back into your home if you forget your password. It's shown once; you can make a new one from the panel inside.</p>
+      <button class="btn" type="button" id="recoveryOk">I've saved it</button>
+    </div>
     <div id="coupleCodeBox" class="paybox" hidden>
       <b>Your couple code</b>
       <div class="row codeRow"><input id="coupleCode" readonly aria-label="Couple code"><button class="btn" type="button" id="coupleCopy">Copy</button></div>
@@ -633,13 +677,23 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
     </div>
     <p class="fine" id="acctNote"></p>
     <p class="fine links"><a href="policies.html#terms" target="_blank" rel="noopener">Terms</a> · <a href="policies.html#privacy" target="_blank" rel="noopener">Privacy</a> · <a href="policies.html#refunds" target="_blank" rel="noopener">Refunds</a> · <a href="policies.html#contact" target="_blank" rel="noopener">Contact</a></p>
-    <p class="fine" id="enterFine">Two people can be inside a home at a time. Once inside, you can see each other, chat, and talk when your mic is on. Headphones stop your speakers echoing into the mic.</p>
+    <p class="fine" id="enterFine">Your home is invite-only: only people you send an invite link to, or friends you've added, can come in, and two people can be inside at a time. Once inside, you can see each other, chat, and talk when your mic is on. Headphones stop your speakers echoing into the mic.</p>
   </form>
 </div>
 <div class="loading" id="loading">Loading Veed…</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/renderers/CSS3DRenderer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/SAOShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/DepthLimitedBlurShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/UnpackDepthRGBAShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/SAOPass.js"></script>
 <script type="module">
 try {
   const T = await import("https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm");
@@ -676,7 +730,7 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.domElement.className = "gl";
 view.appendChild(renderer.domElement);
 
@@ -692,7 +746,7 @@ const sky = new THREE.Mesh(new THREE.SphereGeometry(1200, 32, 16), new THREE.Sha
   side: THREE.BackSide, depthWrite: false, fog: false,
   uniforms: {top: {value: new THREE.Color(0x2f6fc4)}, mid: {value: new THREE.Color(0x9ec8ea)}, low: {value: new THREE.Color(0xdfe9ee)}, sun: {value: sunDir.clone()}, sunC: {value: new THREE.Color(1, .93, .78)}, glowK: {value: 1}, discK: {value: 4}},
   vertexShader: "varying vec3 vD; void main(){ vD = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }",
-  fragmentShader: "uniform vec3 top, mid, low, sun, sunC; uniform float glowK, discK; varying vec3 vD; void main(){ float h = vD.y; vec3 c = h > 0.0 ? mix(mid, top, pow(clamp(h * 1.5, 0.0, 1.0), 0.7)) : mix(mid, low, clamp(-h * 5.0, 0.0, 1.0)); float s = max(dot(normalize(vD), sun), 0.0); c += sunC * (pow(s, 900.0) * discK + pow(s, 14.0) * 0.22 * glowK + pow(s, 3.0) * 0.12 * glowK); gl_FragColor = vec4(c, 1.0); }"
+  fragmentShader: "uniform vec3 top, mid, low, sun, sunC; uniform float glowK, discK; varying vec3 vD; void main(){ float h = vD.y; vec3 c = h > 0.0 ? mix(mid, top, pow(clamp(h * 1.5, 0.0, 1.0), 0.7)) : mix(mid, low, clamp(-h * 5.0, 0.0, 1.0)); float s = max(dot(normalize(vD), sun), 0.0); c += sunC * (pow(s, 900.0) * discK + pow(s, 14.0) * 0.22 * glowK + pow(s, 3.0) * 0.12 * glowK); c = max(c, 0.0); gl_FragColor = vec4(mix(pow((c + 0.055) / 1.055, vec3(2.4)), c / 12.92, vec3(lessThanEqual(c, vec3(0.04045)))), 1.0);\n#include <encodings_fragment>\n}"
 }));
 sky.renderOrder = -10; sky.frustumCulled = false;
 scene.add(sky);
@@ -702,7 +756,7 @@ const sun = new THREE.DirectionalLight(0xfff0d9, 1.05);
 sun.castShadow = true;
 sun.shadow.mapSize.set(coarse ? 1024 : 2048, coarse ? 1024 : 2048);
 Object.assign(sun.shadow.camera, {left: -34, right: 34, top: 34, bottom: -34, near: 1, far: 140});
-sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
+sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.03; sun.shadow.radius = 2;
 scene.add(hemi, sun, sun.target, new THREE.AmbientLight(0xffffff, 0.08));
 
 /* ---------- procedural textures ---------- */
@@ -713,6 +767,23 @@ function canvasTex(size, draw, srgb){
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAXANI;
   if (srgb !== false) t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+// a normal map made from a texture's own light and dark: every surface gets fine relief without any image files
+const NORMALS = {};
+function normalFromTex(key, tex, strength, blur){
+  const src = tex.image, s = src.width, g = document.createElement("canvas").getContext("2d"); g.canvas.width = g.canvas.height = s;
+  g.drawImage(src, 0, 0); const d = g.getImageData(0, 0, s, s).data, H = new Float32Array(s * s);
+  for (let i = 0; i < s * s; i++) H[i] = (d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11) / 255;
+  if (blur) for (let p = 0; p < blur; p++){ const B = new Float32Array(s * s); for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){ let a = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) a += H[((y + dy + s) % s) * s + (x + dx + s) % s]; B[y * s + x] = a / 9; } H.set(B); }
+  const out = g.createImageData(s, s), o = out.data;
+  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){
+    const dx = (H[y * s + (x + 1) % s] - H[y * s + (x + s - 1) % s]) * strength, dy = (H[((y + 1) % s) * s + x] - H[((y + s - 1) % s) * s + x]) * strength, n = Math.hypot(dx, dy, 1), i = (y * s + x) * 4;
+    o[i] = (-dx / n * .5 + .5) * 255; o[i + 1] = (dy / n * .5 + .5) * 255; o[i + 2] = (1 / n * .5 + .5) * 255; o[i + 3] = 255;
+  }
+  g.putImageData(out, 0, 0);
+  const t = new THREE.CanvasTexture(g.canvas); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAXANI;
+  NORMALS[key] = {tex: t, scale: strength > 3 ? .9 : .6}; tex.userData.nkey = key;
   return t;
 }
 function speckle(g, s, n, colors, sz){
@@ -759,6 +830,19 @@ const TEX = {
   }),
   paddock: canvasTex(256, (g, s) => { g.fillStyle = "#8a7a52"; g.fillRect(0, 0, s, s); speckle(g, s, 6000, ["#9a8a60", "#7a6b45", "#6d8a45", "#a59468"], 3); })
 };
+normalFromTex("grass", TEX.grass, 1.2, 1); normalFromTex("brick", TEX.brick, 5, 1); normalFromTex("plaster", TEX.plaster, 1.5, 1); normalFromTex("wood", TEX.wood, 2.2, 0);
+normalFromTex("tile", TEX.tile, 3, 0); normalFromTex("soil", TEX.soil, 2.5, 1); normalFromTex("gravel", TEX.gravel, 3, 0); normalFromTex("asphalt", TEX.asphalt, 1.6, 0);
+normalFromTex("concrete", TEX.concrete, 1.5, 1); normalFromTex("paddock", TEX.paddock, 2, 1); normalFromTex("carpet", TEX.carpet, 1.2, 0);
+// a leafy cut-out so tree crowns stop looking like smooth balls
+const LEAF_TEX = canvasTex(256, (g, s) => {
+  g.clearRect(0, 0, s, s);
+  for (let i = 0; i < 260; i++){
+    const x = Math.random() * s, y = Math.random() * s, r = 7 + Math.random() * 11, a = Math.random() * Math.PI;
+    const v = 150 + Math.random() * 105; g.fillStyle = `rgb(${v * .82 | 0},${v | 0},${v * .55 | 0})`;
+    g.save(); g.translate(x, y); g.rotate(a); g.beginPath(); g.ellipse(0, 0, r, r * .45, 0, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "rgba(40,70,20,.35)"; g.lineWidth = 1; g.beginPath(); g.moveTo(-r, 0); g.lineTo(r, 0); g.stroke(); g.restore();
+  }
+}, true);
 // a rippling normal map for water (the pond, the sea and the river move with it)
 const WATER_NS = [];   // every water normal map, scrolled a little each frame
 const WATER_N = (() => {
@@ -785,7 +869,11 @@ const mats = {};
 function mat(color, rough, extra){
   const key = color + "|" + rough + "|" + (extra ? JSON.stringify(Object.keys(extra)) + (extra.map ? extra.map.uuid : "") : "");
   if (!extra && mats[key]) return mats[key];
-  const m = new THREE.MeshStandardMaterial(Object.assign({color, roughness: rough == null ? .85 : rough}, extra || {}));
+  if (extra && extra.map && extra.map.userData && extra.map.userData.nkey && !extra.normalMap && NORMALS[extra.map.userData.nkey]){
+    const N = NORMALS[extra.map.userData.nkey], n = N.tex.clone(); n.needsUpdate = true; n.repeat.copy(extra.map.repeat); n.offset.copy(extra.map.offset);
+    extra = Object.assign({normalMap: n, normalScale: new THREE.Vector2(N.scale, N.scale)}, extra);
+  }
+  const m = new THREE.MeshStandardMaterial(Object.assign({color, roughness: rough == null ? .85 : rough, envMapIntensity: .4}, extra || {}));
   if (!extra) mats[key] = m;
   return m;
 }
@@ -793,20 +881,20 @@ const M = {
   brick: mat(0xffffff, .9, {map: TEX.brick}),
   plaster: mat(0xffffff, .92, {map: TEX.plaster}),
   cap: mat(0xe6e1d6, .9),
-  glass: new THREE.MeshPhysicalMaterial({color: 0xb7d6e3, roughness: .05, metalness: 0, transmission: 0, transparent: true, opacity: .28}),
+  glass: new THREE.MeshPhysicalMaterial({color: 0xb7d6e3, roughness: .05, metalness: 0, transmission: 0, transparent: true, opacity: .32, envMapIntensity: 1.2, clearcoat: 1, clearcoatRoughness: .05}),
   frame: mat(0x2e3033, .5),
   roof: mat(0xe9e5dd, .95),
   plinth: mat(0x8d8577, .95),
   wood: mat(0x7d5a3d, .6), woodLight: mat(0xa98058, .55), kitchen: mat(0xece8e0, .45), top: mat(0x2f2f31, .3),
   linen: mat(0xf3efe7, .9), sheet: mat(0x8fa3b5, .9), fabric: mat(0x5d6f86, .85), dark: mat(0x2e3033, .6),
   ceramic: mat(0xfafafa, .18), metal: new THREE.MeshStandardMaterial({color: 0xd3d6d8, roughness: .3, metalness: .6}),
-  mirror: new THREE.MeshStandardMaterial({color: 0xc6d2d8, roughness: .04, metalness: .9}),
+  mirror: new THREE.MeshStandardMaterial({color: 0xc6d2d8, roughness: .04, metalness: .9, envMapIntensity: 1.5}),
   art: mat(0x7c8a5e, .7), curtain: mat(0xd9cfbd, .95), rug: mat(0x8e5d47, 1),
   leaf: mat(0x3f6e33, .9), leafLight: mat(0x5b8a3f, .9), bark: mat(0x6f5a44, 1), stone: mat(0xa8a196, .95),
   rustic: mat(0x8a6a48, .9), post: mat(0x6b5038, .95),
   glow: new THREE.MeshStandardMaterial({color: 0xfff3d6, emissive: 0xffe2a8, emissiveIntensity: .9}),
-  water: new THREE.MeshStandardMaterial({color: 0x2f7f96, roughness: .06, metalness: .15, transparent: true, opacity: .88, normalMap: WATER_N, normalScale: new THREE.Vector2(.3, .3)}),
-  tin: new THREE.MeshStandardMaterial({color: 0x9aa3a8, roughness: .45, metalness: .55}),
+  water: new THREE.MeshStandardMaterial({color: 0x2f7f96, roughness: .06, metalness: .15, transparent: true, opacity: .88, normalMap: WATER_N, normalScale: new THREE.Vector2(.3, .3), envMapIntensity: 1.3}),
+  tin: new THREE.MeshStandardMaterial({color: 0x9aa3a8, roughness: .45, metalness: .55, envMapIntensity: 1}),
   white: mat(0xf4f1ea, .85), green: mat(0x2c8a5c, .5), gold: new THREE.MeshStandardMaterial({color: 0xc9a54c, roughness: .3, metalness: .8})
 };
 
@@ -1096,7 +1184,10 @@ function ribbon(points, width, material, y, parent){
   g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
   const m = new THREE.Mesh(g, material); m.receiveShadow = true; m.material.side = THREE.DoubleSide; m.userData.noCollide = true; (parent || world).add(m); return m;
 }
-function bush(x, z, r, color){ const s = addMesh(new THREE.IcosahedronGeometry(r, 1), color ? mat(color, .9) : M.leaf, x, r * .8, z, {noCollide: true}); s.scale.y = .85; return s; }
+// crowns and bushes: a leaf cut-out over the shape, lit from both sides
+const leafMats = {};
+function leafMat(color){ if (!leafMats[color]) leafMats[color] = new THREE.MeshStandardMaterial({color, roughness: .9, map: rep(LEAF_TEX, 2.5), alphaTest: .42, side: THREE.DoubleSide, envMapIntensity: .35}); return leafMats[color]; }
+function bush(x, z, r, color){ const s = addMesh(new THREE.IcosahedronGeometry(r, 2), leafMat(color || 0x3f6e33), x, r * .8, z, {noCollide: true}); s.scale.y = .85; return s; }
 function flowers(x, z, color, n){
   const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g);
   const fm = mat(color, .7), sm = M.leafLight;
@@ -1108,9 +1199,9 @@ function flowers(x, z, color, n){
 }
 function tree(x, z, h, r, leafColor){
   cyl(Math.max(.12, r * .07), Math.max(.18, r * .1), h * .55, x, 0, z, M.bark, null, 9);
-  const lm = mat(leafColor || 0x3f6e33, .9);
+  const lm = leafMat(leafColor || 0x3f6e33);
   [[0, h * .62, 0, r], [r * .45, h * .55, r * .2, r * .7], [-r * .4, h * .58, -r * .25, r * .75], [0, h * .8, r * .1, r * .6]].forEach(([dx, dy, dz, rr]) => {
-    const s = addMesh(new THREE.IcosahedronGeometry(rr, 1), lm, x + dx, dy, z + dz, {noCollide: true}); s.scale.y = .8;
+    const s = addMesh(new THREE.IcosahedronGeometry(rr, 2), lm, x + dx, dy, z + dz, {noCollide: true}); s.scale.y = .8;
   });
 }
 
@@ -1201,7 +1292,7 @@ function buildGarden(){
     const kind = kinds[i % kinds.length], F = FRUITS[kind];
     addMesh(new THREE.CircleGeometry(1.2, 20), mat(0x4a3324, 1), x, .03, z, {noCollide: true, noShadow: true}).rotation.x = -Math.PI / 2;
     const fruits = new THREE.Group(); world.add(fruits);
-    const fm = mat(F.c, .5), lm = mat(F.leaf, .9);
+    const fm = mat(F.c, .5), lm = leafMat(F.leaf);
     let top;
     if (kind === "banana" || kind === "papaya"){
       const h = kind === "banana" ? 2.6 : 3.2;
@@ -1768,9 +1859,9 @@ function buildRiver(){
 
 /* ---------- people: jointed bodies dressed from a style table; walk, sit, sleep, hug, drive, pray ---------- */
 const AV = {
-  satin: new THREE.MeshPhysicalMaterial({color: 0x121216, roughness: .38, metalness: .05, sheen: 1, sheenColor: new THREE.Color(0x5a5a6a), sheenRoughness: .35, clearcoat: .25, clearcoatRoughness: .4}),
-  satinDS: new THREE.MeshPhysicalMaterial({color: 0x121216, roughness: .38, metalness: .05, sheen: 1, sheenColor: new THREE.Color(0x5a5a6a), sheenRoughness: .35, side: THREE.DoubleSide}),
-  jacket: new THREE.MeshPhysicalMaterial({color: 0x1d4a35, roughness: .78, sheen: .6, sheenColor: new THREE.Color(0x3d7a5c), sheenRoughness: .6}),
+  satin: new THREE.MeshPhysicalMaterial({color: 0x121216, roughness: .38, metalness: .05, sheen: 1, sheenColor: new THREE.Color(0x5a5a6a), sheenRoughness: .35, clearcoat: .25, clearcoatRoughness: .4, envMapIntensity: .3}),
+  satinDS: new THREE.MeshPhysicalMaterial({color: 0x121216, roughness: .38, metalness: .05, sheen: 1, sheenColor: new THREE.Color(0x5a5a6a), sheenRoughness: .35, side: THREE.DoubleSide, envMapIntensity: .3}),
+  jacket: new THREE.MeshPhysicalMaterial({color: 0x1d4a35, roughness: .78, sheen: .6, sheenColor: new THREE.Color(0x3d7a5c), sheenRoughness: .6, envMapIntensity: .35}),
   gold: new THREE.MeshStandardMaterial({color: 0xcaa452, roughness: .28, metalness: .85}),
   shades: new THREE.MeshStandardMaterial({color: 0x0b0b0b, roughness: .1, metalness: .6}),
   square: new THREE.MeshStandardMaterial({color: 0x3d6e6a, roughness: .6}),
@@ -1781,14 +1872,67 @@ const AV = {
   stud: new THREE.PointsMaterial({color: 0xfaf6ec, size: .014, sizeAttenuation: true})
 };
 const _avMats = {};
+/* ---------- cloth: every garment gets a woven texture (and a print where the look asks for one) plus soft vertical folds ---------- */
+const _cloth = {}, _seeded = s => () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const _hex = v => "#" + (v >>> 0).toString(16).padStart(6, "0");
+function clothTex(kind, c1, c2){
+  const key = kind + "|" + c1 + "|" + (c2 || 0); if (_cloth[key]) return _cloth[key];
+  const n = 256, c = document.createElement("canvas"); c.width = c.height = n; const g = c.getContext("2d"), R = _seeded(key.length * 7919 + c1);
+  g.fillStyle = _hex(c1); g.fillRect(0, 0, n, n);
+  if (kind === "denim"){ g.globalAlpha = .16; g.strokeStyle = "#0a1a33"; g.lineWidth = 1; for (let i = -n; i < n * 2; i += 4){ g.beginPath(); g.moveTo(i, 0); g.lineTo(i + n, n); g.stroke(); } g.globalAlpha = .08; g.strokeStyle = "#dfe8f4"; for (let i = -n; i < n * 2; i += 4){ g.beginPath(); g.moveTo(i + 2, 0); g.lineTo(i + n + 2, n); g.stroke(); } g.globalAlpha = 1; }
+  else { g.globalAlpha = .06; g.fillStyle = "#000"; for (let y = 0; y < n; y += 2) g.fillRect(0, y, n, 1); g.fillStyle = "#fff"; for (let x = 0; x < n; x += 2) g.fillRect(x, 0, 1, n); g.globalAlpha = 1; }
+  if (kind === "floral"){
+    const petal = _hex(c2 || 0xf6efe3);
+    for (let i = 0; i < 30; i++){
+      const x = R() * n, y = R() * n, r = 5 + R() * 4;
+      g.fillStyle = "#4e6b3f"; g.globalAlpha = .8; g.beginPath(); g.ellipse(x + r * 1.4, y + r * .6, r * .9, r * .35, .7, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
+      g.fillStyle = petal; for (let p = 0; p < 5; p++){ const t = p / 5 * Math.PI * 2; g.beginPath(); g.ellipse(x + Math.cos(t) * r * .55, y + Math.sin(t) * r * .55, r * .45, r * .3, t, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = "#e8b84a"; g.beginPath(); g.arc(x, y, r * .22, 0, Math.PI * 2); g.fill();
+    }
+    g.fillStyle = petal; g.globalAlpha = .7; for (let i = 0; i < 90; i++){ g.beginPath(); g.arc(R() * n, R() * n, 1.3, 0, Math.PI * 2); g.fill(); } g.globalAlpha = 1;
+  } else if (kind === "stripe"){ g.fillStyle = _hex(c2 || 0x1a1a1e); for (let y = 0; y < n; y += 18) g.fillRect(0, y, n, 6); }
+  else if (kind === "check"){ g.fillStyle = _hex(c2 || 0x1a1a1e); g.globalAlpha = .35; for (let x = 0; x < n; x += 24){ g.fillRect(x, 0, 5, n); g.fillRect(0, x, n, 5); } g.globalAlpha = 1; }
+  else if (kind === "leopard"){
+    for (let i = 0; i < 150; i++){ const x = R() * n, y = R() * n, r = 3 + R() * 3.5; g.fillStyle = _hex(c2 || 0x2a1d12); g.beginPath(); g.ellipse(x, y, r, r * .72, R() * 3, .4, Math.PI * 1.7); g.lineWidth = 3; g.strokeStyle = g.fillStyle; g.stroke(); g.fillStyle = "#b58a4f"; g.beginPath(); g.ellipse(x, y, r * .55, r * .4, 0, 0, Math.PI * 2); g.fill(); }
+  }
+  // thread noise so flat colour never looks like plastic
+  const img = g.getImageData(0, 0, n, n), d = img.data;
+  for (let i = 0; i < d.length; i += 4){ const v = (R() - .5) * 16; d[i] += v; d[i + 1] += v; d[i + 2] += v; }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.encoding = THREE.sRGBEncoding; t.anisotropy = typeof MAXANI === "number" ? MAXANI : 1;
+  _cloth[key] = t; return t;
+}
+const FOLD_N = (() => {
+  const n = 128, c = document.createElement("canvas"); c.width = c.height = n; const g = c.getContext("2d"), img = g.createImageData(n, n), d = img.data;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++){ const v = 128 + 58 * Math.sin(x / n * Math.PI * 10) + 22 * Math.sin(x / n * Math.PI * 26 + y / n * 4) + 10 * Math.sin(y / n * Math.PI * 6), i = (y * n + x) * 4; d[i] = d[i + 1] = d[i + 2] = Math.max(0, Math.min(255, v)); d[i + 3] = 255; }
+  g.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(c);
+  if (typeof normalFromTex === "function") return normalFromTex("folds", t, 2.2, 1);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+})();
+const _fab = {};
+// a woven (or printed) cloth material in one colour; folds = soft vertical creases for robes, skirts and wide trousers
+function fabricMat(color, kind, c2, ds, folds, rough){
+  const k = [color, kind || "weave", c2 || 0, ds ? 1 : 0, folds ? 1 : 0, rough || 0].join("|"); if (_fab[k]) return _fab[k];
+  const tex = clothTex(kind || "weave", color, c2).clone(); tex.needsUpdate = true; tex.repeat.set(kind === "floral" || kind === "leopard" ? 2 : 4, kind === "floral" || kind === "leopard" ? 2 : 4);
+  const m = new THREE.MeshStandardMaterial({color: 0xffffff, map: tex, roughness: rough || .88, side: ds ? THREE.DoubleSide : THREE.FrontSide});
+  if (folds){ m.normalMap = FOLD_N; m.normalScale = new THREE.Vector2(.32, .32); }
+  return _fab[k] = m;
+}
 // colour versions of the abaya satin and the bandhgala jacket (for changing clothes)
 const _varM = {};
 function satinVar(c, ds){ const k = "s" + c + (ds ? "d" : ""); if (!_varM[k]){ _varM[k] = (ds ? AV.satinDS : AV.satin).clone(); _varM[k].color.setHex(c); } return _varM[k]; }
 function jacketVar(c){ const k = "j" + c; if (!_varM[k]){ _varM[k] = AV.jacket.clone(); _varM[k].color.setHex(c); _varM[k].sheenColor = new THREE.Color(c).offsetHSL(0, 0, .15); } return _varM[k]; }
 function avMat(color, rough, ds){ const k = color + "|" + rough + "|" + (ds ? 1 : 0); return _avMats[k] || (_avMats[k] = new THREE.MeshStandardMaterial({color, roughness: rough == null ? .8 : rough, side: ds ? THREE.DoubleSide : THREE.FrontSide})); }
+AV.satin.normalMap = AV.satinDS.normalMap = FOLD_N; AV.satin.normalScale = AV.satinDS.normalScale = new THREE.Vector2(.18, .18);
+AV.jacket.normalMap = FOLD_N; AV.jacket.normalScale = new THREE.Vector2(.12, .12);
+const SKIN_N = (() => { const n = 64, c = document.createElement("canvas"); c.width = c.height = n; const g = c.getContext("2d"), R = _seeded(11); g.fillStyle = "#808080"; g.fillRect(0, 0, n, n); for (let i = 0; i < 900; i++){ g.fillStyle = R() > .5 ? "#8a8a8a" : "#767676"; g.fillRect(R() * n, R() * n, 1, 1); } const t = new THREE.CanvasTexture(c); return typeof normalFromTex === "function" ? normalFromTex("skin", t, 1.2, 0) : null; })();
+function skinMat(color){ const k = "skin" + color; if (_avMats[k]) return _avMats[k]; const m = new THREE.MeshStandardMaterial({color, roughness: .58}); if (SKIN_N){ m.normalMap = SKIN_N; m.normalScale = new THREE.Vector2(.25, .25); } return _avMats[k] = m; }
 // skin, top, lower ("robe" = one-piece to the ankles, "skirt"/"mundu" = from the waist, "trousers"), sleeves, head, beard
 const STYLES = {
-  abaya:     {female: 1, scale: .95, skin: 0xc68e64, top: "satin", lower: "robe", sleeve: "bell", head: "hijab", hijab: 0x0f0f12, shoe: 0x161616, belt: 1},
+  // the two people you can be when you log in
+  floralF:   {female: 1, scale: .95, skin: 0xc68e64, topC: 0xc98a93, topF: "floral", topF2: 0xf6efe3, lower: "robe", sleeve: "long", head: "hijab", hijab: 0xefe6d6, coat: 0xd9c4a4, bag: "tote", bagC: 0xe9dfcf, shoe: 0xf2f0ea, shoeKind: "sneaker", lashes: 1, lips: 0xb05a5e},
+  thobeM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf4f1ea, lower: "robe", sleeve: "long", head: "kufi", kufi: 0xffffff, hair: 0x1a1411, beard: 0x1a1411, shoe: 0x6b4a2b, shoeKind: "sandal", watch: 1, collar: 1},
+  abaya:     {female: 1, scale: .95, skin: 0xc68e64, top: "satin", lower: "robe", sleeve: "bell", head: "hijab", hijab: 0x0f0f12, shoe: 0x161616, belt: 1, lashes: 1},
   bandhgala: {female: 0, scale: 1, skin: 0xc68e64, top: "jacket", lower: "trousers", lowerC: 0xcdbb98, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shades: 1, buttons: 1, shoe: 0x3a261b, bracelet: 1, hem: -.2},
   imam:      {female: 0, scale: 1, skin: 0xb07a52, topC: 0xf3f1ea, lower: "robe", sleeve: "long", head: "kufi", kufi: 0xffffff, hair: 0x8a8580, beard: 0xb9b4ad, shoe: 0x5a4a3a},
   teacher:   {female: 0, scale: 1, skin: 0xa8734f, topC: 0x9cc3e6, lower: "trousers", lowerC: 0x4a4f57, sleeve: "long", head: "hair", hair: 0x2a2420, mustache: 0x2a2420, glasses: 1, shoe: 0x2a1d16},
@@ -1808,18 +1952,27 @@ const STYLES = {
   officeF:   {female: 1, scale: .93, skin: 0xb98058, topC: 0x3a6ea5, lower: "trousers", lowerC: 0x2b2b30, sleeve: "long", head: "hijab", hijab: 0x2e4a7a, shoe: 0x2a1d16, kurti: 1},
   officeM:   {female: 0, scale: .98, skin: 0xa8734f, topC: 0xdfe8f2, lower: "trousers", lowerC: 0x3a3f48, sleeve: "long", head: "hair", hair: 0x16110e, mustache: 0x16110e, shoe: 0x2a1d16},
   farmer:    {female: 0, scale: .96, skin: 0x93623f, topC: 0x2c8a5c, lower: "mundu", lowerC: 0xf2eee2, sleeve: "short", head: "hair", hair: 0x2a2420, mustache: 0x2a2420, shoe: 0x3a2a1a, hem: -.08},
-  // outfits from the wardrobe by the washroom
-  salwarF:   {female: 1, scale: .95, skin: 0xc68e64, topC: 0xb03a5b, lower: "trousers", lowerC: 0xf2e6d0, sleeve: "long", head: "hijab", hijab: 0xf2c14e, shoe: 0x8a5a3a, kurti: 1},
-  homeF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x6a8fb5, lower: "trousers", lowerC: 0x2b2b30, sleeve: "long", head: "hijab", hijab: 0x9fbcd8, shoe: 0x6b4a2b, kurti: 1},
-  whiteF:    {female: 1, scale: .95, skin: 0xc68e64, topC: 0xf6f4ee, lower: "robe", sleeve: "long", head: "hijab", hijab: 0xffffff, shoe: 0xe8e2d6},
-  kurtaM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf6f4ee, lower: "trousers", lowerC: 0xf1eee6, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x6b4a2b, hem: -.36},
-  munduM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0x8fb7d9, lower: "mundu", lowerC: 0xf7f3e6, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x3a2a1a, hem: -.08},
-  thobeM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf6f4ee, lower: "robe", sleeve: "long", head: "kufi", kufi: 0xffffff, hair: 0x1a1411, beard: 0x1a1411, shoe: 0x5a4a3a},
-  casualM2:  {female: 0, scale: 1, skin: 0xc68e64, topC: 0x2b4a6b, lower: "trousers", lowerC: 0x3a4a6a, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0xeeeeee, hem: -.06},
+  // her wardrobe (the shelf in the bedroom)
+  coatF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0xf4f1ea, lower: "trousers", lowerC: 0xe8e1d2, wide: 1, sleeve: "long", head: "hijab", hijab: 0x8a9aa8, coat: 0xb98b5a, coatLong: 1, bag: "cross", bagC: 0x5a3a26, shoe: 0x5a3a26, shoeKind: "flat", lashes: 1, lips: 0xb05a5e},
+  denimF:    {female: 1, scale: .95, skin: 0xc68e64, topC: 0x5a7aa8, topF: "denim", lower: "skirt", lowerC: 0xf2efe6, sleeve: "long", head: "hijab", hijab: 0xd8a0a8, bag: "tote", bagC: 0xf1e9d8, shoe: 0xf2f0ea, shoeKind: "sneaker", lashes: 1, lips: 0xb05a5e, hem: -.1},
+  leopardF:  {female: 1, scale: .95, skin: 0xc68e64, topC: 0x1a1a1e, lower: "skirt", lowerC: 0xcfb48a, lowF: "leopard", lowF2: 0x2a1d12, sleeve: "long", head: "hijab", hijab: 0x141417, bag: "cross", bagC: 0x1a1a1e, shoe: 0x161616, shoeKind: "flat", lashes: 1, lips: 0xb05a5e},
+  stripeF:   {female: 1, scale: .95, skin: 0xc68e64, topC: 0xf4f1ea, topF: "stripe", topF2: 0x2a2a30, lower: "trousers", lowerC: 0xefe7d8, wide: 1, sleeve: "long", head: "hijab", hijab: 0xf2efe8, bag: "cross", bagC: 0x8a5a3a, shoe: 0xf2f0ea, shoeKind: "sneaker", lashes: 1, lips: 0xb05a5e},
+  salwarF:   {female: 1, scale: .95, skin: 0xc68e64, topC: 0xb03a5b, lower: "trousers", lowerC: 0xf2e6d0, sleeve: "long", head: "hijab", hijab: 0xf2c14e, shoe: 0x8a5a3a, shoeKind: "flat", kurti: 1, lashes: 1, lips: 0xb05a5e},
+  homeF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x6a8fb5, lower: "trousers", lowerC: 0x2b2b30, sleeve: "long", head: "hijab", hijab: 0x9fbcd8, shoe: 0x6b4a2b, shoeKind: "flat", kurti: 1, lashes: 1, lips: 0xb05a5e},
+  whiteF:    {female: 1, scale: .95, skin: 0xc68e64, topC: 0xf6f4ee, lower: "robe", sleeve: "long", head: "hijab", hijab: 0xffffff, shoe: 0xe8e2d6, shoeKind: "flat", lashes: 1},
+  // his wardrobe
+  thobeGrey: {female: 0, scale: 1, skin: 0xc68e64, topC: 0x8a8f94, lower: "robe", sleeve: "long", head: "ghutra", ghutra: 0xf6f4ee, hair: 0x1a1411, beard: 0x1a1411, shoe: 0x4a3626, shoeKind: "sandal", watch: 1, collar: 1},
+  thobeNavy: {female: 0, scale: 1, skin: 0xc68e64, topC: 0x2a3550, lower: "robe", sleeve: "long", head: "kufi", kufi: 0xf6f4ee, hair: 0x1a1411, beard: 0x1a1411, shoe: 0x2a1d16, shoeKind: "shoe", watch: 1, collar: 1},
+  suitM:     {female: 0, scale: 1, skin: 0xc68e64, top: "jacket", jacketC: 0x2b3a5c, lower: "trousers", lowerC: 0x2b3a5c, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x161616, shoeKind: "shoe", tie: 0x7a2030, shirt: 0xf4f1ea, watch: 1, hem: -.22},
+  shirtM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0x9cc3e6, lower: "trousers", lowerC: 0x3a3f48, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x2a1d16, shoeKind: "shoe", watch: 1, collar: 1, hem: -.08},
+  kurtaM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0xf6f4ee, lower: "trousers", lowerC: 0xf1eee6, sleeve: "long", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x6b4a2b, shoeKind: "sandal", hem: -.36},
+  munduM:    {female: 0, scale: 1, skin: 0xc68e64, topC: 0x8fb7d9, lower: "mundu", lowerC: 0xf7f3e6, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0x3a2a1a, shoeKind: "sandal", hem: -.08},
+  casualM2:  {female: 0, scale: 1, skin: 0xc68e64, topC: 0x2b4a6b, lower: "trousers", lowerC: 0x3a4a6a, lowF: "denim", sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0xeeeeee, shoeKind: "sneaker", bag: "cross", bagC: 0x2a2a2e, watch: 1, hem: -.06},
   // swimwear: a full-cover burkini for the abaya look, a rash guard and long shorts for the bandhgala look
-  swimF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x1f3d6b, lower: "trousers", lowerC: 0x1f3d6b, sleeve: "long", head: "hijab", hijab: 0x1f3d6b, shoe: 0xc68e64, kurti: 1},
+  swimF:     {female: 1, scale: .95, skin: 0xc68e64, topC: 0x1f3d6b, lower: "trousers", lowerC: 0x1f3d6b, sleeve: "long", head: "hijab", hijab: 0x1f3d6b, shoe: 0xc68e64, kurti: 1, lashes: 1},
   swimM:     {female: 0, scale: 1, skin: 0xc68e64, topC: 0x1d4a35, lower: "shorts", lowerC: 0x22345a, sleeve: "short", head: "hair", hair: 0x1a1411, beard: 0x1a1411, shoe: 0xc68e64, hem: -.12}
 };
+STYLES.bandhgala.shoeKind = "shoe"; STYLES.bandhgala.watch = 1;
 STYLES.abayaNavy = Object.assign({}, STYLES.abaya, {satinC: 0x1b2a4e, hijab: 0x141c33});
 STYLES.abayaMaroon = Object.assign({}, STYLES.abaya, {satinC: 0x4a1022, hijab: 0x2a0a12});
 STYLES.bandhgalaMaroon = Object.assign({}, STYLES.bandhgala, {jacketC: 0x6a1f2b});
@@ -1838,22 +1991,54 @@ function lathe(points, m, parent, y, sz){
   o.scale.z = sz || .78; return o;
 }
 function faceFeatures(head, S, skinM, hy, fz){
-  const brow = avMat(S.hair || 0x1a1411, .85);
+  const brow = avMat(S.hair || 0x1a1411, .85), lash = avMat(0x15100e, .9);
   [-1, 1].forEach(s => {
-    const w = mesh(new THREE.SphereGeometry(.017, 12, 8), AV.eyeW, head, s * .036, hy + .012, -(fz - .007)); w.scale.z = .55;
+    const w = mesh(new THREE.SphereGeometry(.018, 14, 10), AV.eyeW, head, s * .036, hy + .012, -(fz - .007)); w.scale.z = .55;
     mesh(new THREE.SphereGeometry(.0095, 10, 8), AV.iris, head, s * .036, hy + .012, -(fz + .001));
-    const b = mesh(new THREE.BoxGeometry(.036, S.female ? .006 : .009, .012), brow, head, s * .037, hy + .038, -(fz - .004)); b.rotation.z = s * (S.female ? -.15 : -.06);
+    mesh(new THREE.SphereGeometry(.0045, 8, 6), avMat(0x050505, .3), head, s * .036, hy + .012, -(fz + .006));
+    mesh(new THREE.SphereGeometry(.002, 6, 4), AV.eyeW, head, s * .036 - .003 * s, hy + .016, -(fz + .009));
+    // an upper lid that sits over the eyeball, and lashes along its edge
+    const lid = mesh(new THREE.SphereGeometry(.02, 14, 8, 0, Math.PI * 2, 0, Math.PI * .42), skinM, head, s * .036, hy + .013, -(fz - .007)); lid.scale.z = .6;
+    const l = mesh(new THREE.TorusGeometry(.0185, S.lashes ? .0024 : .0015, 5, 14, Math.PI), lash, head, s * .036, hy + .0125, -(fz + .003)); l.rotation.z = s * -.08;
+    if (S.lashes) [0, 1].forEach(k => { const h = mesh(new THREE.BoxGeometry(.0025, .009, .0025), lash, head, s * (.052 + k * .004), hy + .026 - k * .006, -(fz - .001)); h.rotation.z = s * -.9 + k * .3 * s; });
+    const b = mesh(new THREE.BoxGeometry(.038, S.female ? .006 : .01, .012), brow, head, s * .037, hy + .04, -(fz - .004)); b.rotation.z = s * (S.female ? -.09 : -.06);
+    mesh(new THREE.SphereGeometry(.014, 10, 8), skinM, head, s * .05, hy - .012, -(fz - .02)).scale.set(1.1, .7, .6);   // cheek
   });
-  const n = mesh(new THREE.ConeGeometry(.013, .036, 8), skinM, head, 0, hy - .01, -(fz + .004)); n.rotation.x = -Math.PI / 2 + .3;
-  mesh(new THREE.TorusGeometry(.02, .0045, 6, 12, Math.PI), S.female ? AV.lip : AV.mouth, head, 0, hy - .042, -(fz - .008)).rotation.z = Math.PI;
+  const n = mesh(new THREE.ConeGeometry(.013, .038, 8), skinM, head, 0, hy - .01, -(fz + .004)); n.rotation.x = -Math.PI / 2 + .3;
+  mesh(new THREE.SphereGeometry(.009, 8, 6), skinM, head, 0, hy - .026, -(fz + .008)).scale.set(1.25, .7, .8);   // tip of the nose
+  const lipM = S.female ? (S.lips ? avMat(S.lips, .45) : AV.lip) : AV.mouth;
+  mesh(new THREE.TorusGeometry(.019, .0045, 6, 12, Math.PI), lipM, head, 0, hy - .041, -(fz - .008)).rotation.z = Math.PI;
+  mesh(new THREE.SphereGeometry(.012, 10, 6), lipM, head, 0, hy - .048, -(fz - .009)).scale.set(1.5, .55, .6);   // lower lip
+}
+function hand(parent, skinM, y, side, female){
+  const w = female ? .88 : 1, g = jointG(parent, 0, y, 0);
+  mesh(new THREE.BoxGeometry(.06 * w, .07 * w, .024 * w), skinM, g, 0, -.032 * w, 0);
+  mesh(new THREE.SphereGeometry(.028 * w, 10, 8), skinM, g, 0, 0, 0).scale.set(1, .6, .8);   // wrist
+  for (let f = 0; f < 4; f++){ const m = mesh(new THREE.CylinderGeometry(.0068 * w, .006 * w, .046 * w, 6), skinM, g, (-.021 + f * .014) * w, -.088 * w, 0); if (f === 0 || f === 3) m.scale.y = .88; m.rotation.x = .12; }
+  const th = mesh(new THREE.CylinderGeometry(.0075 * w, .0065 * w, .04 * w, 6), skinM, g, -side * .036 * w, -.048 * w, -.008 * w); th.rotation.z = -side * .6; th.rotation.x = .3;
+  return g;
+}
+function shoe(parent, shoeM, female, kind, skinM){
+  const L = female ? .22 : .25, W = female ? .085 : .1, y = -.44;
+  if (kind === "sandal"){
+    mesh(new THREE.BoxGeometry(W, .025, L), shoeM, parent, 0, y + .012, -.05);
+    mesh(new THREE.BoxGeometry(W + .01, .012, .03), shoeM, parent, 0, y + .05, -.08);
+    mesh(new THREE.BoxGeometry(W, .045, L - .05), skinM, parent, 0, y + .04, -.045).scale.set(.85, 1, 1);   // the foot
+    return;
+  }
+  const soleM = avMat(kind === "sneaker" ? 0xf6f6f3 : 0x1a1512, .6);
+  mesh(new THREE.BoxGeometry(W, .025, L), soleM, parent, 0, y + .012, -.05);
+  const up = mesh(new THREE.SphereGeometry(W * .5, 12, 8), shoeM, parent, 0, y + .035, -.12); up.scale.set(1, .8, 1.9);
+  mesh(new THREE.BoxGeometry(W * .96, kind === "flat" ? .035 : .055, L * .5), shoeM, parent, 0, y + .04, -.02);
+  if (kind === "sneaker"){ for (let k = 0; k < 3; k++) mesh(new THREE.BoxGeometry(.004, .003, .02), avMat(0x9aa4b0, .7), parent, 0, y + .07, -.1 + k * .022); }
 }
 function buildHuman(look){
   const S = STYLES[look] || STYLES.abaya, female = !!S.female;
-  const skinM = avMat(S.skin, .62);
-  const topM = S.top === "satin" ? (S.satinC ? satinVar(S.satinC) : AV.satin) : S.top === "jacket" ? (S.jacketC ? jacketVar(S.jacketC) : AV.jacket) : avMat(S.topC, .82);
+  const skinM = skinMat(S.skin);
+  const topM = S.top === "satin" ? (S.satinC ? satinVar(S.satinC) : AV.satin) : S.top === "jacket" ? (S.jacketC ? jacketVar(S.jacketC) : AV.jacket) : fabricMat(S.topC, S.topF || "weave", S.topF2, false, S.lower === "robe");
   const satinDS = S.satinC ? satinVar(S.satinC, true) : AV.satinDS, jacketM = S.jacketC ? jacketVar(S.jacketC) : AV.jacket;
   const covered = S.lower !== "trousers" && S.lower !== "shorts";
-  const lowM = S.lower === "robe" ? topM : avMat(S.lowerC, .85);
+  const lowM = S.lower === "robe" ? topM : fabricMat(S.lowerC, S.lowF || "weave", S.lowF2, false, true);
   const shoeM = avMat(S.shoe || 0x222222, .4);
   const root = new THREE.Group(); root.rotation.order = "YXZ";
   const inner = new THREE.Group(); root.add(inner);          // tipped over when lying down
@@ -1868,6 +2053,17 @@ function buildHuman(look){
   if (female) lathe([[.001, -.02], [.145 * w, -.02], [.13 * w, .07], [.152 * w, .24], [.162 * w, .37], [.155 * w, .44], [.07, .52], [.001, .53]], topM, torso);
   else { const hem = S.hem == null ? -.04 : S.hem; lathe([[.001, hem], [.185 * w, hem], [.176 * w, -.03], [.165 * w, .08], [.182 * w, .28], [.192 * w, .4], [.18 * w, .47], [.072, .52], [.001, .52]], topM, torso, 0, .74); }
   if (S.kurti) lathe([[.001, -.28], [.2, -.28], [.16, .02], [.155, .1], [.001, .1]], topM, torso, 0, .8);
+  // an open coat or cardigan over the dress: a shell around the body with the front left open
+  let coatM = null;
+  if (S.coat){
+    coatM = fabricMat(S.coat, S.coatF || "weave", 0, true, true, .92);
+    const hem = S.coatLong ? -.62 : -.42, pts = (female ? [[.175, hem], [.19, -.2], [.178, .07], [.185, .24], [.19, .37], [.182, .44], [.13, .5], [.08, .535]] : [[.21, hem], [.215, -.1], [.2, .08], [.21, .28], [.215, .4], [.205, .47], [.12, .52], [.08, .54]]).map(p => new THREE.Vector2(p[0] * w, p[1]));
+    const c = mesh(new THREE.LatheGeometry(pts, 28, Math.PI + .38, Math.PI * 2 - .76), coatM, torso, 0, 0, 0); c.scale.z = .8; c.castShadow = true;
+    [-1, 1].forEach(s => { const lp = mesh(new THREE.BoxGeometry(.034, .15, .012), coatM, torso, s * .08, .38, -.14); lp.rotation.set(.1, s * .35, s * .18); });   // lapels
+  }
+  if (S.shirt){ const sh = mesh(new THREE.ConeGeometry(.07, .17, 3), avMat(S.shirt, .8), torso, 0, .4, -.145); sh.rotation.set(Math.PI, 0, 0); sh.scale.z = .35; }
+  if (S.tie){ const t = mesh(new THREE.BoxGeometry(.034, .3, .01), fabricMat(S.tie, "stripe", 0x2a0d14, false, false, .6), torso, 0, .31, -.152); t.scale.x = .8; mesh(new THREE.BoxGeometry(.03, .03, .012), avMat(S.tie, .6), torso, 0, .465, -.15); }
+  if (S.collar){ const cm = topM; mesh(new THREE.TorusGeometry(.07, .014, 6, 20), cm, torso, 0, .5, 0).rotation.x = Math.PI / 2; }
   if (S.belt){ const b = mesh(new THREE.CylinderGeometry(.137, .137, .045, 28), topM, torso, 0, .07, 0); b.scale.z = .8; }
   if (S.buttons){
     mesh(new THREE.CylinderGeometry(.07, .074, .075, 20), jacketM, torso, 0, .545, 0);
@@ -1878,20 +2074,33 @@ function buildHuman(look){
   }
   // lower body: a skirt that hangs from the hips when standing
   if (covered){
-    const r0 = S.lower === "mundu" ? .19 : .155, r1 = S.lower === "robe" ? .35 : S.lower === "mundu" ? .24 : .3;
+    const r0 = S.lower === "mundu" ? .19 : .155, r1 = S.lower === "robe" ? (female ? .36 : .27) : S.lower === "mundu" ? .24 : .32;
     H.skirt = lathe([[.001, 0], [r0 * w, 0], [(r0 + .03) * w, -.22], [(r0 + r1) / 2 * w, -.5], [r1 * w, -.78], [(r1 + .02) * w, -.9], [.001, -.905]], lowM, hips, 0, .82);
   }
   // head
   const fz = female ? .099 : .105;
   if (S.head === "hijab"){
-    const hm = avMat(S.hijab, .7, true);
+    const hm = fabricMat(S.hijab, S.hijabF || "weave", 0, true, false, .8);
     mesh(new THREE.SphereGeometry(.1, 24, 18), skinM, head, 0, .1, -.004).scale.set(.92, 1.12, .95);
     faceFeatures(head, S, skinM, .1, fz);
     mesh(new THREE.SphereGeometry(.118, 28, 20, Math.PI * 1.5 + .62, Math.PI * 2 - 1.24, 0, Math.PI * .86), hm, head, 0, .105, .006).scale.set(1, 1.1, 1.02);
     mesh(new THREE.SphereGeometry(.119, 28, 12, 0, Math.PI * 2, 0, Math.PI * .3), hm, head, 0, .105, .004).scale.set(1, 1.1, 1.02);
     mesh(new THREE.SphereGeometry(.118, 24, 10, Math.PI, Math.PI, Math.PI * .7, Math.PI * .3), hm, head, 0, .1, -.01).scale.set(1, 1.1, 1.05);
-    mesh(new THREE.CylinderGeometry(.1, .26, .3, 30, 1, true), hm, neck, 0, -.12, .015).scale.z = .82;
+    mesh(new THREE.CylinderGeometry(.1, S.coat ? .19 : .24, S.coat ? .24 : .28, 30, 1, true), hm, neck, 0, S.coat ? -.09 : -.11, .015).scale.z = .82;
     mesh(new THREE.CircleGeometry(.1, 20), hm, neck, 0, .03, .015).rotation.x = -Math.PI / 2;
+    mesh(new THREE.SphereGeometry(.009, 8, 6), AV.gold, head, .07, .03, -.07);   // a pin at the side
+  } else if (S.head === "ghutra"){
+    const gm = fabricMat(S.ghutra, "weave", 0, true, false, .9);
+    mesh(new THREE.CylinderGeometry(.046, .05, .1, 14), skinM, neck, 0, -.01, 0);
+    const hd = mesh(new THREE.SphereGeometry(.105, 28, 20), skinM, head, 0, .1, 0); hd.scale.set(.93, 1.1, 1);
+    [-1, 1].forEach(s => mesh(new THREE.SphereGeometry(.024, 10, 8), skinM, head, s * .098, .1, .005).scale.set(.5, 1, .8));
+    faceFeatures(head, S, skinM, .1, fz);
+    mesh(new THREE.SphereGeometry(.118, 28, 20, Math.PI * 1.5 + .7, Math.PI * 2 - 1.4, 0, Math.PI * .6), gm, head, 0, .105, .006).scale.set(1, 1.1, 1.02);   // the cloth over the head
+    [-1, 1].forEach(s => { const f = mesh(new THREE.BoxGeometry(.11, .34, .02), gm, head, s * .1, -.06, .05); f.rotation.set(.15, s * .35, s * -.08); });   // hanging at the sides
+    mesh(new THREE.BoxGeometry(.2, .3, .02), gm, head, 0, -.04, .12).rotation.x = -.25;   // and down the back
+    [0, 1].forEach(k => mesh(new THREE.TorusGeometry(.112, .012, 8, 28), avMat(0x111111, .7), head, 0, .16 + k * .028, .004).rotation.x = Math.PI / 2);   // the black agal
+    if (S.beard){ const b = mesh(new THREE.SphereGeometry(.108, 24, 12, Math.PI * 1.06, Math.PI * .88, Math.PI * .54, Math.PI * .3), avMat(S.beard, .9), head, 0, .098, -.002); b.scale.set(.95, 1.12, 1.02); }
+    if (S.beard){ const mm = avMat(S.beard, .9); mesh(new THREE.BoxGeometry(.03, .008, .012), mm, head, -.016, .064, -.104); mesh(new THREE.BoxGeometry(.03, .008, .012), mm, head, .016, .064, -.104); }
   } else {
     mesh(new THREE.CylinderGeometry(.046, .05, .1, 14), skinM, neck, 0, -.01, 0);
     const hd = mesh(new THREE.SphereGeometry(.105, 28, 20), skinM, head, 0, .1, 0); hd.scale.set(.93, 1.1, 1);
@@ -1905,6 +2114,7 @@ function buildHuman(look){
     } else {
       mesh(new THREE.SphereGeometry(.111, 28, 14, 0, Math.PI * 2, 0, Math.PI * .42), hairM, head, 0, .112, .006).scale.set(.96, 1.15, 1.02);
       mesh(new THREE.SphereGeometry(.109, 24, 14, 0, Math.PI, 0, Math.PI * .62), hairM, head, 0, .1, .004).scale.set(.95, 1.11, 1.01);
+      for (let k = 0; k < 5; k++){ const f = mesh(new THREE.BoxGeometry(.028, .05, .02), hairM, head, -.05 + k * .025, .175, -.092 + Math.abs(k - 2) * .006); f.rotation.set(.35, 0, (k - 2) * .18); }   // a fringe
       if (S.head === "cap"){
         const c = mesh(new THREE.SphereGeometry(.115, 24, 10, 0, Math.PI * 2, 0, Math.PI * .45), avMat(S.cap, .6), head, 0, .118, .006); c.scale.set(.97, 1.1, 1.03);
         const v = mesh(new THREE.CylinderGeometry(.08, .08, .01, 20, 1, false, Math.PI * .5, Math.PI), avMat(S.cap, .6), head, 0, .155, -.075); v.scale.set(1, 1, .8);
@@ -1918,7 +2128,7 @@ function buildHuman(look){
   // arms
   sx.forEach((s, i) => {
     const sh = jointG(torso, s * (female ? .17 : .195) * w, female ? .45 : .46, 0);
-    const sleeveM = S.top === "jacket" ? jacketM : topM;
+    const sleeveM = coatM || (S.top === "jacket" ? jacketM : topM);
     mesh(new THREE.SphereGeometry(female ? .058 : .062, 14, 10), sleeveM, sh);
     if (S.sleeve === "bell"){ seg(sh, .28, .055, .062, sleeveM); studs(sh, .28, .056, .063, 70); }
     else seg(sh, S.sleeve === "short" ? .2 : .29, .06 * w, .054 * w, sleeveM);
@@ -1928,30 +2138,44 @@ function buildHuman(look){
     if (S.sleeve === "bell"){
       mesh(new THREE.CylinderGeometry(.062, .155, .27, 22, 1, true), satinDS, el, 0, -.135, 0);
       studs(el, .27, .063, .156, 140);
-      mesh(new THREE.SphereGeometry(.04, 12, 10), skinM, el, 0, -.255, 0).scale.set(.8, 1.15, .6);
+      hand(el, skinM, -.235, s, female);
     } else {
       seg(el, .26, .048 * w, .042 * w, S.sleeve === "short" ? skinM : sleeveM);
       if (S.buttons) [0, 1].forEach(k => mesh(new THREE.SphereGeometry(.008, 8, 6), AV.gold, el, s * .02 * (k ? 1 : .2), -.22 - k * .02, -.045));
-      mesh(new THREE.SphereGeometry(.043, 12, 10), skinM, el, 0, -.3, 0).scale.set(.75, 1.2, .55);
+      hand(el, skinM, -.27, s, female);
       if (S.bracelet && s < 0) mesh(new THREE.TorusGeometry(.044, .007, 6, 16), AV.gold, el, 0, -.255, 0).rotation.x = Math.PI / 2;
+      if (S.watch && s < 0){ mesh(new THREE.TorusGeometry(.044, .008, 6, 16), avMat(0x2a2a2e, .5), el, 0, -.25, 0).rotation.x = Math.PI / 2; mesh(new THREE.CylinderGeometry(.018, .018, .012, 16), avMat(0xd8d8d0, .2), el, 0, -.25, -.044).rotation.x = Math.PI / 2; }
     }
     H.arm[i] = sh; H.fore[i] = el;
   });
   // legs (hidden under a robe or skirt unless sitting or kneeling)
   sx.forEach((s, i) => {
     const hip = jointG(hips, s * (female ? .085 : .095), -.02, 0);
-    const legM = covered ? lowM : avMat(S.lowerC, .85), shinM = S.lower === "shorts" ? skinM : legM;
-    const th = seg(hip, .44, covered ? .1 : .078 * w, covered ? .09 : .068 * w, legM);
+    const legM = covered ? lowM : fabricMat(S.lowerC, S.lowF || "weave", S.lowF2, false, !!S.wide), shinM = S.lower === "shorts" ? skinM : legM;
+    const wd = S.wide ? 1.25 : 1;
+    const th = seg(hip, .44, covered ? .1 : .078 * w * wd, covered ? .09 : .068 * w * wd, legM);
     const kn = jointG(hip, 0, -.44, 0);
-    const kj = mesh(new THREE.SphereGeometry(covered ? .088 : .066 * w, 12, 10), legM, kn);
-    const sh = seg(kn, .43, covered ? .085 : .064 * w, covered ? .07 : .055 * w, shinM);
-    mesh(new THREE.BoxGeometry(female ? .085 : .1, .065, female ? .22 : .26), shoeM, kn, 0, -.44, -.05);
+    const kj = mesh(new THREE.SphereGeometry(covered ? .088 : .066 * w * wd, 12, 10), legM, kn);
+    const sh = seg(kn, .43, covered ? .085 : .064 * w * wd, covered ? .07 : (S.wide ? .075 : .055) * w, shinM);
+    shoe(kn, shoeM, female, S.shoeKind || (female ? "flat" : "shoe"), skinM);
     if (covered) H.legMeshes.push(th, sh, kj);
     H.leg[i] = hip; H.knee[i] = kn;
   });
   if (covered){
     H.sitDrape = mesh(new THREE.BoxGeometry(.46, .46, .05), lowM, hips, 0, -.25, -.5);
     H.sitLap = mesh(new THREE.BoxGeometry(.44, .07, .46), lowM, hips, 0, .04, -.22);
+  }
+  if (S.bag){
+    const bm = avMat(S.bagC || 0x5a3a26, .55), strapM = avMat(S.bagC || 0x5a3a26, .7);
+    if (S.bag === "tote"){
+      const b = mesh(new THREE.BoxGeometry(.26, .3, .08), bm, torso, -.25 * w, -.08, .02); b.rotation.z = .04;
+      [-.08, .08].forEach(z => { const st = mesh(new THREE.BoxGeometry(.014, .5, .012), strapM, torso, -.25 * w, .26, z); st.rotation.z = .08; });
+      mesh(new THREE.BoxGeometry(.1, .09, .09), avMat(0x6a8a5a, .8), torso, -.22 * w, .1, .0);   // a little greenery peeping out
+    } else {
+      mesh(new THREE.BoxGeometry(.17, .13, .06), bm, torso, .2 * w, -.06, .06);
+      mesh(new THREE.BoxGeometry(.17, .05, .065), bm, torso, .2 * w, .0, .06);
+      const st = mesh(new THREE.BoxGeometry(.018, .66, .012), strapM, torso, 0, .22, -(female ? .165 : .19) * w); st.rotation.z = -.55;
+    }
   }
   root.traverse(o => { o.userData.noCollide = true; });
   const keep = new Set(H.legMeshes); [H.skirt, H.sitDrape, H.sitLap].forEach(m => m && keep.add(m));
@@ -2252,7 +2476,7 @@ function bodyPos(){ return player.mode === "car" && player.veh ? {x: player.veh.
 
 /* ---------- state ---------- */
 const COLORS = [0xd1495b, 0xedae49, 0x00798c, 0x30638e, 0x8f5bb3, 0x3c9d5d, 0xe07a5f, 0x2a9d8f];
-const me = {name: "", look: "abaya", color: COLORS[Math.floor(Math.random() * COLORS.length)], H: null, tag: null};
+const me = {name: "", look: "floralF", color: COLORS[Math.floor(Math.random() * COLORS.length)], H: null, tag: null};
 const player = {pos: new THREE.Vector3(SPAWN.x, 0, SPAWN.z), yaw: SPAWN.yaw, pitch: -.1, camYaw: SPAWN.yaw, camPitch: .3, mode: "walk", spot: null, standPos: new THREE.Vector3(), speed: 0, hugUntil: 0, camDragAt: 0, veh: null, swim: false};
 let firstPerson = store.get("veed-fp", false), topView = false, entered = false;
 const life = {v: Math.max(0, Math.min(100, Number(store.get("veed-life", 100)) || 0))};
@@ -3072,12 +3296,13 @@ const ready = loadIdentity().then(async () => {
     $("enterBtn").textContent = "Knock on the door";
   }
   $("ownerSect").hidden = !net.isOwner; $("inviteBtn").hidden = !net.isOwner;
+  if (typeof precompile === "function") precompile();
   $("loading").hidden = true;
 });
 try {
   $("nameIn").value = ACCT.display || "";
-  const lk = store.get("veed-look", "");
-  if (lk === "abaya" || lk === "bandhgala") document.querySelector('input[name="look"][value="' + lk + '"]').checked = true;
+  const lk = store.get("veed-look", ""), lkIn = lk && STYLES[lk] ? document.querySelector('input[name="look"][value="' + (STYLES[lk].female ? "floralF" : "thobeM") + '"]') : null;
+  if (lkIn) lkIn.checked = true;
 } catch(e){}
 function ensureCtx(){
   const C = window.AudioContext || window.webkitAudioContext;
@@ -3091,9 +3316,9 @@ $("enterForm").addEventListener("submit", async e => {
   if (ACCT.user && !acctPaid()){ renderPay(); return; }                                                               // pay first
   const n = (TRIAL ? $("nameIn").value.trim().replace(/\s+/g, " ") : (ACCT.display || ACCT.user)).slice(0, 24); if (!n){ $("nameIn").focus(); return; }
   const chosen = document.querySelector('input[name="look"]:checked');
-  me.name = n; me.look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
-  { const o = store.get("veed-outfit", ""); if (OUTFIT_KEYS.has(o) && !!STYLES[o].female === (me.look === "abaya")) me.look = o; }
-  store.set("veed-name", n); store.set("veed-look", me.look);
+  me.name = n; me.look = chosen && STYLES[chosen.value] ? chosen.value : chosen && chosen.value === "bandhgala" ? "thobeM" : "floralF";
+  { const o = store.get("veed-outfit", ""); if (OUTFIT_KEYS.has(o) && !!STYLES[o].female === !!STYLES[me.look].female) me.look = o; }
+  store.set("veed-name", n); store.set("veed-look", me.look); if (!store.get("veed-since", 0)) store.set("veed-since", Date.now());
   ensureCtx();
   await ready;
   me.H = buildHuman(me.look); scene.add(me.H.root);
@@ -3205,7 +3430,7 @@ async function onHi(id, d){
   const p = peer(id);
   p.name = String(d.name || "Guest").slice(0, 24);
   p.color = COLORS.includes(d.color) ? d.color : COLORS[0];
-  p.look = OUTFIT_KEYS.has(d.look) ? d.look : d.look === "bandhgala" ? "bandhgala" : "abaya";
+  p.look = OUTFIT_KEYS.has(d.look) ? d.look : d.look === "bandhgala" ? "thobeM" : "floralF";
   if (net.isOwner){
     if (d.owner) return;                                    // your own home open on another device
     p.invite = String(d.invite || "").slice(0, 16);
@@ -3215,6 +3440,7 @@ async function onHi(id, d){
       if (g.invite === p.invite && g.name === p.name) peerLeft(net.guestId);     // the same guest reconnected: drop the old connection
       else { net.act.admit.send({ok: false, why: "full"}, {target: id}); return; }
     }
+    if (typeof isBlocked === "function" && isBlocked(p.name)){ net.act.admit.send({ok: false, why: "blocked"}, {target: id}); return; }
     const why = checkInvite(p.invite, p.name);
     if (why !== "ok"){ net.act.admit.send({ok: false, why}, {target: id}); return; }
     // someone you already let in with this link comes straight back in
@@ -3292,7 +3518,7 @@ function onAdmit(id, d){
   else {
     net.admitted = false; net.declined = true;
     const why = {full: "The house is full. Only two people can be inside at a time.", expired: "This invite link isn't valid. Ask for a new one.",
-      used: "This invite link was already used by someone else. Ask for a new one.", noinvite: "You need an invite link to go inside. Ask the owner for one."}[d.why];
+      used: "This invite link was already used by someone else. Ask for a new one.", noinvite: "You need an invite link to go inside. Ask the owner for one.", blocked: "You can't enter this home."}[d.why];
     banner(why || owner.name + " didn't let you in this time.", d.why === "declined");
   }
   renderPeople(); status();
@@ -3336,7 +3562,7 @@ function renderPeople(){
     const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = "#" + color.toString(16).padStart(6, "0");
     const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = name;
     const s = document.createElement("span"); s.className = "st" + (stOn ? " on" : ""); s.textContent = st;
-    li.append(dot, nm, s); if (btn) li.appendChild(btn); ul.appendChild(li);
+    li.append(dot, nm, s); if (btn) li.appendChild(btn); ul.appendChild(li); return li;
   };
   const micText = m => m === 1 ? "mic on" : m === 2 ? "muted" : "mic off";
   const myMic = !net.stream ? 0 : net.muted ? 2 : 1;
@@ -3345,7 +3571,8 @@ function renderPeople(){
   if (pid && net.peers[pid]){
     const p = net.peers[pid], b = document.createElement("button");
     b.type = "button"; b.textContent = "Find"; b.addEventListener("click", () => goToPeer(pid));
-    row(p.name + (p.isOwner ? " (owner)" : ""), p.color, micText(p.mic || 0), p.mic === 1, b);
+    const li = row(p.name + (p.isOwner ? " (owner)" : ""), p.color, micText(p.mic || 0), p.mic === 1, b);
+    if (typeof peopleExtra === "function") peopleExtra(li, p.name);
   }
   if (net.isOwner) Object.values(net.peers).filter(p => p.knocking).forEach(p => {
     const b = document.createElement("button"); b.type = "button"; b.textContent = "Let in"; b.addEventListener("click", () => decide(p.id, true));
@@ -3528,6 +3755,7 @@ $("chatForm").addEventListener("submit", e => {
   const inp = $("chatIn"), text = inp.value.trim().slice(0, 200); if (!text) return;
   if (secretCode(text)){ inp.value = ""; inp.blur(); view.focus({preventScroll: true}); return; }   // codes are never sent as chat
   if (gotoCommand(text)) return;
+  { const g = text.match(/^\s*graphics?\s+(low|medium|high)\s*$/i); if (g){ setQuality(g[1].toLowerCase(), true); inp.value = ""; inp.blur(); view.focus({preventScroll: true}); return; } }
   const pid = partner();
   if (!pid){ toast(net.isOwner ? "No guest is inside yet." : "You can chat once the owner lets you in."); return; }
   inp.value = ""; chatLine(me.name + " (you)", text); net.act.chat.send({text}, {target: pid});
@@ -3967,7 +4195,7 @@ function buildLandVisual(L, noGrid){
     landBox(L, 1.2, 1.2, 1.2, x0 + 16.5, 0, z0 + 1.2, M.woodLight);
   } else if (s.build === "orchard"){
     TREES.filter(t => t.land === L.i).forEach(t => {
-      const F = FRUITS[t.kind], lm = mat(F.leaf, .9), fm = mat(F.c, .5), h = 3.4, r = 1.4;
+      const F = FRUITS[t.kind], lm = leafMat(F.leaf), fm = mat(F.c, .5), h = 3.4, r = 1.4;
       landBox(L, .01, .01, .01, t.x, 0, t.z, M.bark, {noCollide: true});
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.1, .15, h * .5, 8), M.bark); trunk.position.set(t.x, h * .25, t.z); trunk.castShadow = true; L.group.add(trunk);
       [[0, h * .65, 0, r], [r * .4, h * .58, r * .2, r * .72], [-r * .35, h * .6, -r * .2, r * .75]].forEach(([dx, dy, dz, rr]) => { const c = new THREE.Mesh(new THREE.IcosahedronGeometry(rr, 1), lm); c.position.set(t.x + dx, dy, t.z + dz); c.scale.y = .82; c.castShadow = true; c.userData.noCollide = true; L.group.add(c); });
@@ -4123,32 +4351,46 @@ function mergeStatic(){
   return {pieces: victims.length, merged: buckets.size};
 }
 
-// Graphics: "smooth" (no shadows, lower resolution) or "detailed"; phones start smooth
-const QUAL = {mode: store.get("veed-gfx", coarse ? "smooth" : "detailed"), shadows: true, npcFar: 80};
+// Graphics: low / medium / high. The level is chosen from measured frame times, never from the screen size or the browser name.
+const GFX_LEVELS = ["low", "medium", "high"];
+const QUAL = {mode: (m => m === "smooth" ? "low" : m === "detailed" ? "high" : GFX_LEVELS.includes(m) ? m : "")(store.get("veed-gfx", "")), shadows: true, npcFar: 80, scale: 1};
+if (!QUAL.mode) QUAL.mode = coarse ? "medium" : "high";       // a starting guess; the first seconds of play decide for real
 function applyQuality(first){
-  const smooth = QUAL.mode === "smooth";
-  QUAL.shadows = !smooth; QUAL.npcFar = smooth ? 55 : 80;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, smooth ? 1 : (coarse ? 1.5 : 2)));
-  if (renderer.shadowMap.enabled !== !smooth){
-    renderer.shadowMap.enabled = !smooth;
-    if (typeof nightLightsFor === "function") nightLightsFor(!smooth);
+  const lv = GFX_LEVELS.indexOf(QUAL.mode), low = lv === 0, high = lv === 2;
+  QUAL.shadows = !low; QUAL.npcFar = low ? 55 : high ? 90 : 75;
+  QUAL.scale = 1; renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, low ? 1 : high ? (coarse ? 2 : 2) : 1.5));
+  const shadowsOn = !low;
+  sun.shadow.mapSize.set(high ? (coarse ? 2048 : 4096) : 2048, high ? (coarse ? 2048 : 4096) : 2048);
+  if (sun.shadow.map){ sun.shadow.map.dispose(); sun.shadow.map = null; }
+  if (renderer.shadowMap.enabled !== shadowsOn){
+    renderer.shadowMap.enabled = shadowsOn;
+    if (typeof nightLightsFor === "function") nightLightsFor(shadowsOn);
     scene.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); });
   }
-  sceneFog.near = smooth ? 90 : 140; sceneFog.far = smooth ? 380 : 620;
+  sceneFog.near = low ? 90 : 140; sceneFog.far = low ? 380 : 620;
   $("gfxSel").value = QUAL.mode;
+  if (typeof gfxApply === "function") gfxApply(first);
   if (!first) resize();
 }
-$("gfxSel").addEventListener("change", () => { QUAL.mode = $("gfxSel").value; store.set("veed-gfx", QUAL.mode); applyQuality(); view.focus({preventScroll: true}); });
-// if frames are slow for a few seconds, switch to smooth by itself (once)
-let fpsT = 0, fpsN = 0, fpsChecked = !!store.get("veed-gfx-auto", false);
+function setQuality(mode, say){ if (!GFX_LEVELS.includes(mode)) return false; QUAL.mode = mode; store.set("veed-gfx", mode); applyQuality(); if (say) toast("Graphics: " + mode + ".", 2500); return true; }
+$("gfxSel").addEventListener("change", () => { setQuality($("gfxSel").value); view.focus({preventScroll: true}); });
+// the first seconds of play measure real frame times: too slow, and the level steps down (once per level, remembered)
+let fpsT = 0, fpsN = 0, fpsChecked = !!store.get("veed-gfx-auto", false), fpsWorst = 0;
 function watchFps(dt){
-  if (fpsChecked || !entered || QUAL.mode === "smooth") return;
+  if (!entered) return;
   fpsT += dt; fpsN++;
-  if (fpsT >= 4){
-    const avg = fpsT / fpsN; fpsT = 0; fpsN = 0;
-    if (avg > 1 / 30){ QUAL.mode = "smooth"; store.set("veed-gfx", "smooth"); applyQuality(); toast("Switched to smoother graphics so Veed runs faster on this device.", 6000); }
-    fpsChecked = true; store.set("veed-gfx-auto", true);
+  if (fpsT < 3) return;
+  const avg = fpsT / fpsN; fpsT = 0; fpsN = 0;
+  // long-term: step the level down while frames are slow, and remember it
+  if (!fpsChecked && avg > 1 / 30 && QUAL.mode !== "low"){
+    setQuality(GFX_LEVELS[GFX_LEVELS.indexOf(QUAL.mode) - 1]); toast("Switched to " + QUAL.mode + " graphics so Veed runs smoothly on this device. Type \"graphics high\" in the chat to change it.", 6000);
+    if (QUAL.mode === "low"){ fpsChecked = true; store.set("veed-gfx-auto", true); }
+    return;
   }
+  if (!fpsChecked && avg <= 1 / 30){ fpsChecked = true; store.set("veed-gfx-auto", true); }
+  // short-term: shrink the render resolution a little while things are slow, and grow it back when they're not
+  if (avg > 1 / 26 && QUAL.scale > .6){ QUAL.scale = Math.max(.6, QUAL.scale - .12); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, QUAL.mode === "low" ? 1 : 2) * QUAL.scale); resize(); }
+  else if (avg < 1 / 50 && QUAL.scale < 1){ QUAL.scale = Math.min(1, QUAL.scale + .08); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, QUAL.mode === "low" ? 1 : 2) * QUAL.scale); resize(); }
 }
 
 /* ---------- accounts: a name and password; your game saves to your account and continues next time ---------- */
@@ -4197,13 +4439,14 @@ async function acctSubmit(mode){
   const name = $("nameIn").value.trim().replace(/\s+/g, " ").slice(0, 24), pass = $("passIn").value, id = name.toLowerCase();
   if (name.length < 2){ acctBusy(false, "Type your name (at least 2 letters)."); return; }
   if (pass.length < 4){ acctBusy(false, "Type a password (at least 4 characters)."); return; }
-  const chosen = document.querySelector('input[name="look"]:checked'), look = chosen && chosen.value === "bandhgala" ? "bandhgala" : "abaya";
+  const chosen = document.querySelector('input[name="look"]:checked'), look = chosen && STYLES[chosen.value] ? chosen.value : "floralF";
   const pfx = "u:" + id + ":";
   acctBusy(true, mode === "create" ? "Creating your account…" : "Logging in…");
   try {
     if (cloudOn()){
       const r = await rpc(mode === "create" ? "veed_register" : "veed_login", mode === "create" ? {p_name: name, p_pass: pass, p_code: ($("codeIn").value || "").trim().toUpperCase() || null} : {p_name: name, p_pass: pass});
       LS.set("veed-paid:" + id, r.paid === false ? "0" : "1");
+      if (r.recovery) sessionStorage.setItem("veed-recovery", r.recovery);
       if (mode === "create"){ acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look)); }
       else {
         // keep whichever copy is newer: the one online, or the one already on this device
@@ -4247,7 +4490,7 @@ async function acctLogout(){
   location.reload();
 }
 function confirmLeave(){ $("acctSync").textContent = "Not saved online yet"; if (confirmLeave.armed){ confirmLeave.armed = false; return true; } confirmLeave.armed = true; toast("Couldn't save online (check your internet). Your game is still saved on this device. Press Log out again to log out anyway.", 7000); return false; }
-$("acctOut").addEventListener("click", acctLogout); $("acctSwitch").addEventListener("click", e => { e.preventDefault(); acctLogout(); });
+$("acctOut").addEventListener("click", () => typeof openShare === "function" ? openShare(true) : acctLogout()); $("acctSwitch").addEventListener("click", e => { e.preventDefault(); acctLogout(); });
 // show the right parts of the welcome card
 function acctPaid(){ return !cloudOn() || !ACCT.user ? true : LS.get("veed-paid:" + ACCT.user) === "1"; }
 (function acctUI(){
@@ -4644,7 +4887,7 @@ function hillY(x, z){ const r = Math.hypot(x - HILL.x, z - HILL.z) / HILL.R; ret
   const P = geo.attributes.position;
   for (let i = 0; i < P.count; i++){ const px = P.getX(i) + x, pz = P.getZ(i) + z; P.setY(i, hillY(px, pz) + .01); }
   geo.computeVertexNormals();
-  const hill = new THREE.Mesh(geo, mat(0xffffff, 1, {map: rep(TEX.grass, S / 4)})); hill.position.set(x, 0, z); hill.receiveShadow = true; world.add(hill);
+  const hill = new THREE.Mesh(geo, mat(0xffffff, 1, {map: rep(TEX.grass, S / 4)})); hill.position.set(x, 0, z); hill.receiveShadow = true; hill.userData.grassy = true; world.add(hill);
   addZone("Sunrise Hill", x - R, z - R, x + R, -152);
   // a gravel path up the slope that follows the ground
   {
@@ -4683,7 +4926,7 @@ function hillY(x, z){ const r = Math.hypot(x - HILL.x, z - HILL.z) / HILL.R; ret
     if (Math.abs(px - x) < 8 && pz > z) continue;
     const y = hillY(px, pz), h = 5 + (i % 3);
     const tr = cyl(.15, .2, h * .5, px, y - .2, pz, M.bark, null, 7);
-    const c = addMesh(new THREE.IcosahedronGeometry(2 + (i % 2) * .6, 1), mat([0x3a6a30, 0x4b7a37, 0x355f2c][i % 3], .9), px, y + h * .62, pz, {noCollide: true}); c.scale.y = .85;
+    const c = addMesh(new THREE.IcosahedronGeometry(2 + (i % 2) * .6, 2), leafMat([0x3a6a30, 0x4b7a37, 0x355f2c][i % 3]), px, y + h * .62, pz, {noCollide: true}); c.scale.y = .85;
   }
   // parking at the foot
   addMesh(new THREE.PlaneGeometry(16, 6), mat(0xffffff, .95, {map: rep(TEX.asphalt, 4, 2)}), x, .024, -155, {noCollide: true, noShadow: true}).rotation.x = -Math.PI / 2;
@@ -4819,6 +5062,7 @@ const TILE_TEX = canvasTex(256, (g, s) => {
   }
   speckle(g, s, 900, ["rgba(60,30,10,.25)", "rgba(255,210,170,.12)"], 2);
 });
+normalFromTex("tile_roof", TILE_TEX, 4, 0);
 const M_TILE = mat(0xffffff, .78, {map: TILE_TEX});
 // a hip roof (four slopes and a short ridge) with Kerala tiles; eaves overhang the walls
 function hipRoof(x0, z0, x1, z1, y, h, ov, m, opt){
@@ -4870,7 +5114,9 @@ const PADDY_TEX = canvasTex(512, (g, s) => {
   g.strokeStyle = "#5f9e3c"; g.lineWidth = 2;
   for (let k = 0; k <= n; k++){ g.beginPath(); g.moveTo(k * cs, 0); g.lineTo(k * cs, s); g.stroke(); g.beginPath(); g.moveTo(0, k * cs); g.lineTo(s, k * cs); g.stroke(); }
 });
+const PADDIES = [];
 function paddy(x0, z0, x1, z1){
+  PADDIES.push([x0, z0, x1, z1]);
   const w = x1 - x0, d = z1 - z0, m = mat(0xffffff, .85, {map: rep(PADDY_TEX, w / 44, d / 44)});
   const p = addMesh(new THREE.PlaneGeometry(w, d), m, (x0 + x1) / 2, .025, (z0 + z1) / 2, {noShadow: true, noCollide: true}); p.rotation.x = -Math.PI / 2;
 }
@@ -5125,6 +5371,7 @@ const FALL_TEX = (() => {
 })();
 const FALLS_FX = {sheets: [], mist: [], foam: null, snd: null};
 (function buildFalls(){
+  normalFromTex("rock", ROCK_TEX, 3, 1);
   const {x, top, ledge, zc, w} = FALLS, rock = mat(0xffffff, .95, {map: rep(ROCK_TEX, 6, 3)}), moss = mat(0x3f6a2a, .95);
   // the cliff: a wall of rock with a plateau behind it, a ledge halfway down
   box(70, top, 140, x - 35, 0, zc, rock);
@@ -5193,7 +5440,7 @@ const JUNGLE = {trees: [], monkeys: [], items: [], animal: null, fireflies: null
   const N = spots.length, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3(), col = new THREE.Color();
   const trunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.75, 1, 1, 8), mat(0x3b3024, .95), N);
   const roots = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 7), mat(0x33291e, .95), N);
-  const crowns = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), mat(0xffffff, .85), N * 5);
+  const crowns = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 2), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .9, map: rep(LEAF_TEX, 3), alphaTest: .42, side: THREE.DoubleSide, envMapIntensity: .3}), N * 5);
   spots.forEach((s, i) => {
     e.set(s.lean, R() * 6, s.lean); q.setFromEuler(e);
     m4.compose(v.set(s.x, s.h / 2, s.z), q, sc.set(s.r, s.h, s.r)); trunks.setMatrixAt(i, m4);
@@ -5210,7 +5457,7 @@ const JUNGLE = {trees: [], monkeys: [], items: [], animal: null, fireflies: null
   const NF = 2600, ferns = new THREE.InstancedMesh(fernG, new THREE.MeshStandardMaterial({map: fernT, alphaTest: .45, side: THREE.DoubleSide, roughness: .9}), NF);
   for (let i = 0; i < NF; i++){ let x, z, t = 0; do { x = x0 + R() * (x1 - x0); z = z0 + R() * (z1 - z0 - 3); t++; } while (t < 6 && (trailDist(x, z) < 1.8 || x < FALLS.x + 2 || Math.hypot(x - JG.clear.x, z - JG.clear.z) < 13));
     e.set((R() - .5) * .5, R() * 6, (R() - .5) * .5); q.setFromEuler(e); const s = .6 + R() * 1.3; m4.compose(v.set(x, 0, z), q, sc.set(s, s, s)); ferns.setMatrixAt(i, m4); ferns.setColorAt(i, col.setHSL(.25 + R() * .07, .5, .3 + R() * .25)); }
-  const bushes = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), mat(0xffffff, .9), 900);
+  const bushes = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 2), new THREE.MeshStandardMaterial({color: 0xffffff, roughness: .9, map: rep(LEAF_TEX, 2), alphaTest: .42, side: THREE.DoubleSide, envMapIntensity: .3}), 900);
   for (let i = 0; i < 900; i++){ const x = x0 + R() * (x1 - x0), z = z0 + R() * (z1 - z0 - 3); if (trailDist(x, z) < 2.5 || x < FALLS.x + 2 || Math.hypot(x - JG.clear.x, z - JG.clear.z) < 14){ m4.makeScale(0, 0, 0); bushes.setMatrixAt(i, m4); continue; } const s = .5 + R() * 1.0; m4.compose(v.set(x, s * .45, z), q.identity(), sc.set(s * 1.3, s * .9, s * 1.3)); bushes.setMatrixAt(i, m4); bushes.setColorAt(i, col.setHSL(.28 + R() * .05, .45, .09 + R() * .08)); }
   const bamboo = new THREE.InstancedMesh(new THREE.CylinderGeometry(.06, .07, 1, 6), mat(0x7a9a3a, .7), 420);
   for (let c = 0; c < 30; c++){ const cx = x0 + 20 + R() * (x1 - x0 - 40), cz = z0 + 20 + R() * (z1 - z0 - 40); for (let k = 0; k < 14; k++){ const i = c * 14 + k, h = 6 + R() * 6; e.set((R() - .5) * .25, 0, (R() - .5) * .25); q.setFromEuler(e); m4.compose(v.set(cx + (R() - .5) * 2.4, h / 2, cz + (R() - .5) * 2.4), q, sc.set(1, h, 1)); bamboo.setMatrixAt(i, m4); } }
@@ -5593,11 +5840,11 @@ function updateSky(){
   sunDir.copy(_sd.y > 0 ? _sd : new THREE.Vector3(.3, .55, .4).normalize());
   sun.intensity = (_sd.y > 0 ? 1.08 * dayK : .1 * nightK) * (1 - rain * .6);
   sun.color.setRGB(1, .94 - goldK * .25, .85 - goldK * .45); if (_sd.y <= 0) sun.color.setRGB(.62, .7, 1);
-  hemi.intensity = (.07 + .55 * dayK) * (1 - rain * .25);
+  hemi.intensity = (.045 + .55 * dayK) * (1 - rain * .25) * (scene.environment ? .7 : 1);   // the sky's own light fills in when the environment map is on
   hemi.color.setRGB(.6 + .29 * dayK, .66 + .28 * dayK, .85 + .15 * dayK);
   renderer.toneMappingExposure = 1 + nightK * .1;
   sceneFog.color.copy(U.low.value);
-  const smoothQ = QUAL.mode === "smooth";
+  const smoothQ = QUAL.mode === "low";
   sceneFog.near = (smoothQ ? 90 : 140) * (1 - rain * .55); sceneFog.far = (smoothQ ? 380 : 620) * (1 - rain * .55);
   // lights that come on after dark
   M.glow.emissiveIntensity = .5 + nightK * 1.4;
@@ -6160,7 +6407,7 @@ function tickTraffic(dt){
       else if ((L.dir > 0 && t.s >= L.max) || (L.dir < 0 && t.s <= L.min)){ t.s = L.dir > 0 ? L.max : L.min; t.turnT = 0; }
     }
     const P = tPos(t);
-    const far = Math.hypot(P.x - cam.x, P.z - cam.z) > (QUAL.mode === "smooth" ? 170 : 260);
+    const far = Math.hypot(P.x - cam.x, P.z - cam.z) > (QUAL.mode === "low" ? 170 : 260);
     t.g.visible = !far || topView;
     t.g.position.set(P.x, 0, P.z); t.g.rotation.y = P.yaw;
   });
@@ -6765,9 +7012,18 @@ function tickGames(dt){
 interact.push({pos: new THREE.Vector3(-5.93, SCENE.P, 8.62), r: 1.8, label: () => player.mode === "walk" ? "Play a game (chess, ludo, cards)" : null, act: () => gameOpen()});
 
 
-/* ---------- couple mode: hugs, roses, romantic music and dancing stay off until the secret code is typed in the chat ---------- */
-// the codes are stored only as hashes, so they can't be read in the page source
-const CODE_COUPLE = 355054862, CODE_DANCE = 2477283449;
+/* ---------- couple mode: hugs, roses, romantic music and dancing stay off until your own secret words are typed in the chat ---------- */
+// each home has its own two words, chosen by the owner in the planner. Only their hashes are kept and shared with the guest.
+let WORDS = null;   // {c, d}: hashes of the couple word and the dance word for the home you're in
+function wordsKey(){ return "veed-words-" + net.homeId; }
+function myWords(){ if (!net.isOwner) return WORDS; const w = store.get(wordsKey(), null); return w && typeof w === "object" ? w : null; }
+function wordHash(t){ return hashStr("veed:" + String(t || "").trim().toUpperCase().replace(/\s+/g, " ")); }
+function setWords(coupleWord, danceWord){
+  const w = {c: coupleWord ? wordHash(coupleWord) : 0, d: danceWord ? wordHash(danceWord) : 0, at: Date.now()};
+  store.set(wordsKey(), w); WORDS = w;
+  const pid = partner(); if (pid && net.act.couple) net.act.couple.send({op: "words", w: {c: w.c, d: w.d}}, {target: pid});
+}
+const CODE_COUPLE = () => { const w = myWords(); return w && w.c || -1; }, CODE_DANCE = () => { const w = myWords(); return w && w.d || -1; };
 let COUPLE = null;
 function coupleKey(){ return "veed-couple-" + net.homeId; }
 function coupleRec(){ if (!COUPLE || COUPLE.key !== coupleKey()){ const r = store.get(coupleKey(), null); COUPLE = {key: coupleKey(), on: !!(r && r.on), with: r && r.with || ""}; } return COUPLE; }
@@ -6780,15 +7036,15 @@ function renderCouple(){
 }
 function secretCode(text){
   const h = hashStr("veed:" + String(text || "").trim().toUpperCase());
-  if (h !== CODE_COUPLE && h !== CODE_DANCE) return false;
+  if (h !== CODE_COUPLE() && h !== CODE_DANCE()) return false;
   const pid = partner();
   if (!pid){ toast("Your partner needs to be inside with you."); return true; }
-  if (h === CODE_COUPLE){
+  if (h === CODE_COUPLE()){
     if (coupleOn()){ toast("You're already a couple. ❤", 2500); return true; }
     // you have to be standing together: walk up to each other first
     const near = partnerDistance();
     if (near > COUPLE_NEAR){ toast(isFinite(near) ? "Walk up close to " + peerName(pid) + " (about " + Math.round(near) + " m away now), stand side by side, then type it again." : "Walk up close to " + peerName(pid) + " first, then type it again.", 6000); return true; }
-    setCouple(true, peerName(pid)); net.act.couple.send({op: "on", by: me.name}, {target: pid});
+    setCouple(true, peerName(pid)); net.act.couple.send({op: "on", by: me.name, h}, {target: pid});
     coupleJoy(); coupleAssets(); return true;
   }
   // the dance code works once you're a couple
@@ -6818,15 +7074,16 @@ function coupleJoy(){
 }
 function onCoupleMsg(d){
   const pid = partner(); if (!pid) return;
-  if (d.op === "on"){ setCouple(true, peerName(pid)); coupleJoy(); }
+  if (d.op === "on"){ if (net.isOwner && d.h !== CODE_COUPLE()) return; setCouple(true, peerName(pid)); coupleJoy(); }
   else if (d.op === "off"){ setCouple(false); toast(peerName(pid) + " turned couple mode off.", 4000); }
-  else if (d.op === "state"){ if (d.on && !coupleOn()) setCouple(true, peerName(pid)); else renderCouple(); }
+  else if (d.op === "state"){ if (d.w) WORDS = {c: +d.w.c || 0, d: +d.w.d || 0}; if (d.on && !coupleOn()) setCouple(true, peerName(pid)); else renderCouple(); }
+  else if (d.op === "words" && !net.isOwner && d.w){ WORDS = {c: +d.w.c || 0, d: +d.w.d || 0}; }
   else if (d.op === "dance" && coupleOn() && typeof d.cx === "number"){ startDance(d.cx, d.cz, +d.y || 0); }
   else if (d.op === "mylands" && net.isOwner && coupleOn() && Array.isArray(d.lands)) mergeLands(d.lands);
   else if (d.op === "land" && net.isOwner && coupleOn()) partnerLand(d);
   if (d.op === "on" || d.op === "state") coupleAssets();
 }
-function coupleWelcome(p){ setTimeout(() => { if (partner() === p.id) net.act.couple.send({op: "state", on: coupleOn() || (coupleRec().on && coupleRec().with === peerName(p.id))}, {target: p.id}); renderCouple(); updateHint(); }, 600); }
+function coupleWelcome(p){ setTimeout(() => { if (partner() === p.id){ const w = net.isOwner ? myWords() : null; net.act.couple.send({op: "state", on: coupleOn() || (coupleRec().on && coupleRec().with === peerName(p.id)), w: w ? {c: w.c, d: w.d} : undefined}, {target: p.id}); } renderCouple(); updateHint(); }, 600); }
 function coupleLeft(){ if (dance.on) endDance(); setTimeout(() => { renderCouple(); updateHint(); }, 0); }
 $("coupleOff").addEventListener("click", () => { const pid = partner(); setCouple(false); if (pid) net.act.couple.send({op: "off"}, {target: pid}); toast("Couple mode is off.", 3000); });
 renderCouple();
@@ -6901,10 +7158,10 @@ function tickShower(dt){
 }
 interact.push({pos: new THREE.Vector3(SHOWER.x, SHOWER.y, SHOWER.z - .7), r: 1.5, label: () => player.mode === "walk" && !player.swim ? "Take a shower" : null, act: startShower});
 
-/* ---------- the wardrobe shelf by the washroom: change your clothes ---------- */
+/* ---------- the wardrobe shelf in the bedroom (by the bathroom wall): change your clothes ---------- */
 const OUTFITS = {
-  f: [["abaya", "Black abaya"], ["abayaNavy", "Navy abaya"], ["abayaMaroon", "Maroon abaya"], ["salwarF", "Salwar kameez"], ["homeF", "Home kurti"], ["whiteF", "White prayer dress"]],
-  m: [["bandhgala", "Green bandhgala"], ["bandhgalaMaroon", "Maroon bandhgala"], ["bandhgalaNavy", "Navy bandhgala"], ["kurtaM", "White kurta"], ["munduM", "Shirt & mundu"], ["thobeM", "White thobe"], ["casualM2", "T-shirt & jeans"]]
+  f: [["floralF", "Floral dress & cardigan"], ["coatF", "Camel coat & wide trousers"], ["denimF", "Denim jacket & long skirt"], ["stripeF", "Striped top & trousers"], ["leopardF", "Black top & leopard skirt"], ["abaya", "Black abaya"], ["abayaNavy", "Navy abaya"], ["abayaMaroon", "Maroon abaya"], ["salwarF", "Salwar kameez"], ["homeF", "Home kurti"], ["whiteF", "White prayer dress"]],
+  m: [["thobeM", "White thobe"], ["thobeGrey", "Grey thobe & ghutra"], ["thobeNavy", "Navy thobe"], ["shirtM", "Shirt & trousers"], ["suitM", "Navy suit"], ["casualM2", "T-shirt & jeans"], ["bandhgala", "Green bandhgala"], ["bandhgalaMaroon", "Maroon bandhgala"], ["bandhgalaNavy", "Navy bandhgala"], ["kurtaM", "White kurta"], ["munduM", "Shirt & mundu"]]
 };
 const OUTFIT_KEYS = new Set([...OUTFITS.f, ...OUTFITS.m].map(o => o[0]));
 const WARDROBE = {x: .75, z: 4.78};
@@ -6921,8 +7178,9 @@ interact.push({pos: new THREE.Vector3(WARDROBE.x, SCENE.P, WARDROBE.z - .5), r: 
 function openWardrobe(){
   const box2 = $("wardOpts"); box2.textContent = "";
   const female = !!(STYLES[me.look] && STYLES[me.look].female);
-  OUTFITS[female ? "f" : "m"].forEach(([k, label]) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn" + (me.look === k ? " primary" : ""); b.textContent = label; b.addEventListener("click", () => changeOutfit(k, label)); box2.appendChild(b); });
+  OUTFITS[female ? "f" : "m"].forEach(([k, label]) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn" + (me.look === k ? " primary" : ""); b.textContent = label; b.addEventListener("click", () => changeOutfit(k, label)); b.addEventListener("pointerenter", () => typeof previewLook === "function" && previewLook("wardCv", k)); b.addEventListener("focus", () => typeof previewLook === "function" && previewLook("wardCv", k)); box2.appendChild(b); });
   $("wardDlg").hidden = false;
+  if (typeof previewLook === "function") previewLook("wardCv", me.look);
 }
 function changeOutfit(k, label){
   $("wardDlg").hidden = true; view.focus({preventScroll: true});
@@ -7232,9 +7490,10 @@ function renderPlanner(){
   if (!planner.open) return;
   document.querySelectorAll("#planTabs [data-t]").forEach(b => b.classList.toggle("primary", b.dataset.t === planner.tab));
   const shared = planner.tab === "shared", host = net.isOwner ? "" : peerName(net.ownerId);
-  $("planSub").textContent = shared ? (net.isOwner ? (partner() ? "Shared with " + peerName(partner()) + ". You both see and edit these, and they're kept in your home." : "Plans for your home. When your partner visits, you both see and edit them.") : (partner() ? "Plans in " + (host || "your partner") + "'s home. You both see and edit them." : "You're offline from this home, so this is the last copy you saw.")) : "Only you can see these. They're saved to your account.";
+  $("planSub").textContent = planner.tab === "couple" ? (net.isOwner ? "Your home's secret words. Only you can set them; tell them to your partner in person." : "The owner of this home sets the words. Typing them in the chat turns couple mode on.") : shared ? (net.isOwner ? (partner() ? "Shared with " + peerName(partner()) + ". You both see and edit these, and they're kept in your home." : "Plans for your home. When your partner visits, you both see and edit them.") : (partner() ? "Plans in " + (host || "your partner") + "'s home. You both see and edit them." : "You're offline from this home, so this is the last copy you saw.")) : "Only you can see these. They're saved to your account.";
   const body = $("planBody"); body.textContent = "";
-  $("planNew").hidden = !!planner.edit; $("planDoneWrap").hidden = !!planner.edit;
+  $("planNew").hidden = !!planner.edit || planner.tab === "couple"; $("planDoneWrap").hidden = !!planner.edit || planner.tab === "couple";
+  if (planner.tab === "couple") return renderCoupleTab(body);
   if (planner.edit) return renderPlanEditor(body);
   const today = new Date().toISOString().slice(0, 10);
   const list = listFor(planner.tab).filter(p => !p.del && (planner.showDone || !p.done));
@@ -7313,6 +7572,34 @@ function commitPlan(p){
   else { putPlan(myPlans, p); savePlans(); }
 }
 
+/* the Couple tab: the owner chooses the two secret words for this home */
+function renderCoupleTab(body){
+  const wrap = document.createElement("div"); wrap.className = "planedit"; body.appendChild(wrap);
+  const w = typeof myWords === "function" ? myWords() : null, have = !!(w && w.c);
+  if (!net.isOwner){
+    wrap.innerHTML = `<p>${have ? "This home has its secret words. Stand next to each other and type the couple word in the chat." : "The owner hasn't chosen the secret words yet, so couple mode can't be turned on here."}</p>
+      <p class="fine">Couple mode turns on hugs, roses, romantic music and dancing for the two of you. It only works when you're standing close together.</p>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <p>${have ? "Words are set. Type new ones to change them." : "Choose two words only the two of you know. They're kept as scrambled codes, never as text."}</p>
+    <label class="label" for="wordC">Couple word · turns couple mode on (hugs, roses, music)</label>
+    <input id="wordC" maxlength="40" autocomplete="off" autocapitalize="characters" placeholder="${have ? "(set) type a new word to change it" : "e.g. a word from your story"}">
+    <label class="label" for="wordD">Dance word · a 10-second dance together (works once you're a couple)</label>
+    <input id="wordD" maxlength="40" autocomplete="off" autocapitalize="characters" placeholder="${have && w.d ? "(set) type a new word to change it" : "another word"}">
+    <div class="row"><button class="btn primary" type="button" id="wordSave">Save the words</button>${have ? '<button class="btn danger" type="button" id="wordClear">Remove the words</button>' : ""}<small id="wordMsg"></small></div>
+    <p class="fine">Case and spaces don't matter. To use a word, stand next to each other and type it in the chat box; it's never sent as a message.</p>`;
+  $("wordSave").addEventListener("click", () => {
+    const c = $("wordC").value.trim(), d = $("wordD").value.trim(), old = myWords() || {};
+    if (!c && !old.c){ $("wordMsg").textContent = "Type a couple word first."; return; }
+    if (c && c.length < 3){ $("wordMsg").textContent = "Make the word at least 3 letters."; return; }
+    const w = {c: c ? wordHash(c) : old.c, d: d ? wordHash(d) : old.d || 0, at: Date.now()};
+    store.set(wordsKey(), w); WORDS = w; const pid = partner(); if (pid && net.act.couple) net.act.couple.send({op: "words", w: {c: w.c, d: w.d}}, {target: pid});
+    toast("Your secret words are saved. ❤", 3000); renderPlanner();
+  });
+  const clr = $("wordClear"); if (clr) clr.addEventListener("click", () => { store.set(wordsKey(), null); WORDS = null; const pid = partner(); if (pid && net.act.couple) net.act.couple.send({op: "words", w: {c: 0, d: 0}}, {target: pid}); if (coupleOn()) $("coupleOff").click(); renderPlanner(); });
+}
+
 
 /* ---------- friends: add each other once you've been inside together; later visit or invite them without a link ---------- */
 let friends = store.get("veed-friends", []); if (!Array.isArray(friends)) friends = [];
@@ -7330,7 +7617,7 @@ function friendKeyFor(name){
 function onFriendMsg(d, from){
   const name = peerName(from);
   if (d.op === "req"){
-    if (TRIAL || !ACCT.user){ net.act.friend.send({op: "no"}, {target: from}); return; }
+    if (TRIAL || !ACCT.user || isBlocked(name)){ net.act.friend.send({op: "no"}, {target: from}); return; }
     if (friendByName(name)){ net.act.friend.send({op: "already"}, {target: from}); return; }
     FR.pending = {from, user: String(d.user || "").slice(0, 40)};
     $("friendReqText").textContent = name + " wants to add you as a friend. Friends can visit each other and invite each other over without a link.";
@@ -7407,7 +7694,7 @@ async function friendPing(){
     const r = await rpc("veed_ping", {p_name: ACCT.user, p_token: acctToken()});
     FR.online = {}; (r.friends || []).forEach(x => { FR.online[x.id] = !!x.online; });
     (r.calls || []).forEach(c => {
-      const f = friendByUser(c.from); if (!f) return;
+      const f = friendByUser(c.from); if (!f || isBlocked(f.name)) return;
       FR.call = f; $("friendCallText").textContent = f.name + " is inviting you to their home."; $("friendCall").hidden = false;
       try { navigator.vibrate && navigator.vibrate([150, 80, 150]); } catch(e){}
     });
@@ -7426,6 +7713,425 @@ $("friendLater").addEventListener("click", () => { $("friendCall").hidden = true
   setTimeout(go, 300);
 })();
 setInterval(renderFriends, 3000);
+
+
+/* ---------- recovery codes, forgot password, block list, reports, analytics ---------- */
+// a recovery code is shown once after it's made (never stored on the device)
+function showRecovery(code){ if (!code) return; $("recoveryShow").hidden = false; $("recoveryCode").value = code; $("enterBtn").hidden = true; }
+$("recoveryCopy").addEventListener("click", () => copyText($("recoveryCode").value, "Recovery code copied. Keep it somewhere safe."));
+$("recoveryOk").addEventListener("click", () => { $("recoveryShow").hidden = true; $("recoveryCode").value = ""; $("enterBtn").hidden = !(ACCT.user && acctPaid() || TRIAL); if (ACCT.user && !acctPaid()) renderPay(); });
+(function recoveryOnLoad(){ try { const c = sessionStorage.getItem("veed-recovery"); if (c){ sessionStorage.removeItem("veed-recovery"); setTimeout(() => showRecovery(c), 0); } } catch(e){} })();
+$("recoveryNew").addEventListener("click", async () => {
+  if (!cloudOn() || !ACCT.user) { toast("Recovery codes need online accounts."); return; }
+  if ($("recoveryNew").dataset.arm !== "1"){ $("recoveryNew").dataset.arm = "1"; $("recoveryNew").textContent = "This replaces the old code. Tap again to confirm"; setTimeout(() => { $("recoveryNew").dataset.arm = ""; $("recoveryNew").textContent = "Get a new recovery code"; }, 4000); return; }
+  $("recoveryNew").dataset.arm = ""; $("recoveryNew").textContent = "Get a new recovery code";
+  try { const r = await rpc("veed_recovery", {p_name: ACCT.user, p_token: acctToken()}); $("enter").hidden = false; showRecovery(r.recovery); }
+  catch(e){ toast(String(e.message || e)); }
+});
+// forgot the password
+$("forgotRow").hidden = !cloudOn() || !!ACCT.user || TRIAL;
+$("forgotBtn").addEventListener("click", () => { $("recoverBox").hidden = false; $("acctLogin").hidden = true; $("acctCreate").hidden = true; $("passWrap").hidden = true; $("codeRowNew").hidden = true; $("priceNote").hidden = true; $("trialBtn").hidden = true; $("forgotRow").hidden = true; $("recIn").focus(); });
+$("recCancel").addEventListener("click", () => location.reload());
+$("recBtn").addEventListener("click", async () => {
+  const name = $("nameIn").value.trim(), code = $("recIn").value.trim(), pass = $("recPass").value, m = $("recMsg");
+  const say = (t, ok) => { m.textContent = t; m.hidden = !t; m.classList.toggle("ok", !!ok); };
+  if (name.length < 2){ say("Type your name first."); $("nameIn").focus(); return; }
+  if (code.replace(/[^a-z0-9]/gi, "").length < 12){ say("That doesn't look like a recovery code (12 letters and numbers)."); return; }
+  if (pass.length < 4){ say("Choose a new password of at least 4 characters."); return; }
+  $("recBtn").disabled = true; say("Checking…", true);
+  try {
+    const r = await rpc("veed_reset", {p_name: name, p_recovery: code, p_pass: pass}), id = name.toLowerCase().replace(/\s+/g, " ");
+    acctImport("u:" + id + ":", r.data || {});
+    LS.set("veed-token:" + id, r.token); LS.set("veed-current-display", r.name || name); LS.set("veed-current-user", id); LS.set("veed-paid:" + id, r.paid === false ? "0" : "1");
+    sessionStorage.setItem("veed-just-logged", "1"); if (r.recovery) sessionStorage.setItem("veed-recovery", r.recovery);
+    location.reload();
+  } catch(e){ $("recBtn").disabled = false; say(String(e.message || e)); }
+});
+
+/* block list: blocked people can't knock, can't send friend requests and can't invite you */
+let blockList = store.get("veed-blocked", []); if (!Array.isArray(blockList)) blockList = [];
+function isBlocked(name){ return !!name && blockList.includes(String(name).toLowerCase()); }
+function blockPerson(name){
+  const n = String(name || "").toLowerCase(); if (!n || isBlocked(n)) return;
+  blockList.push(n); store.set("veed-blocked", blockList); renderBlocked();
+  if (typeof friends !== "undefined"){ const f = friends.find(x => x.name.toLowerCase() === n); if (f) removeFriend(f, {dataset: {arm: "1"}, textContent: ""}); }
+  const pid = partner();
+  if (pid && peerName(pid).toLowerCase() === n){
+    if (net.isOwner){ net.act.admit.send({ok: false, why: "blocked"}, {target: pid}); peerLeft(pid); }
+    else goToHome(homeUrl());
+  }
+  toast(name + " is blocked. They can't come to your home or contact you.", 4000);
+}
+function unblockPerson(n){ blockList = blockList.filter(x => x !== n); store.set("veed-blocked", blockList); renderBlocked(); }
+function renderBlocked(){
+  const box = $("blockedBox"), ul = $("blockedList"); ul.textContent = ""; box.hidden = !blockList.length;
+  blockList.forEach(n => { const li = document.createElement("li"); const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = n; const b = document.createElement("button"); b.type = "button"; b.textContent = "Unblock"; b.addEventListener("click", () => unblockPerson(n)); li.append(nm, b); ul.appendChild(li); });
+}
+renderBlocked();
+
+/* reports */
+let reportAbout = "";
+function openReport(name){ reportAbout = name; $("reportWho").textContent = name; $("reportNote").value = ""; $("reportBlock").checked = true; $("reportDlg").hidden = false; }
+$("reportSend").addEventListener("click", async () => {
+  const reason = $("reportReason").value, note = $("reportNote").value.trim(), name = reportAbout;
+  $("reportDlg").hidden = true;
+  if (cloudOn() && ACCT.user){ try { await rpc("veed_report", {p_name: ACCT.user, p_token: acctToken(), p_about: name, p_reason: reason, p_note: note}); toast("Thank you. Your report about " + name + " was sent.", 4000); } catch(e){ toast("The report couldn't be sent: " + (e.message || e)); } }
+  else toast("Report noted on this device.", 3000);
+  if ($("reportBlock").checked) blockPerson(name);
+});
+// the people list gets Report and Block next to the other person
+function peopleExtra(li, name){
+  if (TRIAL || !name) return;
+  const r = document.createElement("button"); r.type = "button"; r.textContent = "Report"; r.title = "Report " + name; r.addEventListener("click", () => openReport(name));
+  const b = document.createElement("button"); b.type = "button"; b.textContent = "Block"; b.title = "Block " + name; b.addEventListener("click", () => { if (b.dataset.arm !== "1"){ b.dataset.arm = "1"; b.textContent = "Block?"; setTimeout(() => { b.dataset.arm = ""; b.textContent = "Block"; }, 3000); return; } blockPerson(name); });
+  li.append(r, b);
+}
+
+/* free, cookie-less visitor counts: paste your Cloudflare Web Analytics token (dash.cloudflare.com -> Web Analytics -> Add a site) */
+const CF_ANALYTICS_TOKEN = "PASTE_CF_ANALYTICS_TOKEN";
+if (!/^PASTE_/.test(CF_ANALYTICS_TOKEN) && location.protocol === "https:"){ const s = document.createElement("script"); s.defer = true; s.src = "https://static.cloudflareinsights.com/beacon.min.js"; s.setAttribute("data-cf-beacon", JSON.stringify({token: CF_ANALYTICS_TOKEN})); document.head.appendChild(s); }
+
+
+/* ---------- the two people you can be, turning slowly on the login card; the same little stage shows outfits at the wardrobe ---------- */
+const LOOKPREV = {r: null, cam: null, scene: null, light: null, cache: {}, cur: null, raf: 0, last: 0, targets: new Map()};
+function lookStage(){
+  if (LOOKPREV.r || LOOKPREV.failed) return LOOKPREV.r;
+  try {
+    const r = new THREE.WebGLRenderer({antialias: true, alpha: true, powerPreference: "low-power"}); r.setSize(224, 336, false); r.setPixelRatio(1);
+    r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05; r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+    const sc = new THREE.Scene();
+    sc.add(new THREE.HemisphereLight(0xdde8ff, 0x8a7a66, .75));
+    const sun = new THREE.DirectionalLight(0xfff1dc, 1.35); sun.position.set(1.6, 3.2, 2.4); sun.castShadow = true; sun.shadow.mapSize.set(512, 512); sun.shadow.camera.left = sun.shadow.camera.bottom = -1.4; sun.shadow.camera.right = sun.shadow.camera.top = 1.4; sun.shadow.camera.near = .5; sun.shadow.camera.far = 8; sun.shadow.bias = -.0005; sc.add(sun);
+    const fill = new THREE.DirectionalLight(0xcfe0ff, .35); fill.position.set(-2, 1.5, -1.5); sc.add(fill);
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(.9, 40), new THREE.ShadowMaterial({opacity: .28})); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; sc.add(floor);
+    const cam = new THREE.PerspectiveCamera(26, 224 / 336, .1, 20); cam.position.set(0, 1.05, 4.2); cam.lookAt(0, .92, 0);
+    Object.assign(LOOKPREV, {r, scene: sc, cam, light: sun});
+  } catch(e){ LOOKPREV.failed = true; }
+  return LOOKPREV.r;
+}
+function lookBody(key){
+  if (!STYLES[key]) key = "floralF";
+  if (!LOOKPREV.cache[key]){ const H = buildHuman(key); H.root.traverse(o => { if (o.isMesh) o.receiveShadow = false; }); for (let k = 0; k < 30; k++) animateHuman(H, "stand", 0, .05); LOOKPREV.cache[key] = H; }
+  return LOOKPREV.cache[key];
+}
+// draw one person onto a 2D canvas (the stage renders, the canvas copies it)
+function lookDraw(cv, key, yaw, dt){
+  const r = lookStage(); if (!r) return false;
+  const H = lookBody(key); if (LOOKPREV.cur && LOOKPREV.cur !== H) LOOKPREV.scene.remove(LOOKPREV.cur.root);
+  if (LOOKPREV.cur !== H){ LOOKPREV.scene.add(H.root); LOOKPREV.cur = H; }
+  H.root.rotation.y = yaw; animateHuman(H, "stand", 0, dt || .016, {headY: Math.sin(yaw * .5) * .15});
+  r.render(LOOKPREV.scene, LOOKPREV.cam);
+  const g = cv.getContext("2d"); g.clearRect(0, 0, cv.width, cv.height); g.drawImage(r.domElement, 0, 0, cv.width, cv.height);
+  return true;
+}
+function lookTick(t){
+  LOOKPREV.raf = 0;
+  // not while the village is still loading, and never faster than 30 frames a second
+  if (!$("loading").hidden){ setTimeout(lookStart, 300); return; }
+  if (t - (LOOKPREV.last || 0) < 32){ LOOKPREV.raf = requestAnimationFrame(lookTick); return; }
+  const dt = Math.min(.1, (t - (LOOKPREV.last || t)) / 1000); LOOKPREV.last = t;
+  let any = false;
+  LOOKPREV.targets.forEach((o, cv) => {
+    if (!cv.isConnected || cv.closest("[hidden]")) return;
+    o.yaw += dt * .55; lookDraw(cv, o.key, Math.sin(o.yaw) * 1.1 + .25, dt); any = true;
+  });
+  if (any) LOOKPREV.raf = requestAnimationFrame(lookTick);
+}
+function lookStart(){ if (!LOOKPREV.raf && !document.hidden) LOOKPREV.raf = requestAnimationFrame(lookTick); }
+function previewLook(id, key){ const cv = typeof id === "string" ? $(id) : id; if (!cv) return; const o = LOOKPREV.targets.get(cv) || {yaw: 0}; o.key = key; LOOKPREV.targets.set(cv, o); lookStart(); }
+document.querySelectorAll("canvas.lookCv").forEach((cv, i) => { const o = {key: cv.dataset.look, yaw: i * 1.3}; LOOKPREV.targets.set(cv, o); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) lookStart(); });
+new MutationObserver(lookStart).observe($("wardDlg"), {attributes: true, attributeFilter: ["hidden"]});
+lookStart();
+
+/* ---------- "share your Veed life": a picture of your home with your name and golden points, for Instagram ---------- */
+const SHARE = {blob: null, file: null, url: "", leaving: false};
+function shareLink(){ return location.origin + location.pathname.replace(/index\.html$/, ""); }
+function shareCaption(){ return "My home in Veed 🌴 " + Math.round(gold) + " golden points so far. Come and live your village life: " + shareLink() + " #veed #veedgame"; }
+function roundRect(g, x, y, w, h, r){ g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function star(g, x, y, r){ g.beginPath(); for (let i = 0; i < 10; i++){ const rr = i % 2 ? r * .45 : r, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fill(); }
+function shareCard(){
+  const W = 1080, H = 1350, out = document.createElement("canvas"); out.width = W; out.height = H; const g = out.getContext("2d");
+  // the village as you see it right now, drawn at poster size (no panels, no post-processing)
+  let drew = false;
+  try {
+    const sz = renderer.getSize(new THREE.Vector2()), pr = renderer.getPixelRatio(), asp = camera.aspect;
+    renderer.setPixelRatio(1); renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+    // you turn to face the camera for the picture
+    const B = me.H && me.H.root.visible ? me.H : null, yaw0 = B ? B.root.rotation.y : 0;
+    if (B){ B.root.rotation.y = Math.atan2(camera.position.x - B.root.position.x, camera.position.z - B.root.position.z) + Math.PI; B.head.rotation.y = 0; }
+    renderer.setRenderTarget(null); renderer.render(scene, camera);
+    if (B) B.root.rotation.y = yaw0;
+    g.drawImage(renderer.domElement, 0, 0, W, H); drew = true;
+    renderer.setPixelRatio(pr); renderer.setSize(sz.x, sz.y, false); camera.aspect = asp; camera.updateProjectionMatrix();
+    if (typeof gfxResize === "function") gfxResize(sz.x, sz.y);
+  } catch(e){}
+  if (!drew){ const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#7fb0d8"); bg.addColorStop(1, "#2f7a4a"); g.fillStyle = bg; g.fillRect(0, 0, W, H); }
+  // a soft frame: dark at the bottom for the words, a warm glow at the top
+  let gr = g.createLinearGradient(0, H * .5, 0, H); gr.addColorStop(0, "rgba(10,20,16,0)"); gr.addColorStop(1, "rgba(10,20,16,.82)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  gr = g.createLinearGradient(0, 0, 0, 260); gr.addColorStop(0, "rgba(0,0,0,.45)"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, 260);
+  g.textBaseline = "alphabetic"; g.fillStyle = "#fff";
+  g.font = "800 64px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"; g.fillText("Veed", 64, 118);
+  g.font = "500 30px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"; g.fillStyle = "rgba(255,255,255,.85)"; g.fillText("a 3D home for two", 66, 162);
+  const name = (me.name || ACCT.display || ACCT.user || "Someone").slice(0, 24);
+  g.fillStyle = "#fff"; g.font = "800 72px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  let title = name + "'s village life"; while (g.measureText(title).width > W - 128 && title.length > 12) title = title.slice(0, -4) + "…";
+  g.fillText(title, 64, H - 300);
+  // the numbers that matter
+  const since = +store.get("veed-since", 0) || 0, days = since ? Math.max(1, Math.round((Date.now() - since) / 864e5)) : 1;
+  const lands = typeof garden !== "undefined" && garden.lands ? Object.values(garden.lands).filter(l => l && l.owned).length : 0;
+  const nfr = typeof friends !== "undefined" && Array.isArray(friends) ? friends.length : 0;
+  const chips = [["★", Math.round(gold) + " golden points"], ["☀", days + (days === 1 ? " day" : " days") + " in Veed"]];
+  if (lands) chips.push(["⌂", lands + (lands === 1 ? " plot of land" : " plots of land")]);
+  if (nfr) chips.push(["♥", nfr + (nfr === 1 ? " friend" : " friends")]);
+  g.font = "600 34px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  let x = 64, y = H - 236;
+  chips.forEach(([ic, tx]) => {
+    const w = g.measureText(tx).width + 108; if (x + w > W - 64){ x = 64; y += 78; }
+    g.fillStyle = "rgba(255,255,255,.16)"; roundRect(g, x, y, w, 62, 31); g.fill();
+    g.fillStyle = "#ffd34d"; if (ic === "★") star(g, x + 36, y + 31, 15); else { g.font = "600 30px system-ui, sans-serif"; g.fillText(ic, x + 24, y + 42); g.font = "600 34px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"; }
+    g.fillStyle = "#fff"; g.fillText(tx, x + 68, y + 43); x += w + 14;
+  });
+  // the invitation
+  const link = shareLink().replace(/^https?:\/\//, "").replace(/\/$/, "");
+  g.font = "700 36px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  const lw = g.measureText(link).width + 300;
+  g.fillStyle = "#ffd34d"; roundRect(g, 64, H - 128, Math.min(W - 128, lw), 76, 38); g.fill();
+  g.fillStyle = "#1d2420"; g.fillText("Play free  ›  " + link, 100, H - 77);
+  return out;
+}
+async function prepareShare(){
+  const cv = shareCard(); $("shareImg").src = cv.toDataURL("image/jpeg", .82);
+  SHARE.blob = await new Promise(r => cv.toBlob(r, "image/jpeg", .92));
+  SHARE.file = SHARE.blob ? new File([SHARE.blob], "veed-" + (me.name || "home").replace(/[^\w]+/g, "-").toLowerCase() + ".jpg", {type: "image/jpeg"}) : null;
+  const sheet = !!(navigator.share && navigator.canShare && SHARE.file && navigator.canShare({files: [SHARE.file]}));
+  $("shareIg").textContent = sheet ? "Share to Instagram" : "Save picture for Instagram";
+  $("shareHint").textContent = sheet ? "Your phone's share sheet opens; pick Instagram (Story or Post). The caption is copied for you." : "The picture downloads and the caption is copied. Open Instagram, make a new post and choose the picture.";
+}
+function openShare(leaving){
+  SHARE.leaving = !!leaving; $("shareSkip").textContent = leaving ? "Log out without sharing" : "Close"; $("shareDlg").hidden = false;
+  $("shareImg").removeAttribute("src"); $("shareHint").textContent = "Making your picture…"; $("shareIg").disabled = true;
+  setTimeout(async () => { try { await prepareShare(); } catch(e){ $("shareHint").textContent = "Couldn't make the picture on this device."; } $("shareIg").disabled = !SHARE.file; }, 30);
+}
+async function shareNow(){
+  if (!SHARE.file) return;
+  const text = shareCaption();
+  try { await navigator.clipboard.writeText(text); } catch(e){}
+  if (navigator.share && navigator.canShare && navigator.canShare({files: [SHARE.file]})){
+    try { await navigator.share({files: [SHARE.file], title: "Veed", text}); $("shareHint").textContent = "Shared. Thank you!"; }
+    catch(e){ if (e && e.name === "AbortError") return; saveShare(); }
+  } else saveShare();
+  if (SHARE.leaving) setTimeout(acctLogout, 900);
+}
+function saveShare(){
+  if (!SHARE.blob) return;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(SHARE.blob); a.download = SHARE.file ? SHARE.file.name : "veed.jpg"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 8000);
+  $("shareHint").textContent = "Picture saved and caption copied. Open Instagram, make a new post and choose it.";
+}
+$("shareIg").addEventListener("click", shareNow);
+$("shareSave").addEventListener("click", () => { saveShare(); try { navigator.clipboard.writeText(shareCaption()); } catch(e){} });
+$("shareSkip").addEventListener("click", () => { $("shareDlg").hidden = true; if (SHARE.leaving) acctLogout(); else view.focus({preventScroll: true}); });
+$("shareBtn").addEventListener("click", () => openShare(false));
+
+
+/* ---------- graphics: sky-lit reflections, post-processing, wind-blown grass, context loss ---------- */
+const GFX = {composer: null, passes: {}, env: null, envAt: 0, envKey: "", grass: null, grassOK: false, webgl2: renderer.capabilities.isWebGL2, lost: false, lvl: 0};
+const gfxLevel = () => GFX_LEVELS.indexOf(QUAL.mode);
+
+/* 1. the sky lights everything: a small environment map is rendered from the sky dome and refreshed as the day moves on */
+const pmrem = (() => { try { const p = new THREE.PMREMGenerator(renderer); p.compileEquirectangularShader(); return p; } catch(e){ return null; } })();
+const envScene = new THREE.Scene(); envScene.add(new THREE.Mesh(sky.geometry, sky.material));
+const PROF = {env: 0, envN: 0, mask: 0, maskN: 0, tiles: 0, measure: 0, compile: 0, render: 0, frames: 0};
+GFX.prof = PROF;
+function refreshEnv(force){
+  if (!pmrem || gfxLevel() === 0) return;
+  const U = sky.material.uniforms, q = c => (c.getHex() >> 4) & 0xf0f0f, key = [q(U.top.value), q(U.mid.value), q(U.low.value), Math.round(U.sun.value.y * 8), Math.round(U.glowK.value * 2)].join(",");
+  if (!force && (key === GFX.envKey || performance.now() - GFX.envAt < 5000) && performance.now() - GFX.envAt < 60000) return;
+  GFX.envKey = key; GFX.envAt = performance.now();
+  const old = GFX.env, t0 = performance.now();
+  try { GFX.env = pmrem.fromScene(envScene, .04, 1, 3000); scene.environment = GFX.env.texture; } catch(e){ return; }
+  PROF.env += performance.now() - t0; PROF.envN++;
+  if (old) old.dispose();
+}
+
+/* 2. the post-processing chain: multisampled render -> ambient occlusion (high) -> soft bloom -> colour grade + vignette -> sRGB */
+const GradeShader = {
+  uniforms: {tDiffuse: {value: null}, uSat: {value: 1.03}, uCon: {value: 1.0}, uVig: {value: .22}, uWarm: {value: .01}},
+  vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uSat, uCon, uVig, uWarm; varying vec2 vUv;
+    vec3 toSRGB(vec3 c){ return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
+    void main(){
+      vec4 t = texture2D(tDiffuse, vUv); vec3 c = t.rgb;
+      float l = dot(c, vec3(0.2126, 0.7152, 0.0722)); c = mix(vec3(l), c, uSat);
+      c = (c - 0.5) * uCon + 0.5;
+      c += vec3(uWarm, uWarm * 0.4, -uWarm * 0.6) * l;
+      vec2 d = vUv - 0.5; c *= 1.0 - uVig * smoothstep(0.25, 0.85, dot(d, d) * 2.0);
+      gl_FragColor = vec4(toSRGB(clamp(c, 0.0, 1.0)), t.a);
+    }`
+};
+function buildComposer(){
+  if (GFX.composer){ GFX.composer.renderTarget1.dispose(); GFX.composer.renderTarget2.dispose(); GFX.composer = null; }
+  if (!THREE.EffectComposer || !GFX.webgl2 || gfxLevel() === 0) return;
+  const w = view.clientWidth, h = view.clientHeight, pr = renderer.getPixelRatio();
+  const rt = new THREE.WebGLRenderTarget(Math.round(w * pr), Math.round(h * pr), {samples: 4});
+  const c = new THREE.EffectComposer(renderer, rt); c.setPixelRatio(pr); c.setSize(w, h);
+  c.addPass(new THREE.RenderPass(scene, camera));
+  if (THREE.UnrealBloomPass){ const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(w, h), gfxLevel() === 2 ? .1 : .07, .35, .95); c.addPass(bloom); GFX.passes.bloom = bloom; }
+  const grade = new THREE.ShaderPass(GradeShader); grade.renderToScreen = true; c.addPass(grade); GFX.passes.grade = grade;
+  GFX.composer = c;
+}
+function gfxResize(w, h){ if (GFX.composer){ GFX.composer.setPixelRatio(renderer.getPixelRatio()); GFX.composer.setSize(w, h); } }
+
+/* 3. grass: thousands of thin blades around you that bend in the wind, only where the ground is bare grass */
+const BLADE_TEX = canvasTex(8, (g, s) => { const gr = g.createLinearGradient(0, s, 0, 0); gr.addColorStop(0, "#27521a"); gr.addColorStop(.55, "#468a30"); gr.addColorStop(1, "#78b84e"); g.fillStyle = gr; g.fillRect(0, 0, s, s); });
+BLADE_TEX.wrapS = BLADE_TEX.wrapT = THREE.ClampToEdgeWrapping;
+const GRASS = {mesh: null, tiles: new Map(), cx: 1e9, cz: 1e9, max: 0, radius: 0, queue: [], time: 0};
+function bladeGeometry(){
+  const g = new THREE.BufferGeometry(), w = .02;
+  g.setAttribute("position", new THREE.Float32BufferAttribute([-w, 0, 0, w, 0, 0, -w * .55, .5, 0, w * .55, .5, 0, 0, 1, 0], 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute([0, 0, 1, 0, 0, .5, 1, .5, .5, 1], 2));
+  g.setAttribute("normal", new THREE.Float32BufferAttribute([0, .3, 1, 0, .3, 1, 0, .3, 1, 0, .3, 1, 0, .3, 1], 3));
+  g.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4]); return g;
+}
+function buildGrass(){
+  if (GRASS.mesh){ scene.remove(GRASS.mesh); GRASS.mesh.geometry.dispose(); GRASS.mesh = null; }
+  const lv = gfxLevel(); if (lv === 0) return;
+  GRASS.radius = lv === 2 ? 34 : 22; GRASS.max = lv === 2 ? 26000 : 9000;
+  const m = new THREE.MeshStandardMaterial({map: BLADE_TEX, roughness: .9, side: THREE.DoubleSide, envMapIntensity: .2});
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uTime = GRASS.uTime = {value: 0};
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nuniform float uTime;")
+      .replace("#include <begin_vertex>", `#include <begin_vertex>
+        { float ph = instanceMatrix[3].x * 0.37 + instanceMatrix[3].z * 0.53; float b = uv.y * uv.y;
+          float sway = sin(uTime * 1.7 + ph) * 0.6 + sin(uTime * 2.9 + ph * 1.9) * 0.25;
+          transformed.x += sway * 0.16 * b; transformed.z += sway * 0.07 * b; }`);
+  };
+  const mesh = new THREE.InstancedMesh(bladeGeometry(), m, GRASS.max); mesh.count = 0; mesh.frustumCulled = false; mesh.receiveShadow = true; mesh.castShadow = false;
+  mesh.userData.noCollide = true; scene.add(mesh); GRASS.mesh = mesh; GRASS.cx = 1e9; GRASS.tiles.clear();
+}
+const TILE = 8, _gm4 = new THREE.Matrix4(), _gq = new THREE.Quaternion(), _ge = new THREE.Euler(), _gv3 = new THREE.Vector3(), _gsc = new THREE.Vector3();
+// the ground seen from straight above: anything that isn't grass-green (paths, beds, floors, roads, water, sand) gets no blades
+const MASK = {res: 512, rt: null, cam: new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 140), buf: null, cx: 0, cz: 0, half: 0, ok: false};
+MASK.cam.up.set(0, 0, -1);
+function renderMask(cx, cz, half){
+  if (!MASK.rt){ MASK.rt = new THREE.WebGLRenderTarget(MASK.res, MASK.res); MASK.buf = new Uint8Array(MASK.res * MASK.res * 4); }
+  const cam = MASK.cam; cam.left = -half; cam.right = half; cam.top = half; cam.bottom = -half; cam.updateProjectionMatrix();
+  cam.position.set(cx, 90, cz); cam.lookAt(cx, 0, cz); cam.updateMatrixWorld(true);
+  const fog = scene.fog, gv = GRASS.mesh ? GRASS.mesh.visible : false, env = scene.environment;
+  scene.fog = null; if (GRASS.mesh) GRASS.mesh.visible = false; scene.environment = null;
+  const prev = renderer.getRenderTarget(), t0 = performance.now();
+  try { renderer.setRenderTarget(MASK.rt); renderer.clear(); renderer.render(scene, cam); renderer.readRenderTargetPixels(MASK.rt, 0, 0, MASK.res, MASK.res, MASK.buf); MASK.ok = true; }
+  catch(e){ MASK.ok = false; }
+  PROF.mask += performance.now() - t0; PROF.maskN++;
+  renderer.setRenderTarget(prev); scene.fog = fog; if (GRASS.mesh) GRASS.mesh.visible = gv; scene.environment = env;
+  MASK.cx = cx; MASK.cz = cz; MASK.half = half;
+}
+function maskGrass(x, z){
+  if (!MASK.ok) return true;
+  const u = (x - (MASK.cx - MASK.half)) / (2 * MASK.half), v = ((MASK.cz + MASK.half) - z) / (2 * MASK.half);
+  if (u < 0 || u >= 1 || v < 0 || v >= 1) return false;
+  const i = ((v * MASK.res | 0) * MASK.res + (u * MASK.res | 0)) * 4, r = MASK.buf[i], g = MASK.buf[i + 1], b = MASK.buf[i + 2];
+  return g > 28 && g > r * 1.12 && g > b * 1.25;
+}
+function grassAllowed(x, z){
+  if (z > RIVER.z0 - 2.5 && z < RIVER.z1 + 2.5) return false;
+  if (x > JG.x0 - 2 && x < JG.x1 + 2 && z > JG.z0 - 2 && z < JG.z1 + 2) return false;
+  if (z > BEACH.prom - 2) return false;
+  const px = (x - POND.x) / (POND.rx + .6), pz = (z - POND.z) / (POND.rz + .6); if (px * px + pz * pz < 1) return false;
+  if (z > ROAD.z0 - 5.4 && z < ROAD.z1 + 5.4) return false;
+  if (Math.abs(x - 75) < 5.6 && z > -153 && z < 203) return false;
+  if (typeof PADDIES !== "undefined" && PADDIES.some(p => x > p[0] - 1 && x < p[2] + 1 && z > p[1] - 1 && z < p[3] + 1)) return false;
+  return true;
+}
+// one tile of blades: a ray down at each spot keeps grass off floors, paths, beds, roads and water
+function grassTile(i, j){
+  const R = rng(hashStr("grass" + i + "," + j)), out = [], x0 = i * TILE, z0 = j * TILE, dense = gfxLevel() === 2 ? 15 : 9;
+  for (let k = 0; k < TILE * TILE * dense; k++){
+    const x = x0 + R() * TILE, z = z0 + R() * TILE;
+    if (!grassAllowed(x, z) || !maskGrass(x, z)) continue;
+    const y = typeof hillY === "function" ? hillY(x, z) : 0;
+    out.push(x, y, z, R() * Math.PI, .1 + R() * .2, .8 + R() * .3);
+  }
+  return out;
+}
+function tickGrass(dt){
+  const G = GRASS; if (!G.mesh) return;
+  G.time += dt; if (G.uTime) G.uTime.value = G.time;
+  const b = bodyPos(), cx = Math.round(b.x / TILE), cz = Math.round(b.z / TILE);
+  const n = Math.ceil(G.radius / TILE);
+  if (cx !== G.cx || cz !== G.cz || G.dirty){
+    G.cx = cx; G.cz = cz; G.dirty = false; G.queue = [];
+    renderMask(cx * TILE, cz * TILE, (n + 1) * TILE);
+    for (let i = cx - n; i <= cx + n; i++) for (let j = cz - n; j <= cz + n; j++){ const k = i + "," + j; if (!G.tiles.has(k)) G.queue.push([i, j, k]); }
+    G.queue.sort((p, q) => (Math.abs(p[0] - cx) + Math.abs(p[1] - cz)) - (Math.abs(q[0] - cx) + Math.abs(q[1] - cz)));
+    G.rebuild = true;
+  }
+  // build at most two missing tiles per frame so nothing stutters
+  let built = 0;
+  while (G.queue.length && built < 2){ const [i, j, k] = G.queue.shift(); G.tiles.set(k, grassTile(i, j)); built++; G.rebuild = true; }
+  if (!G.rebuild) return;
+  G.rebuild = false;
+  if (G.tiles.size > 260) for (const k of G.tiles.keys()){ const [i, j] = k.split(",").map(Number); if (Math.abs(i - cx) > n + 2 || Math.abs(j - cz) > n + 2) G.tiles.delete(k); }
+  let c = 0; const r2 = G.radius * G.radius;
+  for (let i = cx - n; i <= cx + n && c < G.max; i++) for (let j = cz - n; j <= cz + n && c < G.max; j++){
+    const t = G.tiles.get(i + "," + j); if (!t) continue;
+    for (let p = 0; p < t.length && c < G.max; p += 6){
+      const dx = t[p] - b.x, dz = t[p + 2] - b.z; if (dx * dx + dz * dz > r2) continue;
+      _ge.set(0, t[p + 3], 0); _gq.setFromEuler(_ge); _gv3.set(t[p], t[p + 1], t[p + 2]); _gsc.set(t[p + 5], t[p + 4], 1);
+      _gm4.compose(_gv3, _gq, _gsc); G.mesh.setMatrixAt(c++, _gm4);
+    }
+  }
+  G.mesh.count = c; G.mesh.instanceMatrix.needsUpdate = true;
+}
+
+/* 4. applying a level, drawing a frame, and surviving a lost WebGL context */
+function gfxApply(first){
+  GFX.lvl = gfxLevel();
+  buildComposer(); buildGrass();
+  if (gfxLevel() === 0){ if (scene.environment){ scene.environment = null; } } else if (first){ GFX.envKey = ""; envT = 0; } else refreshEnv(true);
+  if (!first) scene.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); });
+}
+let envT = 0;
+function gfxRender(dt){
+  if (GFX.lost || !$("loading").hidden) return;   // nothing to see behind the loading screen, and the level isn't measured yet
+  const tR = performance.now(); PROF.frames++;
+  envT -= dt; if (envT <= 0){ envT = 2; refreshEnv(false); }
+  // under the jungle canopy the sky can't light things, so the environment map goes off there
+  if (GFX.env){ const dark = typeof JG !== "undefined" && JG.k > .3; if (dark && scene.environment){ scene.environment = null; GFX.envOff = true; } else if (!dark && GFX.envOff){ scene.environment = GFX.env.texture; GFX.envOff = false; } }
+  tickGrass(dt);
+  if (GFX.composer){ if (GFX.passes.bloom) GFX.passes.bloom.strength = (gfxLevel() === 2 ? .1 : .07) * (1 + SKY.nightK * .8); GFX.composer.render(); }
+  else renderer.render(scene, camera);
+  PROF.render += performance.now() - tR;
+}
+// every shader is built while the loading screen is up, so walking into a new area never stalls on a first-time compile
+function precompile(){
+  { const t0 = performance.now(); measureGpu(); PROF.measure = performance.now() - t0; }
+  if (QUAL.mode === "low") return;   // old phones: shaders compile as they're met, like before (shorter wait at the start)
+  try {
+    const t0 = performance.now();
+    if (GFX.composer){ renderer.setRenderTarget(GFX.composer.renderTarget1); renderer.compile(scene, camera); renderer.setRenderTarget(null); }
+    else renderer.compile(scene, camera);
+    GFX.programs = renderer.info.programs ? renderer.info.programs.length : 0; GFX.compileMs = PROF.compile = Math.round(performance.now() - t0);
+  } catch(e){}
+}
+// the starting level comes from a real measurement of this device drawing this scene (not from the screen size or the browser's name);
+// a level the player picked by hand is always kept
+function measureGpu(){
+  if (store.get("veed-gfx", "")) return;
+  try {
+    const gl = renderer.getContext(), px = new Uint8Array(4), t = [];
+    for (let i = 0; i < 5; i++){ const t0 = performance.now(); renderer.render(scene, camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); t.push(performance.now() - t0); }
+    t.sort((a, b) => a - b); const ms = t[Math.floor(t.length / 2)];
+    const pick = ms > 34 ? "low" : ms > 15 ? "medium" : "high";
+    GFX.measured = ms;
+    if (pick !== QUAL.mode){ QUAL.mode = pick; applyQuality(); }
+  } catch(e){}
+}
+renderer.domElement.addEventListener("webglcontextlost", e => { e.preventDefault(); GFX.lost = true; toast("The graphics stopped for a moment. Hold on…", 6000); setTimeout(() => { if (GFX.lost) toast("Graphics couldn't restart. Reload the page to continue.", 10000); }, 8000); });
+renderer.domElement.addEventListener("webglcontextrestored", () => { GFX.lost = false; GFX.envKey = ""; applyQuality(); toast("Graphics are back.", 2500); });
+// WebGL1 or a missing post-processing script: the plain renderer keeps working
+if (!GFX.webgl2 || !THREE.EffectComposer) console.info("Veed graphics: post-processing off (" + (GFX.webgl2 ? "scripts missing" : "WebGL1") + ")");
 
 
 /* ---------- phone-friendly: minimise any panel, hide them all, full screen, install as an app ---------- */
@@ -7559,7 +8265,7 @@ function tickMore(dt){
   lightT -= dt; if (lightT <= 0){ lightT = .4; tickNightLights(); }
   weatherT -= dt; if (weatherT <= 0){ weatherT = 30; renderWeather(); }
   if (headlight.visible) tickNightLights();
-  if (!tickMore.init){ tickMore.init = true; nightLightsFor(QUAL.mode !== "smooth"); }
+  if (!tickMore.init){ tickMore.init = true; nightLightsFor(QUAL.mode !== "low"); }
   tickRain(dt); tickSwings(dt); tickSwim(); tickKids(dt); tickCat(dt); tickTraffic(dt); tickPolice(dt); tickCrossers(dt);
   tickKisanic(dt); tickClass(); tickGames(dt); updateRoseBtn(); tickKneel();
   musicPlay(entered && ((player.mode === "car" && coupleOn()) || dance.on));
@@ -7623,6 +8329,7 @@ function resize(){
   const w = view.clientWidth, h = view.clientHeight;
   renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
   if (css.r) css.r.setSize(w, h);
+  if (typeof gfxResize === "function") gfxResize(w, h);
 }
 addEventListener("resize", resize); resize();
 mergeStatic(); buildGrid(); applyQuality(true);
@@ -7668,7 +8375,7 @@ function tick(){
   netTick(dt);
   const showCss = tickCinema(dt);
   sky.position.copy(camera.position);
-  renderer.render(scene, camera);
+  if (typeof gfxRender === "function") gfxRender(dt); else renderer.render(scene, camera);
   if (showCss) css.r.render(css.scene, camera);
 }
 tick();
