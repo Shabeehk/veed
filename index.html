@@ -204,6 +204,14 @@ body.theater .trialbar{display:none!important}
 .next b{color:var(--ink)}
 .ptimes{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:12.5px;font-variant-numeric:tabular-nums}
 .ptimes .now{font-weight:700;color:var(--accent)}
+.azantimes{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;font-size:13px}
+.azantimes input[type=time]{font:inherit;font-weight:600;padding:5px 8px;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(255,255,255,.14);color:#fff;color-scheme:dark;min-width:118px}
+.azantimes input[type=time]:focus-visible{outline:2px solid #f2d78a;outline-offset:1px}
+.azantimes small{display:block;color:var(--muted);font-size:11px}
+.azantimes .set small{color:var(--accent);font-weight:600}
+.dialog .panel.azan select{max-width:58%}
+#plNow{font-size:12px;color:var(--muted)}
+.label small{font-weight:400;letter-spacing:0;text-transform:none}
 .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px}
 .toggle input{accent-color:var(--accent);margin:0}
 .dialog{position:fixed;inset:0;z-index:22;display:grid;place-items:center;background:rgba(10,14,12,.35);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
@@ -365,6 +373,7 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
 </style>
 </head>
 <body>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1518315262337802&ev=PageView&noscript=1"></noscript>
 <div id="view" tabindex="0" aria-label="3D world of Veed"></div>
 
 <section class="card panel" id="card">
@@ -404,7 +413,7 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
       </div>
       <p class="note">Salams to people you pass: <b id="salamCount">0/100</b> toward a golden point.</p>
     </div>
-    <div class="sect" hidden><div class="label">Prayer times · India (IST)</div><div class="ptimes" id="ptimes"></div></div>
+    <div class="sect"><div class="field"><span class="label" id="ptLabel">Prayer times</span><button class="linkbtn" type="button" id="ptChange">Change place or times</button></div><div class="ptimes" id="ptimes"></div></div>
     <div class="sect" id="acctPanel" hidden>
       <div class="field"><span>Account: <b id="acctPanelName"></b></span><span><button class="linkbtn" id="shareBtn" type="button">Share</button> · <button class="linkbtn" id="acctOut" type="button">Log out</button></span></div>
       <p class="note" id="acctSync"></p>
@@ -570,6 +579,19 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
   <p class="note">Pick something from the shelf. Hover or tap to try it on.</p>
   <div class="wardrow"><canvas id="wardCv" width="224" height="336" aria-hidden="true"></canvas><div class="grid2" id="wardOpts"></div></div>
   <button class="btn" type="button" data-close>Close</button>
+</div></div>
+<div class="dialog" id="azanDlg" hidden><div class="panel azan" role="dialog" aria-labelledby="azanTitle">
+  <h2 id="azanTitle">Azan times at the masjid</h2>
+  <p class="note">The masjid follows the place you live in: the azan, the prayer boards and the sky's real time. Pick your city, or type any prayer's time to set it yourself.</p>
+  <div class="field"><label for="plCity">Your place</label><select id="plCity"></select></div>
+  <div class="field"><button class="linkbtn" type="button" id="plLocate">Use my location</button><span id="plNow"></span></div>
+  <div class="field"><label for="plMethod">Calculation</label><select id="plMethod"></select></div>
+  <div class="field"><label for="plAsr">Asr</label><select id="plAsr"><option value="1">Standard (Shafi'i, Maliki, Hanbali)</option><option value="2">Hanafi (later)</option></select></div>
+  <div class="label">Today's times <small>· type a time to set it by hand</small></div>
+  <div class="azantimes" id="azanTimes"></div>
+  <button class="linkbtn" type="button" id="azanReset">Use the calculated times for all</button>
+  <p class="acctmsg" id="azanMsg" hidden role="alert"></p>
+  <div class="row"><button class="btn primary" type="button" id="azanSave">Save</button><button class="btn" type="button" data-close>Cancel</button></div>
 </div></div>
 <div class="dialog" id="shareDlg" hidden><div class="panel share" role="dialog" aria-labelledby="shareTitle">
   <h2 id="shareTitle">Share your Veed life</h2>
@@ -3942,7 +3964,7 @@ $("sellAll").addEventListener("click", () => {
 });
 function openAuto(){
   const box = $("autoDest"); box.textContent = "";
-  const dests = [{name: "Home (Veed)", x: 1, z: 39.6, yaw: 0}, ...PLACES.filter(p => !/Store/.test(p.name))];
+  const dests = [{name: "Home (Veed)", x: 1, z: 39.6, yaw: 0}, ...CITIES.filter(p => !/Store/.test(p.name))];
   dests.forEach(d => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = d.name; b.addEventListener("click", () => rideAuto(d)); box.appendChild(b); });
   $("autoDlg").hidden = false;
 }
@@ -3954,12 +3976,166 @@ function rideAuto(d){
   setTimeout(() => { goTo(d); setTimeout(() => { f.style.opacity = 0; toast("The driver dropped you at " + d.name + ". ₹20 paid.", 3500); }, 350); }, 500);
 }
 
-/* ---------- prayer times (Indian Standard Time, calculated for each day) ---------- */
-/* prayer times (University of Islamic Sciences, Karachi: Fajr 18°, Isha 18°; Asr shadow 1), Indian Standard Time */
-const PRAYER = {lat: 21.15, lon: 79.09, tz: 5.5, fajr: 18, isha: 18, asr: 1, add: {fajr: 1, sunrise: 0, dhuhr: 0, asr: 0, maghrib: 1, isha: 1}};   // minutes of safety margin, as in many Indian timetables
-function prayerTimes(y, m, d){
+/* ---------- prayer times, calculated each day for the place the player lives in (set at the masjid) ---------- */
+/* ---------- where the player lives: prayer times, the azan, the boards and the sky's real time follow this place ---------- */
+// calculation methods (twilight angles); ishaMin = minutes after maghrib instead of an angle; add = safety minutes as printed in many timetables
+const METHODS = {
+  karachi: {n: "Karachi (India, Pakistan, Bangladesh)", fajr: 18, isha: 18, add: {fajr: 1, maghrib: 1, isha: 1}},
+  mwl: {n: "Muslim World League", fajr: 18, isha: 17},
+  makkah: {n: "Umm al-Qura, Makkah", fajr: 18.5, ishaMin: 90},
+  gulf: {n: "Gulf region", fajr: 19.5, ishaMin: 90},
+  egypt: {n: "Egyptian General Authority", fajr: 19.5, isha: 17.5},
+  turkey: {n: "Diyanet, Türkiye", fajr: 18, isha: 17},
+  isna: {n: "ISNA (North America)", fajr: 15, isha: 15},
+  france: {n: "UOIF, France", fajr: 12, isha: 12},
+  russia: {n: "Spiritual Administration, Russia", fajr: 16, isha: 15},
+  singapore: {n: "MUIS, Singapore", fajr: 20, isha: 18},
+  jakim: {n: "JAKIM, Malaysia", fajr: 20, isha: 18},
+  kemenag: {n: "Kemenag, Indonesia", fajr: 20, isha: 18},
+  tehran: {n: "Institute of Geophysics, Tehran", fajr: 17.7, isha: 14, maghrib: 4.5}
+};
+// [key, city, country, latitude, longitude, time zone, offset if the browser has no zone data, method]
+const CITIES = [
+  ["kozhikode", "Kozhikode", "India", 11.26, 75.78, "Asia/Kolkata", 5.5, "karachi"], ["malappuram", "Malappuram", "India", 11.07, 76.07, "Asia/Kolkata", 5.5, "karachi"],
+  ["kannur", "Kannur", "India", 11.87, 75.37, "Asia/Kolkata", 5.5, "karachi"], ["thrissur", "Thrissur", "India", 10.53, 76.21, "Asia/Kolkata", 5.5, "karachi"],
+  ["kochi", "Kochi", "India", 9.93, 76.27, "Asia/Kolkata", 5.5, "karachi"], ["thiruvananthapuram", "Thiruvananthapuram", "India", 8.52, 76.94, "Asia/Kolkata", 5.5, "karachi"],
+  ["bengaluru", "Bengaluru", "India", 12.97, 77.59, "Asia/Kolkata", 5.5, "karachi"], ["chennai", "Chennai", "India", 13.08, 80.27, "Asia/Kolkata", 5.5, "karachi"],
+  ["hyderabad", "Hyderabad", "India", 17.39, 78.49, "Asia/Kolkata", 5.5, "karachi"], ["mumbai", "Mumbai", "India", 19.08, 72.88, "Asia/Kolkata", 5.5, "karachi"],
+  ["ahmedabad", "Ahmedabad", "India", 23.02, 72.57, "Asia/Kolkata", 5.5, "karachi"], ["nagpur", "Nagpur", "India", 21.15, 79.09, "Asia/Kolkata", 5.5, "karachi"],
+  ["bhopal", "Bhopal", "India", 23.26, 77.41, "Asia/Kolkata", 5.5, "karachi"], ["delhi", "Delhi", "India", 28.61, 77.21, "Asia/Kolkata", 5.5, "karachi"],
+  ["lucknow", "Lucknow", "India", 26.85, 80.95, "Asia/Kolkata", 5.5, "karachi"], ["patna", "Patna", "India", 25.59, 85.14, "Asia/Kolkata", 5.5, "karachi"],
+  ["kolkata", "Kolkata", "India", 22.57, 88.36, "Asia/Kolkata", 5.5, "karachi"], ["guwahati", "Guwahati", "India", 26.14, 91.74, "Asia/Kolkata", 5.5, "karachi"],
+  ["srinagar", "Srinagar", "India", 34.08, 74.80, "Asia/Kolkata", 5.5, "karachi"],
+  ["karachi", "Karachi", "Pakistan", 24.86, 67.01, "Asia/Karachi", 5, "karachi"], ["lahore", "Lahore", "Pakistan", 31.55, 74.34, "Asia/Karachi", 5, "karachi"],
+  ["islamabad", "Islamabad", "Pakistan", 33.69, 73.04, "Asia/Karachi", 5, "karachi"], ["peshawar", "Peshawar", "Pakistan", 34.01, 71.58, "Asia/Karachi", 5, "karachi"],
+  ["dhaka", "Dhaka", "Bangladesh", 23.81, 90.41, "Asia/Dhaka", 6, "karachi"], ["chittagong", "Chittagong", "Bangladesh", 22.36, 91.78, "Asia/Dhaka", 6, "karachi"],
+  ["colombo", "Colombo", "Sri Lanka", 6.93, 79.86, "Asia/Colombo", 5.5, "karachi"], ["male", "Malé", "Maldives", 4.18, 73.51, "Indian/Maldives", 5, "karachi"],
+  ["kathmandu", "Kathmandu", "Nepal", 27.72, 85.32, "Asia/Kathmandu", 5.75, "karachi"], ["kabul", "Kabul", "Afghanistan", 34.53, 69.17, "Asia/Kabul", 4.5, "karachi"],
+  ["makkah", "Makkah", "Saudi Arabia", 21.39, 39.86, "Asia/Riyadh", 3, "makkah"], ["madinah", "Madinah", "Saudi Arabia", 24.47, 39.61, "Asia/Riyadh", 3, "makkah"],
+  ["riyadh", "Riyadh", "Saudi Arabia", 24.71, 46.68, "Asia/Riyadh", 3, "makkah"], ["jeddah", "Jeddah", "Saudi Arabia", 21.49, 39.19, "Asia/Riyadh", 3, "makkah"],
+  ["dammam", "Dammam", "Saudi Arabia", 26.43, 50.10, "Asia/Riyadh", 3, "makkah"],
+  ["dubai", "Dubai", "United Arab Emirates", 25.20, 55.27, "Asia/Dubai", 4, "gulf"], ["abudhabi", "Abu Dhabi", "United Arab Emirates", 24.45, 54.38, "Asia/Dubai", 4, "gulf"],
+  ["sharjah", "Sharjah", "United Arab Emirates", 25.35, 55.39, "Asia/Dubai", 4, "gulf"], ["doha", "Doha", "Qatar", 25.29, 51.53, "Asia/Qatar", 3, "gulf"],
+  ["kuwait", "Kuwait City", "Kuwait", 29.38, 47.98, "Asia/Kuwait", 3, "gulf"], ["manama", "Manama", "Bahrain", 26.23, 50.59, "Asia/Bahrain", 3, "gulf"],
+  ["muscat", "Muscat", "Oman", 23.59, 58.41, "Asia/Muscat", 4, "gulf"], ["sanaa", "Sana'a", "Yemen", 15.37, 44.19, "Asia/Aden", 3, "gulf"],
+  ["baghdad", "Baghdad", "Iraq", 33.31, 44.37, "Asia/Baghdad", 3, "mwl"], ["amman", "Amman", "Jordan", 31.95, 35.93, "Asia/Amman", 3, "mwl"],
+  ["ramallah", "Ramallah", "Palestine", 31.90, 35.20, "Asia/Hebron", 2, "egypt"], ["gaza", "Gaza", "Palestine", 31.50, 34.47, "Asia/Gaza", 2, "egypt"],
+  ["beirut", "Beirut", "Lebanon", 33.89, 35.50, "Asia/Beirut", 2, "mwl"], ["damascus", "Damascus", "Syria", 33.51, 36.29, "Asia/Damascus", 3, "mwl"],
+  ["tehran", "Tehran", "Iran", 35.69, 51.39, "Asia/Tehran", 3.5, "tehran"], ["istanbul", "Istanbul", "Türkiye", 41.01, 28.98, "Europe/Istanbul", 3, "turkey"],
+  ["ankara", "Ankara", "Türkiye", 39.93, 32.86, "Europe/Istanbul", 3, "turkey"], ["baku", "Baku", "Azerbaijan", 40.41, 49.87, "Asia/Baku", 4, "mwl"],
+  ["cairo", "Cairo", "Egypt", 30.04, 31.24, "Africa/Cairo", 2, "egypt"], ["alexandria", "Alexandria", "Egypt", 31.20, 29.92, "Africa/Cairo", 2, "egypt"],
+  ["tripoli", "Tripoli", "Libya", 32.89, 13.19, "Africa/Tripoli", 2, "egypt"], ["tunis", "Tunis", "Tunisia", 36.81, 10.17, "Africa/Tunis", 1, "mwl"],
+  ["algiers", "Algiers", "Algeria", 36.75, 3.06, "Africa/Algiers", 1, "mwl"], ["casablanca", "Casablanca", "Morocco", 33.57, -7.59, "Africa/Casablanca", 1, "mwl"],
+  ["marrakech", "Marrakech", "Morocco", 31.63, -8.01, "Africa/Casablanca", 1, "mwl"], ["khartoum", "Khartoum", "Sudan", 15.50, 32.56, "Africa/Khartoum", 2, "egypt"],
+  ["mogadishu", "Mogadishu", "Somalia", 2.05, 45.32, "Africa/Mogadishu", 3, "mwl"], ["addisababa", "Addis Ababa", "Ethiopia", 9.03, 38.74, "Africa/Addis_Ababa", 3, "mwl"],
+  ["nairobi", "Nairobi", "Kenya", -1.29, 36.82, "Africa/Nairobi", 3, "mwl"], ["mombasa", "Mombasa", "Kenya", -4.04, 39.67, "Africa/Nairobi", 3, "mwl"],
+  ["daressalaam", "Dar es Salaam", "Tanzania", -6.79, 39.21, "Africa/Dar_es_Salaam", 3, "mwl"], ["lagos", "Lagos", "Nigeria", 6.52, 3.38, "Africa/Lagos", 1, "mwl"],
+  ["kano", "Kano", "Nigeria", 12.00, 8.52, "Africa/Lagos", 1, "mwl"], ["abuja", "Abuja", "Nigeria", 9.06, 7.49, "Africa/Lagos", 1, "mwl"],
+  ["accra", "Accra", "Ghana", 5.60, -0.19, "Africa/Accra", 0, "mwl"], ["dakar", "Dakar", "Senegal", 14.72, -17.47, "Africa/Dakar", 0, "mwl"],
+  ["bamako", "Bamako", "Mali", 12.64, -8.00, "Africa/Bamako", 0, "mwl"], ["johannesburg", "Johannesburg", "South Africa", -26.20, 28.05, "Africa/Johannesburg", 2, "mwl"],
+  ["capetown", "Cape Town", "South Africa", -33.93, 18.42, "Africa/Johannesburg", 2, "mwl"], ["durban", "Durban", "South Africa", -29.86, 31.02, "Africa/Johannesburg", 2, "mwl"],
+  ["portlouis", "Port Louis", "Mauritius", -20.16, 57.50, "Indian/Mauritius", 4, "mwl"],
+  ["tashkent", "Tashkent", "Uzbekistan", 41.30, 69.24, "Asia/Tashkent", 5, "mwl"], ["almaty", "Almaty", "Kazakhstan", 43.24, 76.89, "Asia/Almaty", 5, "mwl"],
+  ["bishkek", "Bishkek", "Kyrgyzstan", 42.87, 74.59, "Asia/Bishkek", 6, "mwl"], ["dushanbe", "Dushanbe", "Tajikistan", 38.56, 68.77, "Asia/Dushanbe", 5, "mwl"],
+  ["ashgabat", "Ashgabat", "Turkmenistan", 37.96, 58.33, "Asia/Ashgabat", 5, "mwl"],
+  ["moscow", "Moscow", "Russia", 55.76, 37.62, "Europe/Moscow", 3, "russia"], ["kazan", "Kazan", "Russia", 55.80, 49.11, "Europe/Moscow", 3, "russia"],
+  ["grozny", "Grozny", "Russia", 43.32, 45.69, "Europe/Moscow", 3, "russia"], ["ufa", "Ufa", "Russia", 54.73, 55.97, "Asia/Yekaterinburg", 5, "russia"],
+  ["kualalumpur", "Kuala Lumpur", "Malaysia", 3.14, 101.69, "Asia/Kuala_Lumpur", 8, "jakim"], ["penang", "Penang", "Malaysia", 5.41, 100.34, "Asia/Kuala_Lumpur", 8, "jakim"],
+  ["johorbahru", "Johor Bahru", "Malaysia", 1.49, 103.74, "Asia/Kuala_Lumpur", 8, "jakim"], ["singapore", "Singapore", "Singapore", 1.35, 103.82, "Asia/Singapore", 8, "singapore"],
+  ["bandar", "Bandar Seri Begawan", "Brunei", 4.90, 114.94, "Asia/Brunei", 8, "jakim"],
+  ["jakarta", "Jakarta", "Indonesia", -6.21, 106.85, "Asia/Jakarta", 7, "kemenag"], ["bandung", "Bandung", "Indonesia", -6.92, 107.61, "Asia/Jakarta", 7, "kemenag"],
+  ["surabaya", "Surabaya", "Indonesia", -7.26, 112.75, "Asia/Jakarta", 7, "kemenag"], ["medan", "Medan", "Indonesia", 3.60, 98.67, "Asia/Jakarta", 7, "kemenag"],
+  ["makassar", "Makassar", "Indonesia", -5.15, 119.43, "Asia/Makassar", 8, "kemenag"],
+  ["manila", "Manila", "Philippines", 14.60, 120.98, "Asia/Manila", 8, "mwl"], ["bangkok", "Bangkok", "Thailand", 13.76, 100.50, "Asia/Bangkok", 7, "mwl"],
+  ["yangon", "Yangon", "Myanmar", 16.87, 96.20, "Asia/Yangon", 6.5, "mwl"], ["beijing", "Beijing", "China", 39.90, 116.41, "Asia/Shanghai", 8, "mwl"],
+  ["urumqi", "Ürümqi", "China", 43.83, 87.62, "Asia/Shanghai", 8, "mwl"], ["hongkong", "Hong Kong", "Hong Kong", 22.32, 114.17, "Asia/Hong_Kong", 8, "mwl"],
+  ["tokyo", "Tokyo", "Japan", 35.68, 139.69, "Asia/Tokyo", 9, "mwl"], ["seoul", "Seoul", "South Korea", 37.57, 126.98, "Asia/Seoul", 9, "mwl"],
+  ["sydney", "Sydney", "Australia", -33.87, 151.21, "Australia/Sydney", 10, "mwl"], ["melbourne", "Melbourne", "Australia", -37.81, 144.96, "Australia/Melbourne", 10, "mwl"],
+  ["brisbane", "Brisbane", "Australia", -27.47, 153.03, "Australia/Brisbane", 10, "mwl"], ["perth", "Perth", "Australia", -31.95, 115.86, "Australia/Perth", 8, "mwl"],
+  ["auckland", "Auckland", "New Zealand", -36.85, 174.76, "Pacific/Auckland", 12, "mwl"], ["suva", "Suva", "Fiji", -18.14, 178.44, "Pacific/Fiji", 12, "mwl"],
+  ["london", "London", "United Kingdom", 51.51, -0.13, "Europe/London", 0, "mwl"], ["birmingham", "Birmingham", "United Kingdom", 52.49, -1.89, "Europe/London", 0, "mwl"],
+  ["manchester", "Manchester", "United Kingdom", 53.48, -2.24, "Europe/London", 0, "mwl"], ["glasgow", "Glasgow", "United Kingdom", 55.86, -4.25, "Europe/London", 0, "mwl"],
+  ["dublin", "Dublin", "Ireland", 53.35, -6.26, "Europe/Dublin", 0, "mwl"],
+  ["paris", "Paris", "France", 48.86, 2.35, "Europe/Paris", 1, "france"], ["marseille", "Marseille", "France", 43.30, 5.37, "Europe/Paris", 1, "france"],
+  ["lyon", "Lyon", "France", 45.76, 4.84, "Europe/Paris", 1, "france"], ["brussels", "Brussels", "Belgium", 50.85, 4.35, "Europe/Brussels", 1, "mwl"],
+  ["amsterdam", "Amsterdam", "Netherlands", 52.37, 4.90, "Europe/Amsterdam", 1, "mwl"], ["rotterdam", "Rotterdam", "Netherlands", 51.92, 4.48, "Europe/Amsterdam", 1, "mwl"],
+  ["berlin", "Berlin", "Germany", 52.52, 13.41, "Europe/Berlin", 1, "mwl"], ["frankfurt", "Frankfurt", "Germany", 50.11, 8.68, "Europe/Berlin", 1, "mwl"],
+  ["munich", "Munich", "Germany", 48.14, 11.58, "Europe/Berlin", 1, "mwl"], ["hamburg", "Hamburg", "Germany", 53.55, 9.99, "Europe/Berlin", 1, "mwl"],
+  ["zurich", "Zürich", "Switzerland", 47.38, 8.54, "Europe/Zurich", 1, "mwl"], ["vienna", "Vienna", "Austria", 48.21, 16.37, "Europe/Vienna", 1, "mwl"],
+  ["rome", "Rome", "Italy", 41.90, 12.50, "Europe/Rome", 1, "mwl"], ["milan", "Milan", "Italy", 45.46, 9.19, "Europe/Rome", 1, "mwl"],
+  ["madrid", "Madrid", "Spain", 40.42, -3.70, "Europe/Madrid", 1, "mwl"], ["barcelona", "Barcelona", "Spain", 41.39, 2.17, "Europe/Madrid", 1, "mwl"],
+  ["lisbon", "Lisbon", "Portugal", 38.72, -9.14, "Europe/Lisbon", 0, "mwl"], ["stockholm", "Stockholm", "Sweden", 59.33, 18.07, "Europe/Stockholm", 1, "mwl"],
+  ["malmo", "Malmö", "Sweden", 55.60, 13.00, "Europe/Stockholm", 1, "mwl"], ["oslo", "Oslo", "Norway", 59.91, 10.75, "Europe/Oslo", 1, "mwl"],
+  ["copenhagen", "Copenhagen", "Denmark", 55.68, 12.57, "Europe/Copenhagen", 1, "mwl"], ["helsinki", "Helsinki", "Finland", 60.17, 24.94, "Europe/Helsinki", 2, "mwl"],
+  ["warsaw", "Warsaw", "Poland", 52.23, 21.01, "Europe/Warsaw", 1, "mwl"], ["kyiv", "Kyiv", "Ukraine", 50.45, 30.52, "Europe/Kyiv", 2, "mwl"],
+  ["sarajevo", "Sarajevo", "Bosnia and Herzegovina", 43.86, 18.41, "Europe/Sarajevo", 1, "mwl"], ["tirana", "Tirana", "Albania", 41.33, 19.82, "Europe/Tirane", 1, "mwl"],
+  ["pristina", "Pristina", "Kosovo", 42.66, 21.17, "Europe/Belgrade", 1, "mwl"], ["skopje", "Skopje", "North Macedonia", 42.00, 21.43, "Europe/Skopje", 1, "mwl"],
+  ["sofia", "Sofia", "Bulgaria", 42.70, 23.32, "Europe/Sofia", 2, "mwl"], ["athens", "Athens", "Greece", 37.98, 23.73, "Europe/Athens", 2, "mwl"],
+  ["nicosia", "Nicosia", "Cyprus", 35.19, 33.38, "Asia/Nicosia", 2, "mwl"],
+  ["toronto", "Toronto", "Canada", 43.65, -79.38, "America/Toronto", -5, "isna"], ["montreal", "Montréal", "Canada", 45.50, -73.57, "America/Toronto", -5, "isna"],
+  ["ottawa", "Ottawa", "Canada", 45.42, -75.70, "America/Toronto", -5, "isna"], ["calgary", "Calgary", "Canada", 51.05, -114.07, "America/Edmonton", -7, "isna"],
+  ["vancouver", "Vancouver", "Canada", 49.28, -123.12, "America/Vancouver", -8, "isna"],
+  ["newyork", "New York", "United States", 40.71, -74.01, "America/New_York", -5, "isna"], ["newark", "Newark", "United States", 40.74, -74.17, "America/New_York", -5, "isna"],
+  ["boston", "Boston", "United States", 42.36, -71.06, "America/New_York", -5, "isna"], ["washington", "Washington DC", "United States", 38.91, -77.04, "America/New_York", -5, "isna"],
+  ["atlanta", "Atlanta", "United States", 33.75, -84.39, "America/New_York", -5, "isna"], ["miami", "Miami", "United States", 25.76, -80.19, "America/New_York", -5, "isna"],
+  ["detroit", "Detroit", "United States", 42.33, -83.05, "America/Detroit", -5, "isna"], ["chicago", "Chicago", "United States", 41.88, -87.63, "America/Chicago", -6, "isna"],
+  ["minneapolis", "Minneapolis", "United States", 44.98, -93.27, "America/Chicago", -6, "isna"], ["dallas", "Dallas", "United States", 32.78, -96.80, "America/Chicago", -6, "isna"],
+  ["houston", "Houston", "United States", 29.76, -95.37, "America/Chicago", -6, "isna"], ["denver", "Denver", "United States", 39.74, -104.99, "America/Denver", -7, "isna"],
+  ["phoenix", "Phoenix", "United States", 33.45, -112.07, "America/Phoenix", -7, "isna"], ["losangeles", "Los Angeles", "United States", 34.05, -118.24, "America/Los_Angeles", -8, "isna"],
+  ["sanfrancisco", "San Francisco", "United States", 37.77, -122.42, "America/Los_Angeles", -8, "isna"], ["seattle", "Seattle", "United States", 47.61, -122.33, "America/Los_Angeles", -8, "isna"],
+  ["honolulu", "Honolulu", "United States", 21.31, -157.86, "Pacific/Honolulu", -10, "isna"],
+  ["mexicocity", "Mexico City", "Mexico", 19.43, -99.13, "America/Mexico_City", -6, "isna"], ["portofspain", "Port of Spain", "Trinidad and Tobago", 10.65, -61.52, "America/Port_of_Spain", -4, "isna"],
+  ["georgetown", "Georgetown", "Guyana", 6.80, -58.16, "America/Guyana", -4, "isna"], ["paramaribo", "Paramaribo", "Suriname", 5.85, -55.20, "America/Paramaribo", -3, "isna"],
+  ["saopaulo", "São Paulo", "Brazil", -23.55, -46.63, "America/Sao_Paulo", -3, "mwl"], ["buenosaires", "Buenos Aires", "Argentina", -34.60, -58.38, "America/Argentina/Buenos_Aires", -3, "mwl"]
+].map(a => ({key: a[0], name: a[1], country: a[2], lat: a[3], lon: a[4], zone: a[5], tz: a[6], method: a[7]}));
+const CITY_BY_KEY = {}; CITIES.forEach(p => CITY_BY_KEY[p.key] = p);
+function browserZone(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch(e){ return ""; } }
+// the first visit: the browser's time zone picks the place (the same zone can hold several cities; the first listed is used, the player can change it at the masjid)
+function guessPlace(){
+  const zone = browserZone(), byZone = zone && CITIES.find(p => p.zone === zone);
+  if (byZone) return byZone;
+  const off = -new Date().getTimezoneOffset() / 60, region = zone.split("/")[0];
+  return CITIES.find(p => p.tz === off && p.zone.split("/")[0] === region) || CITIES.find(p => p.tz === off) || CITY_BY_KEY.kozhikode;
+}
+function nearestPlace(lat, lon){
+  let best = CITIES[0], bd = 1e9;
+  CITIES.forEach(p => { const d = Math.hypot(p.lat - lat, (p.lon - lon) * Math.cos(lat * Math.PI / 180)); if (d < bd){ bd = d; best = p; } });
+  return best;
+}
+function cleanPlace(s){
+  if (!s || typeof s !== "object" || !isFinite(s.lat) || !isFinite(s.lon) || !s.name) return null;
+  return {key: String(s.key || "here"), name: String(s.name).slice(0, 40), country: String(s.country || "").slice(0, 40), lat: Math.max(-66, Math.min(66, +s.lat)), lon: Math.max(-180, Math.min(180, +s.lon)),
+          zone: typeof s.zone === "string" ? s.zone.slice(0, 40) : "", tz: isFinite(s.tz) ? +s.tz : 0, method: METHODS[s.method] ? s.method : "mwl", asr: s.asr === 2 ? 2 : 1, own: !!s.own};
+}
+let PLACE = cleanPlace(store.get("veed-place", null)) || Object.assign({asr: 1}, guessPlace());
+// times set by hand at the masjid: {fajr: "05:12", ...}; a missing prayer uses the calculated time
+let AZAN_SET = store.get("veed-azan-set", {}); if (!AZAN_SET || typeof AZAN_SET !== "object") AZAN_SET = {};
+const ZONE_FMT = {};
+function zoneNow(zone, ms){
+  if (ZONE_FMT[zone] === false) return null;
+  try {
+    const f = ZONE_FMT[zone] || (ZONE_FMT[zone] = new Intl.DateTimeFormat("en-US", {timeZone: zone, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"}));
+    const o = {}; f.formatToParts(new Date(ms)).forEach(p => { if (p.type !== "literal") o[p.type] = +p.value; });
+    const h = o.hour % 24, whole = Math.floor(ms / 1000) * 1000;
+    return {y: o.year, m: o.month, d: o.day, h: h + o.minute / 60 + o.second / 3600, off: Math.round((Date.UTC(o.year, o.month - 1, o.day, h, o.minute, o.second) - whole) / 60e3) / 60,
+            key: o.year + "-" + String(o.month).padStart(2, "0") + "-" + String(o.day).padStart(2, "0")};
+  } catch(e){ ZONE_FMT[zone] = false; return null; }
+}
+// the date and clock time where the player lives (zone rules, including summer time, come from the browser; a fixed offset is the fallback)
+function localNow(P){
+  P = P || PLACE;
+  const ms = Date.now(), z = P.zone ? zoneNow(P.zone, ms) : null;
+  if (z) return z;
+  const d = new Date(ms + (P.tz || 0) * 3600e3);
+  return {y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600, off: P.tz || 0, key: d.toISOString().slice(0, 10)};
+}
+const ist = localNow;
+/* prayer times for a place (default: where the player lives), by the place's calculation method; Asr by shadow factor 1 (standard) or 2 (Hanafi) */
+function prayerTimes(y, m, d, P){
+  P = P || PLACE;
+  const M = METHODS[P.method] || METHODS.mwl, lat = P.lat, lon = P.lon, tz = ((P.zone && zoneNow(P.zone, Date.UTC(y, m - 1, d, 12))) || localNow(P)).off, asrF = P.asr === 2 ? 2 : 1;
   const rad = Math.PI / 180, deg = 180 / Math.PI;
-  const jd = (() => { let Y = y, M = m; if (M <= 2){ Y--; M += 12; } const A = Math.floor(Y / 100), B = 2 - A + Math.floor(A / 4); return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + d + B - 1524.5; })() - PRAYER.lon / 360;
+  const jd = (() => { let Y = y, Mo = m; if (Mo <= 2){ Y--; Mo += 12; } const A = Math.floor(Y / 100), B = 2 - A + Math.floor(A / 4); return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (Mo + 1)) + d + B - 1524.5; })() - lon / 360;
   const sunPos = t => {   // t: Julian day
     const D = t - 2451545.0, g = (357.529 + .98560028 * D) % 360, q = (280.459 + .98564736 * D) % 360;
     const L = (q + 1.915 * Math.sin(g * rad) + .020 * Math.sin(2 * g * rad)) % 360, e = 23.439 - .00000036 * D;
@@ -3968,32 +4144,44 @@ function prayerTimes(y, m, d){
     return {decl: Math.asin(Math.sin(e * rad) * Math.sin(L * rad)) * deg, eqt: ((eqt + 12) % 24 + 24) % 24 - 12};
   };
   const noon = h => { const s = sunPos(jd + h / 24); return ((12 - s.eqt) % 24 + 24) % 24; };
-  const angleTime = (angle, h, ccw) => {   // time when the sun is `angle` degrees below the horizon
+  const angleTime = (angle, h, ccw) => {   // time when the sun is `angle` degrees below the horizon; NaN when it never gets there (far north or south)
     const s = sunPos(jd + h / 24), n = noon(h);
-    const c = (-Math.sin(angle * rad) - Math.sin(s.decl * rad) * Math.sin(PRAYER.lat * rad)) / (Math.cos(s.decl * rad) * Math.cos(PRAYER.lat * rad));
-    const t = Math.acos(Math.max(-1, Math.min(1, c))) * deg / 15;
+    const c = (-Math.sin(angle * rad) - Math.sin(s.decl * rad) * Math.sin(lat * rad)) / (Math.cos(s.decl * rad) * Math.cos(lat * rad));
+    if (c < -1 || c > 1) return NaN;
+    const t = Math.acos(c) * deg / 15;
     return n + (ccw ? -t : t);
   };
-  const asrTime = (factor, h) => { const s = sunPos(jd + h / 24); const a = -Math.atan(1 / (factor + Math.tan(Math.abs(PRAYER.lat - s.decl) * rad))) * deg; return angleTime(a, h); };
-  let t = {fajr: 5, sunrise: 6, dhuhr: 12, asr: 13, maghrib: 18, isha: 18};
+  const asrTime = (factor, h) => { const s = sunPos(jd + h / 24); const a = -Math.atan(1 / (factor + Math.tan(Math.abs(lat - s.decl) * rad))) * deg; return angleTime(a, h); };
+  const ok = (v, dflt) => isNaN(v) ? dflt : v;
+  let t = {fajr: 5, sunrise: 6, dhuhr: 12, asr: 15, maghrib: 18, isha: 19};
   for (let k = 0; k < 2; k++){
-    t = {fajr: angleTime(PRAYER.fajr, t.fajr, true), sunrise: angleTime(.833, t.sunrise, true), dhuhr: noon(t.dhuhr), asr: asrTime(PRAYER.asr, t.asr), maghrib: angleTime(.833, t.maghrib), isha: angleTime(PRAYER.isha, t.isha)};
+    t = {fajr: angleTime(M.fajr, ok(t.fajr, 5), true), sunrise: angleTime(.833, ok(t.sunrise, 6), true), dhuhr: noon(t.dhuhr), asr: asrTime(asrF, ok(t.asr, 15)),
+         maghrib: angleTime(M.maghrib || .833, ok(t.maghrib, 18)), isha: M.ishaMin ? NaN : angleTime(M.isha, ok(t.isha, 19))};
   }
-  const off = PRAYER.tz - PRAYER.lon / 15, out = {};
-  for (const k in t) out[k] = t[k] + off + PRAYER.add[k] / 60;
-  return out;   // hours after local midnight (IST)
+  // where the sun barely sets or the twilight never ends, the day is split around noon and Fajr/Isha take one seventh of the night
+  if (isNaN(t.sunrise)) t.sunrise = t.dhuhr - 6; if (isNaN(t.maghrib)) t.maghrib = t.dhuhr + 6;
+  const night = 24 - (t.maghrib - t.sunrise);
+  if (M.ishaMin) t.isha = t.maghrib + M.ishaMin / 60; else if (isNaN(t.isha)) t.isha = t.maghrib + night / 7;
+  if (isNaN(t.fajr)) t.fajr = t.sunrise - night / 7;
+  if (isNaN(t.asr)) t.asr = (t.dhuhr + t.maghrib) / 2;
+  const off = tz - lon / 15, add = M.add || {}, out = {};
+  for (const k in t) out[k] = t[k] + off + (add[k] || 0) / 60;
+  return out;   // hours after local midnight at the place
 }
-function fmtTime(h){ let m = Math.round(h * 60); const H = Math.floor(m / 60) % 24, M = m % 60; const ap = H >= 12 ? "pm" : "am"; return ((H + 11) % 12 + 1) + ":" + String(M).padStart(2, "0") + " " + ap; }
+function fmtTime(h){ let m = Math.round(h * 60); const H = ((Math.floor(m / 60) % 24) + 24) % 24, M = ((m % 60) + 60) % 60; const ap = H >= 12 ? "pm" : "am"; return ((H + 11) % 12 + 1) + ":" + String(M).padStart(2, "0") + " " + ap; }
+function fmt24(h){ let m = Math.round(h * 60); const H = ((Math.floor(m / 60) % 24) + 24) % 24, M = ((m % 60) + 60) % 60; return String(H).padStart(2, "0") + ":" + String(M).padStart(2, "0"); }
 
 const PNAMES = {fajr: "Fajr", sunrise: "Sunrise", dhuhr: "Dhuhr", asr: "Asr", maghrib: "Maghrib", isha: "Isha"};
 const PORDER = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"];
-function ist(){ const d = new Date(Date.now() + 5.5 * 3600e3); return {y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), h: d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600, key: d.toISOString().slice(0, 10)}; }
 let PT = null, ptKey = "";
-function todayTimes(){ const n = ist(); if (n.key !== ptKey){ ptKey = n.key; PT = prayerTimes(n.y, n.m, n.d); drawBoards(); renderPtimes(); } return PT; }
+// a time set by hand at the masjid ("05:12") replaces the calculated one for that prayer
+function azanSetHour(k){ const v = /^(\d{1,2}):(\d{2})$/.exec(AZAN_SET[k] || ""); return v ? (+v[1] % 24) + (+v[2] % 60) / 60 : null; }
+function applyAzanSet(t){ ["fajr", "dhuhr", "asr", "maghrib", "isha"].forEach(k => { const h = azanSetHour(k); if (h != null) t[k] = h; }); return t; }
+function todayTimes(){ const n = localNow(); if (n.key !== ptKey){ ptKey = n.key; PT = applyAzanSet(prayerTimes(n.y, n.m, n.d)); drawBoards(); renderPtimes(); } return PT; }
 function minuteOf(h){ return Math.round(h * 60); }
 // which prayer's time it is now (Fajr ends at sunrise; the others run until the next prayer)
 function currentPrayer(){
-  const t = todayTimes(), now = ist().h * 60;
+  const t = todayTimes(), now = localNow().h * 60;
   if (now >= minuteOf(t.isha) || now < minuteOf(t.fajr)) return "isha";
   if (now < minuteOf(t.sunrise)) return "fajr";
   if (now < minuteOf(t.dhuhr)) return null;
@@ -4003,11 +4191,12 @@ function currentPrayer(){
 }
 function renderPtimes(){
   const t = todayTimes(), box = $("ptimes"); box.textContent = "";
+  $("ptLabel").textContent = "Prayer times · " + PLACE.name;
   const cur = currentPrayer();
   PORDER.forEach(k => { const a = document.createElement("span"), b = document.createElement("span"); a.textContent = PNAMES[k]; b.textContent = fmtTime(t[k]); if (k === cur){ a.className = b.className = "now"; } box.append(a, b); });
 }
 function renderNext(){
-  const t = todayTimes(), now = ist().h * 60;
+  const t = todayTimes(), now = localNow().h * 60;
   let next = PORDER.filter(k => k !== "sunrise").find(k => minuteOf(t[k]) > now), tomorrow = false;
   if (!next){ next = "fajr"; tomorrow = true; }
   let mins = minuteOf(t[next]) - now; if (tomorrow) mins += 24 * 60;
@@ -4017,16 +4206,19 @@ function renderNext(){
 }
 function drawBoards(){
   const t = PT; if (!t) return;
-  const n = ist(), date = new Date(Date.UTC(n.y, n.m - 1, n.d)).toLocaleDateString("en-IN", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"});
+  const n = localNow(), date = new Date(Date.UTC(n.y, n.m - 1, n.d)).toLocaleDateString("en-IN", {day: "numeric", month: "long", year: "numeric", timeZone: "UTC"});
+  const setByHand = ["fajr", "dhuhr", "asr", "maghrib", "isha"].some(k => azanSetHour(k) != null);
   prayerBoards.forEach(({c, t: tex}) => {
     const g = c.getContext("2d"); g.fillStyle = "#123b28"; g.fillRect(0, 0, 512, 640);
     g.strokeStyle = "#c9a54c"; g.lineWidth = 10; g.strokeRect(14, 14, 484, 612);
     g.fillStyle = "#f2d78a"; g.textAlign = "center"; g.font = "700 46px Figtree, system-ui, sans-serif"; g.fillText("Prayer Times", 256, 92);
-    g.fillStyle = "#cfe3d6"; g.font = "500 26px Figtree, system-ui, sans-serif"; g.fillText(date + " · IST", 256, 136);
+    g.fillStyle = "#cfe3d6"; g.font = "500 26px Figtree, system-ui, sans-serif"; g.fillText(date, 256, 136);
+    g.font = "500 24px Figtree, system-ui, sans-serif"; g.fillText(PLACE.name + (PLACE.country ? ", " + PLACE.country : ""), 256, 170);
     PORDER.forEach((k, i) => {
-      const y = 210 + i * 66; g.textAlign = "left"; g.fillStyle = "#ffffff"; g.font = "600 36px Figtree, system-ui, sans-serif"; g.fillText(PNAMES[k], 60, y);
+      const y = 236 + i * 62; g.textAlign = "left"; g.fillStyle = "#ffffff"; g.font = "600 36px Figtree, system-ui, sans-serif"; g.fillText(PNAMES[k], 60, y);
       g.textAlign = "right"; g.fillStyle = "#f2d78a"; g.fillText(fmtTime(t[k]), 452, y);
     });
+    g.textAlign = "center"; g.fillStyle = "#9fc3ac"; g.font = "500 20px Figtree, system-ui, sans-serif"; g.fillText(setByHand ? "Times set at this masjid" : (METHODS[PLACE.method] || METHODS.mwl).n, 256, 600);
     tex.needsUpdate = true;
   });
 }
@@ -4059,10 +4251,10 @@ let lastAzanCheck = 0;
 function tickAzan(){
   if (azanAudio) azanAudio.volume = azanVolume();
   const now = performance.now(); if (!entered || now - lastAzanCheck < 1000) return; lastAzanCheck = now;
-  const t = todayTimes(), n = ist(), m = Math.floor(n.h * 60);
+  const t = todayTimes(), n = localNow(), m = Math.floor(n.h * 60);
   ["fajr", "dhuhr", "asr", "maghrib", "isha"].forEach(k => {
-    const key = n.key + k, start = minuteOf(t[k]);
-    if (m >= start && m < start + 3 && !azanDone.has(key)){ azanDone.add(key); playAzan(k); }
+    const key = n.key + k, start = minuteOf(t[k]), hit = x => x >= start && x < start + 3;
+    if ((hit(m) || hit(m + 1440)) && !azanDone.has(key)){ azanDone.add(key); playAzan(k); }   // m + 1440: an Isha that falls after midnight
   });
 }
 
@@ -4084,7 +4276,7 @@ function renderPrayerStep(){ const s = PRAYER_STEPS[prayer.i]; $("praying").text
 function endPrayer(done){
   prayer.active = false; player.mode = "walk"; $("praying").hidden = true; prayer.headY = 0;
   if (!done){ toast("Prayer stopped.", 2500); return; }
-  const k = currentPrayer(), day = ist().key;
+  const k = currentPrayer(), day = localNow().key;
   for (const key in claimed) if (!key.startsWith(day)) delete claimed[key];
   if (k && !claimed[day + k]){ claimed[day + k] = 1; store.set("veed-prayed", claimed); addGold(10, PNAMES[k] + " prayer"); }
   else {
@@ -4103,6 +4295,8 @@ function tickPrayer(dt){
   if (prayer.t >= st[1]){ prayer.t = 0; prayer.i++; if (prayer.i >= PRAYER_STEPS.length){ endPrayer(true); return; } renderPrayerStep(); }
 }
 MASJID_PRAY.forEach(sp => interact.push({pos: new THREE.Vector3(sp.x, .06, sp.z), r: 1.1, label: () => player.mode === "walk" ? "Pray here" : null, act: () => startPrayer(sp)}));
+// the prayer-time boards: set your place and the azan times there
+[[-154, 63.2], [-166.6, 60.8]].forEach(([x, z]) => interact.push({pos: new THREE.Vector3(x, 0, z), r: 1.7, label: () => player.mode === "walk" ? "Set the azan times · " + PLACE.name : null, act: () => openAzanDlg()}));
 
 /* ---------- the Quran reader ---------- */
 const SURAHS = [["Al-Fatihah","الفاتحة",7],["Al-Baqarah","البقرة",286],["Ali 'Imran","آل عمران",200],["An-Nisa","النساء",176],["Al-Ma'idah","المائدة",120],["Al-An'am","الأنعام",165],["Al-A'raf","الأعراف",206],["Al-Anfal","الأنفال",75],["At-Tawbah","التوبة",129],["Yunus","يونس",109],["Hud","هود",123],["Yusuf","يوسف",111],["Ar-Ra'd","الرعد",43],["Ibrahim","ابراهيم",52],["Al-Hijr","الحجر",99],["An-Nahl","النحل",128],["Al-Isra","الإسراء",111],["Al-Kahf","الكهف",110],["Maryam","مريم",98],["Taha","طه",135],["Al-Anbya","الأنبياء",112],["Al-Hajj","الحج",78],["Al-Mu'minun","المؤمنون",118],["An-Nur","النور",64],["Al-Furqan","الفرقان",77],["Ash-Shu'ara","الشعراء",227],["An-Naml","النمل",93],["Al-Qasas","القصص",88],["Al-'Ankabut","العنكبوت",69],["Ar-Rum","الروم",60],["Luqman","لقمان",34],["As-Sajdah","السجدة",30],["Al-Ahzab","الأحزاب",73],["Saba","سبإ",54],["Fatir","فاطر",45],["Ya-Sin","يس",83],["As-Saffat","الصافات",182],["Sad","ص",88],["Az-Zumar","الزمر",75],["Ghafir","غافر",85],["Fussilat","فصلت",54],["Ash-Shuraa","الشورى",53],["Az-Zukhruf","الزخرف",89],["Ad-Dukhan","الدخان",59],["Al-Jathiyah","الجاثية",37],["Al-Ahqaf","الأحقاف",35],["Muhammad","محمد",38],["Al-Fath","الفتح",29],["Al-Hujurat","الحجرات",18],["Qaf","ق",45],["Adh-Dhariyat","الذاريات",60],["At-Tur","الطور",49],["An-Najm","النجم",62],["Al-Qamar","القمر",55],["Ar-Rahman","الرحمن",78],["Al-Waqi'ah","الواقعة",96],["Al-Hadid","الحديد",29],["Al-Mujadila","المجادلة",22],["Al-Hashr","الحشر",24],["Al-Mumtahanah","الممتحنة",13],["As-Saf","الصف",14],["Al-Jumu'ah","الجمعة",11],["Al-Munafiqun","المنافقون",11],["At-Taghabun","التغابن",18],["At-Talaq","الطلاق",12],["At-Tahrim","التحريم",12],["Al-Mulk","الملك",30],["Al-Qalam","القلم",52],["Al-Haqqah","الحاقة",52],["Al-Ma'arij","المعارج",44],["Nuh","نوح",28],["Al-Jinn","الجن",28],["Al-Muzzammil","المزمل",20],["Al-Muddaththir","المدثر",56],["Al-Qiyamah","القيامة",40],["Al-Insan","الانسان",31],["Al-Mursalat","المرسلات",50],["An-Naba","النبإ",40],["An-Nazi'at","النازعات",46],["'Abasa","عبس",42],["At-Takwir","التكوير",29],["Al-Infitar","الإنفطار",19],["Al-Mutaffifin","المطففين",36],["Al-Inshiqaq","الإنشقاق",25],["Al-Buruj","البروج",22],["At-Tariq","الطارق",17],["Al-A'la","الأعلى",19],["Al-Ghashiyah","الغاشية",26],["Al-Fajr","الفجر",30],["Al-Balad","البلد",20],["Ash-Shams","الشمس",15],["Al-Layl","الليل",21],["Ad-Duhaa","الضحى",11],["Ash-Sharh","الشرح",8],["At-Tin","التين",8],["Al-'Alaq","العلق",19],["Al-Qadr","القدر",5],["Al-Bayyinah","البينة",8],["Az-Zalzalah","الزلزلة",8],["Al-'Adiyat","العاديات",11],["Al-Qari'ah","القارعة",11],["At-Takathur","التكاثر",8],["Al-'Asr","العصر",3],["Al-Humazah","الهمزة",9],["Al-Fil","الفيل",5],["Quraysh","قريش",4],["Al-Ma'un","الماعون",7],["Al-Kawthar","الكوثر",3],["Al-Kafirun","الكافرون",6],["An-Nasr","النصر",3],["Al-Masad","المسد",5],["Al-Ikhlas","الإخلاص",4],["Al-Falaq","الفلق",5],["An-Nas","الناس",6]];
@@ -4314,7 +4508,7 @@ let lifeSlow = 0;
 function tickLife(dt){
   tickNPCs(dt); tickPrayer(dt); tickQuran(dt); tickAzan();
   lifeSlow -= dt;
-  if (lifeSlow <= 0){ lifeSlow = 1; renderNext(); if (ptKey !== ist().key) todayTimes(); renderPtimes(); }
+  if (lifeSlow <= 0){ lifeSlow = 1; renderNext(); if (ptKey !== localNow().key) todayTimes(); renderPtimes(); }
 }
 todayTimes(); renderNext();
 
@@ -4501,7 +4695,7 @@ async function acctSubmit(mode){
       }
     }
     LS.set("veed-current-user", id);
-    sessionStorage.setItem("veed-just-logged", "1");
+    sessionStorage.setItem("veed-just-logged", "1"); if (mode === "create") sessionStorage.setItem("veed-registered", "1");
     location.reload();
   } catch(e){
     acctBusy(false, /fetch|network/i.test(String(e.message)) ? "Couldn't reach the account server. Check your internet connection." : String(e.message || e));
@@ -4640,6 +4834,7 @@ function loadRazorpay(){
 }
 async function startPay(plan){
   if (PAY.busy) return; PAY.busy = true; payMsg("Getting ready…");
+  if (typeof pixel === "function") pixel("InitiateCheckout", {content_name: plan, currency: PAY.curr, value: PIXEL_AMOUNTS[PAY.curr][plan]});
   ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = true);
   try {
     const ok = await loadRazorpay(); if (!ok) throw new Error("Couldn't load the payment page. Check your internet connection and try again.");
@@ -4665,6 +4860,7 @@ async function confirmPay(resp, plan){
     const r = await payFn({action: "confirm", order_id: resp.razorpay_order_id, payment_id: resp.razorpay_payment_id, signature: resp.razorpay_signature});
     if (!r.paid) throw new Error("The payment couldn't be confirmed. If money was taken, it will come back to you, or write to us with your payment id " + resp.razorpay_payment_id + ".");
     LS.set("veed-paid:" + ACCT.user, "1");
+    if (typeof pixel === "function") pixel("Purchase", {content_name: plan, currency: PAY.curr, value: PIXEL_AMOUNTS[PAY.curr][plan]});
     if (r.code) LS.set("veed-couple-code:" + ACCT.user, r.code);
     payMsg("Paid. Welcome home!"); renderPay();
     if (r.code){ $("coupleCodeBox").hidden = false; $("coupleCode").value = r.code; }
@@ -5723,8 +5919,8 @@ ready.then(() => { if (!net.isOwner){ hutBuilt = false; buildHutVisual(); } });
   add(new THREE.BoxGeometry(.9, .5, .6), wood, 0, .25, 0); const lid = add(new THREE.CylinderGeometry(.3, .3, .9, 12, 1, false, 0, Math.PI), wood, 0, .5, 0); lid.rotation.z = Math.PI / 2;
   [-.35, .35].forEach(x => add(new THREE.BoxGeometry(.06, .55, .62), M.gold, x, .27, 0)); add(new THREE.BoxGeometry(.12, .14, .04), M.gold, 0, .42, -.31);
   g.traverse(o => { o.userData.noCollide = true; });
-  interact.push({pos: new THREE.Vector3(g.position.x, 0, g.position.z), r: 1.8, label: () => player.mode !== "walk" ? null : store.get("veed-chest-day", "") === ist().key ? {info: "An old chest · come back tomorrow"} : "Open the old chest",
-    act: () => { if (store.get("veed-chest-day", "") === ist().key) return; store.set("veed-chest-day", ist().key); addGold(3, "Jungle treasure"); burst(g.position.x, 1, g.position.z, starTex, 18); toast("Treasure! ★3 golden points. Come back tomorrow for more.", 5000); }});
+  interact.push({pos: new THREE.Vector3(g.position.x, 0, g.position.z), r: 1.8, label: () => player.mode !== "walk" ? null : store.get("veed-chest-day", "") === localNow().key ? {info: "An old chest · come back tomorrow"} : "Open the old chest",
+    act: () => { if (store.get("veed-chest-day", "") === localNow().key) return; store.set("veed-chest-day", localNow().key); addGold(3, "Jungle treasure"); burst(g.position.x, 1, g.position.z, starTex, 18); toast("Treasure! ★3 golden points. Come back tomorrow for more.", 5000); }});
 })();
 
 /* sounds of the jungle and the waterfall, made on the fly */
@@ -5826,7 +6022,7 @@ function tickJungle(dt){
 
 
 /* ---------- day and night follow the real sun in India; some days it rains ---------- */
-const SKY_MODES = {real: "Real time (India)", day: "Day", sunset: "Sunset", night: "Night", rain: "Rain"};
+const SKY_MODES = {real: "Real time · " + PLACE.name, day: "Day", sunset: "Sunset", night: "Night", rain: "Rain"};
 let skyMode = SKY_MODES[store.get("veed-sky", "real")] ? store.get("veed-sky", "real") : "real";
 const SKYC = {
   dayTop: new THREE.Color(0x1859c9), dayMid: new THREE.Color(0x6aaeee), dayLow: new THREE.Color(0xcde5f6),
@@ -5857,14 +6053,14 @@ const SKY = {dayK: 1, nightK: 0, rain: 0, last: 0, h: 12};
 function rainNow(){
   if (skyMode === "rain") return 1;
   if (skyMode !== "real") return 0;
-  const n = ist(), R = rng(hashStr("veed-rain-" + n.key));
+  const n = localNow(), R = rng(hashStr("veed-rain-" + n.key));
   if (R() > .34) return 0;                         // about one day in three has showers
   const showers = 1 + Math.floor(R() * 3);
   for (let i = 0; i < showers; i++){ const s = 7 + R() * 13, len = .5 + R() * 1.2; if (n.h > s && n.h < s + len) return Math.min(1, (n.h - s) * 8, (s + len - n.h) * 8); }
   return 0;
 }
 function weatherText(){
-  const n = ist(), R = rng(hashStr("veed-rain-" + n.key));
+  const n = localNow(), R = rng(hashStr("veed-rain-" + n.key));
   if (R() > .34) return "Clear skies today";
   const showers = 1 + Math.floor(R() * 3), times = [];
   for (let i = 0; i < showers; i++){ const s = 7 + R() * 13; R(); times.push(fmtTime(Math.floor(s * 2) / 2)); }
@@ -5873,7 +6069,7 @@ function weatherText(){
 const _sd = new THREE.Vector3(), _c1 = new THREE.Color(), _c2 = new THREE.Color();
 function updateSky(){
   const t = todayTimes(), sr = t.sunrise, ss = t.maghrib;
-  let h = ist().h;
+  let h = localNow().h;
   if (skyMode === "day") h = sr + 4; else if (skyMode === "sunset") h = ss - .12; else if (skyMode === "night") h = ss + 3;
   else if (skyMode === "rain") h = sr + 5;
   SKY.h = h;
@@ -6342,7 +6538,7 @@ function drawKisBoard(){
 }
 function tickKisanic(dt){
   // the day's numbers grow through working hours (9 am to 6 pm)
-  const h = ist().h, work = clamp((h - 9) / 9, 0, 1), calls = Math.floor(work * 240 + (h >= 9 && h < 18 ? (nowSec() % 37) / 37 * 3 : 0)), orders = Math.floor(calls * .31);
+  const h = localNow().h, work = clamp((h - 9) / 9, 0, 1), calls = Math.floor(work * 240 + (h >= 9 && h < 18 ? (nowSec() % 37) / 37 * 3 : 0)), orders = Math.floor(calls * .31);
   if (calls !== kis.calls || orders !== kis.orders){ kis.calls = calls; kis.orders = orders; drawKisBoard(); }
   const upstairs = player.pos.y > 2.6 && player.pos.x > KIS.x0 && player.pos.x < KIS.x1 && player.pos.z > KIS.z0 && player.pos.z < KIS.z1;
   kis.talk -= dt;
@@ -6356,6 +6552,82 @@ NPCS.forEach(n => {
   if (n.role === "manager") interact.push({pos: new THREE.Vector3(n.x, n.y - .45, n.z - 1), r: 1.8, label: () => player.mode === "walk" ? "Say salam to the manager" : null, act: () => { npcSay(n, "Wa alaikum assalam! Calls are going well today.", 4000); sayAloud("Wa alaikum assalam", false, "وعليكم السلام"); }});
   if (n.role === "vendor") interact.push({pos: new THREE.Vector3(n.x, n.y, n.z), r: 1.4, label: () => null, act: () => {}});
 });
+
+
+/* ---------- the masjid follows your place: choose a city (or your location) and set azan times by hand ---------- */
+function skyLabel(){ SKY_MODES.real = "Real time · " + PLACE.name; const o = $("skySel").querySelector('option[value="real"]'); if (o) o.textContent = SKY_MODES.real; }
+skyLabel();
+function placeChanged(){
+  ptKey = ""; todayTimes(); renderNext(); renderPtimes(); skyLabel();
+  if (typeof updateSky === "function") updateSky();
+  if (typeof renderWeather === "function") renderWeather();
+}
+const AZ = {w: null, set: null};   // the dialog's working copy until Save
+{
+  const city = $("plCity"), groups = {};
+  CITIES.forEach(p => { let g = groups[p.country]; if (!g){ g = groups[p.country] = document.createElement("optgroup"); g.label = p.country; city.appendChild(g); } const o = document.createElement("option"); o.value = p.key; o.textContent = p.name; g.appendChild(o); });
+  const meth = $("plMethod"), auto = document.createElement("option"); auto.value = "auto"; meth.appendChild(auto);
+  Object.entries(METHODS).forEach(([k, m]) => { const o = document.createElement("option"); o.value = k; o.textContent = m.n; meth.appendChild(o); });
+}
+function placeOwnOption(p){   // "My location" appears in the list only while it is the chosen place
+  const city = $("plCity"); let o = city.querySelector('option[value="here"]');
+  if (!p || p.key !== "here"){ if (o) o.remove(); return; }
+  if (!o){ o = document.createElement("option"); o.value = "here"; city.insertBefore(o, city.firstChild); }
+  o.textContent = p.name + (p.country ? " (" + p.country + ")" : "");
+}
+function azanRows(){
+  const W = AZ.w, n = localNow(W), calc = prayerTimes(n.y, n.m, n.d, W), box = $("azanTimes"); box.textContent = "";
+  ["fajr", "dhuhr", "asr", "maghrib", "isha"].forEach(k => {
+    const set = /^\d{1,2}:\d{2}$/.test(AZ.set[k] || ""), lab = document.createElement("label"), inp = document.createElement("input");
+    inp.type = "time"; inp.id = "az_" + k; inp.value = set ? AZ.set[k] : fmt24(calc[k]); inp.setAttribute("aria-label", PNAMES[k] + " time");
+    lab.htmlFor = inp.id; lab.className = set ? "set" : ""; lab.append(PNAMES[k], Object.assign(document.createElement("small"), {textContent: set ? "set by hand · calculated " + fmtTime(calc[k]) : "calculated"}));
+    inp.addEventListener("change", () => {
+      if (!/^\d{1,2}:\d{2}$/.test(inp.value)){ delete AZ.set[k]; azanRows(); return; }
+      if (inp.value === fmt24(calc[k])) delete AZ.set[k]; else AZ.set[k] = inp.value;
+      azanRows();
+    });
+    box.append(lab, inp);
+  });
+  const o = $("plMethod").querySelector('option[value="auto"]'), base = CITY_BY_KEY[W.key] || nearestPlace(W.lat, W.lon);
+  o.textContent = "Usual for this place · " + (METHODS[base.method] || METHODS.mwl).n;
+  $("plNow").textContent = "Now " + fmtTime(n.h) + " in " + W.name + (W.zone ? " · " + W.zone.replace(/_/g, " ") : "");
+}
+function openAzanDlg(){
+  AZ.w = Object.assign({}, PLACE); AZ.set = Object.assign({}, AZAN_SET);
+  placeOwnOption(AZ.w); $("plCity").value = (CITY_BY_KEY[AZ.w.key] || AZ.w.key === "here") ? AZ.w.key : "";
+  $("plMethod").value = AZ.w.own ? AZ.w.method : "auto"; $("plAsr").value = AZ.w.asr === 2 ? "2" : "1";
+  $("azanMsg").hidden = true; azanRows();
+  $("azanDlg").hidden = false; setTimeout(() => $("plCity").focus(), 50);
+}
+$("plCity").addEventListener("change", () => {
+  const p = CITY_BY_KEY[$("plCity").value]; if (!p) return;
+  const own = $("plMethod").value !== "auto";
+  AZ.w = Object.assign({}, p, {asr: +$("plAsr").value === 2 ? 2 : 1, own, method: own ? $("plMethod").value : p.method}); placeOwnOption(AZ.w); azanRows();
+});
+$("plMethod").addEventListener("change", () => {
+  const v = $("plMethod").value, base = CITY_BY_KEY[AZ.w.key] || nearestPlace(AZ.w.lat, AZ.w.lon);
+  AZ.w.own = v !== "auto"; AZ.w.method = v === "auto" ? base.method : v; azanRows();
+});
+$("plAsr").addEventListener("change", () => { AZ.w.asr = $("plAsr").value === "2" ? 2 : 1; azanRows(); });
+$("plLocate").addEventListener("click", () => {
+  if (!navigator.geolocation){ $("azanMsg").textContent = "This browser can't share your location. Pick your city instead."; $("azanMsg").hidden = false; return; }
+  $("plLocate").disabled = true; $("azanMsg").hidden = true;
+  navigator.geolocation.getCurrentPosition(pos => {
+    $("plLocate").disabled = false;
+    const lat = Math.round(pos.coords.latitude * 100) / 100, lon = Math.round(pos.coords.longitude * 100) / 100, near = nearestPlace(lat, lon), zone = browserZone() || near.zone;
+    AZ.w = Object.assign({}, AZ.w, {key: "here", name: "My location", country: "near " + near.name + ", " + near.country, lat, lon, zone, tz: zone === near.zone ? near.tz : -new Date().getTimezoneOffset() / 60, method: AZ.w.own ? AZ.w.method : near.method});
+    placeOwnOption(AZ.w); $("plCity").value = "here"; azanRows();
+  }, () => { $("plLocate").disabled = false; $("azanMsg").textContent = "Your browser didn't share your location. Pick your city instead."; $("azanMsg").hidden = false; }, {timeout: 12000, maximumAge: 600000});
+});
+$("azanReset").addEventListener("click", () => { AZ.set = {}; azanRows(); });
+$("azanSave").addEventListener("click", () => {
+  PLACE = cleanPlace(AZ.w) || PLACE; AZAN_SET = AZ.set;
+  store.set("veed-place", PLACE); store.set("veed-azan-set", AZAN_SET);
+  placeChanged(); $("azanDlg").hidden = true; view.focus({preventScroll: true});
+  const n = Object.keys(AZAN_SET).length;
+  toast("The masjid now follows " + PLACE.name + (n ? " · " + n + " azan time" + (n > 1 ? "s" : "") + " set by hand." : "."), 4000);
+});
+$("ptChange").addEventListener("click", openAzanDlg);
 
 
 /* ---------- traffic: cars, buses, autos and a lorry going round; they stop for people ---------- */
@@ -7843,6 +8115,18 @@ function peopleExtra(li, name){
 }
 
 /* free, cookie-less visitor counts: paste your Cloudflare Web Analytics token (dash.cloudflare.com -> Web Analytics -> Add a site) */
+/* ---------- Meta (Facebook/Instagram) ads: paste your Pixel id and the game reports sign-ups and payments, so ads can be bought per registration or per purchase ---------- */
+const META_PIXEL_ID = "1518315262337802";
+const PIXEL_AMOUNTS = {INR: {single: 99, couple: 149}, USD: {single: 1.99, couple: 2.99}};
+function pixel(ev, data){ try { if (typeof fbq === "function") fbq("track", ev, data || {}); } catch(e){} }
+if (/^\d{8,20}$/.test(META_PIXEL_ID) && location.protocol === "https:"){
+  (function(f,b,e,v,n,t,s){ if (f.fbq) return; n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = true; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = true; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+  fbq("init", META_PIXEL_ID); fbq("track", "PageView");
+  try {
+    if (sessionStorage.getItem("veed-registered")){ sessionStorage.removeItem("veed-registered"); pixel("CompleteRegistration", {content_name: "home", status: "ok"}); }
+  } catch(e){}
+  if (TRIAL) setTimeout(() => pixel("StartTrial", {content_name: "look-around"}), 1500);
+}
 const CF_ANALYTICS_TOKEN = "PASTE_CF_ANALYTICS_TOKEN";
 if (!/^PASTE_/.test(CF_ANALYTICS_TOKEN) && location.protocol === "https:"){ const s = document.createElement("script"); s.defer = true; s.src = "https://static.cloudflareinsights.com/beacon.min.js"; s.setAttribute("data-cf-beacon", JSON.stringify({token: CF_ANALYTICS_TOKEN})); document.head.appendChild(s); }
 
@@ -8300,7 +8584,7 @@ function setSky(mode, mine, by){
   if (!SKY_MODES[mode]) return;
   skyMode = mode; store.set("veed-sky", mode); $("skySel").value = mode; updateSky(); renderWeather();
   if (mine){ const pid = partner(); if (pid) net.act.world.send({sky: mode}, {target: pid}); }
-  else toast((by || "They") + " changed the sky to " + SKY_MODES[mode].replace(" (India)", "") + ".", 3000);
+  else toast((by || "They") + " changed the sky to " + SKY_MODES[mode].split(" · ")[0] + ".", 3000);
 }
 function onWorldMsg(d){
   const pid = partner(); if (!pid) return;
