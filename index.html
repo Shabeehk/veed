@@ -170,6 +170,14 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .codeRow input{flex:1;min-width:0;font:600 13px var(--font);letter-spacing:.04em;text-transform:uppercase}
 .trialbar{position:fixed;z-index:8;left:50%;transform:translateX(-50%);top:calc(48px + env(safe-area-inset-top,0px));display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 8px 6px 14px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap}
 .trialbar .btn{padding:6px 10px;font-size:12.5px}
+#trialText{font-variant-numeric:tabular-nums}
+.dialog.signup{z-index:60;background:rgba(10,14,12,.62)}
+.dialog.signup .panel{max-width:400px}
+.dialog.signup form{display:grid;gap:6px;margin:6px 0 4px}
+.dialog.signup .l small{font-weight:400;color:var(--muted)}
+.dialog.signup input{width:100%;box-sizing:border-box}
+.dialog.signup #suBtn{margin-top:8px}
+#emailWrap .l small{font-weight:400;color:var(--muted)}
 @media (max-width:640px){.trialbar{top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:12px;transform:none;max-width:calc(100% - 24px);white-space:normal}}
 body.theater .trialbar{display:none!important}
 .looks{border:0;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -465,7 +473,20 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
 </section>
 <div class="ginvite panel" id="gameInvite" hidden><p id="gameInviteText"></p><div class="row"><button class="btn primary" id="gameJoin" type="button">Play</button><button class="btn" id="gameNo" type="button">Not now</button></div></div>
 <div class="knock" id="knock" hidden aria-live="assertive"></div>
-<div class="trialbar" id="trialBar" hidden><span>Looking around · nothing is saved</span><button class="btn primary" type="button" id="trialEnd">Create my home</button></div>
+<div class="trialbar" id="trialBar" hidden><span id="trialText">Looking around · 0:20 left</span><button class="btn primary" type="button" id="trialEnd">Create my home</button></div>
+<div class="dialog signup" id="signupDlg" hidden><div class="panel" role="dialog" aria-modal="true" aria-labelledby="suTitle">
+  <h2 id="suTitle">Create your account to keep playing</h2>
+  <p class="note" id="suSub">Your look-around is over. Make your home in a minute: it's saved, and you can invite the one you love.</p>
+  <form id="suForm" autocomplete="on" novalidate>
+    <label class="l" for="suName">Your name</label><input id="suName" maxlength="24" autocomplete="username" autocapitalize="words" required>
+    <label class="l" for="suEmail">Email</label><input id="suEmail" type="email" maxlength="120" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com" required>
+    <label class="l" for="suPass">Password</label><input id="suPass" type="password" maxlength="64" autocomplete="new-password" required>
+    <input id="suCode" maxlength="24" placeholder="Couple code or coupon, if you have one" autocapitalize="characters" autocomplete="off" aria-label="Couple code or coupon" hidden>
+    <p class="acctmsg" id="suMsg" hidden role="alert"></p>
+    <button class="btn primary" type="submit" id="suBtn">Create my account and play</button>
+  </form>
+  <p class="fine">Already have a home? <button class="linkbtn" type="button" id="suLogin">Log in instead</button></p>
+</div></div>
 <div class="ginvite panel frcard" id="friendReq" hidden><p id="friendReqText"></p><div class="row"><button class="btn primary" id="friendYes" type="button">Accept</button><button class="btn" id="friendNo" type="button">Not now</button></div></div>
 <div class="ginvite panel frcard" id="friendCall" hidden><p id="friendCallText"></p><div class="row"><button class="btn primary" id="friendGo" type="button">Go</button><button class="btn" id="friendLater" type="button">Not now</button></div></div>
 <div class="theaterbar" id="theaterBar" hidden><button class="btn" id="thPlay" type="button">Pause</button><button class="btn primary" id="thExit" type="button">Exit full screen</button></div>
@@ -634,6 +655,10 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
       <div id="passWrap" class="acctf">
         <label class="l" for="passIn">Password</label>
         <input id="passIn" type="password" maxlength="64" autocomplete="current-password" required>
+      </div>
+      <div id="emailWrap" class="acctf">
+        <label class="l" for="emailIn">Email <small>(needed to create a home; log in with name and password)</small></label>
+        <input id="emailIn" type="email" maxlength="120" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com">
       </div>
     </div>
     <div class="row codeRow" id="codeRowNew" hidden><input id="codeIn" maxlength="24" placeholder="Couple code or coupon, if you have one" autocapitalize="characters" autocomplete="off" aria-label="Couple code or coupon"><button class="btn" type="button" id="codeBtn">Use</button></div>
@@ -2488,7 +2513,7 @@ const DRAIN = 100 / (30 * 60);       // walking for 30 minutes uses up a full li
 const keys = {};
 let runToggle = false;
 addEventListener("keydown", e => {
-  if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || !entered) return;
+  if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) || !entered || (typeof signupOpen === "function" && signupOpen())) return;
   keys[e.code] = true;
   if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
@@ -3227,6 +3252,7 @@ function randTok(n){ const a = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ2
 function pruneInvites(){ store.set("veed-invites", invites); }
 function inviteLink(tok){ return location.origin + location.pathname + "?home=" + net.homeId + "&invite=" + tok; }
 function createInvite(){
+  if (TRIAL && typeof openSignup === "function"){ openSignup("invite"); return; }
   pruneInvites();
   for (const k in invites) if (!invites[k].guest) delete invites[k];       // a new link replaces older unused ones
   currentInvite = randTok(10);
@@ -3860,7 +3886,7 @@ if (AUTO) interact.push({pos: new THREE.Vector3(AUTO.x, 0, AUTO.z), r: 2.4, labe
 
 /* ---------- dialogs ---------- */
 document.querySelectorAll(".dialog [data-close]").forEach(b => b.addEventListener("click", () => { b.closest(".dialog").hidden = true; view.focus({preventScroll: true}); }));
-document.querySelectorAll(".dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d){ d.hidden = true; view.focus({preventScroll: true}); } }));
+document.querySelectorAll(".dialog").forEach(d => d.addEventListener("click", e => { if (e.target === d && !d.classList.contains("signup")){ d.hidden = true; view.focus({preventScroll: true}); } }));
 function itemBtn(k, n, label, onClick, small){
   const b = document.createElement("button"); b.type = "button"; b.className = "btn";
   const left = document.createElement("span"); left.textContent = label; const right = document.createElement("small"); right.textContent = small || ("× " + n);
@@ -4434,17 +4460,22 @@ async function pbkdf(pass, salt){
   const bits = await crypto.subtle.deriveBits({name: "PBKDF2", salt: new TextEncoder().encode(salt), iterations: 120000, hash: "SHA-256"}, k, 256);
   return [...new Uint8Array(bits)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
-function acctBusy(on, msg){ ["acctLogin", "acctCreate"].forEach(id => $(id).disabled = on); $("acctMsg").textContent = msg || ""; $("acctMsg").hidden = !msg; }
+function acctBusy(on, msg){
+  ["acctLogin", "acctCreate"].forEach(id => $(id).disabled = on); $("acctMsg").textContent = msg || ""; $("acctMsg").hidden = !msg;
+  if (!$("signupDlg").hidden){ $("suBtn").disabled = on; $("suMsg").textContent = msg || ""; $("suMsg").hidden = !msg; }
+}
+const EMAIL_OK = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 async function acctSubmit(mode){
-  const name = $("nameIn").value.trim().replace(/\s+/g, " ").slice(0, 24), pass = $("passIn").value, id = name.toLowerCase();
+  const name = $("nameIn").value.trim().replace(/\s+/g, " ").slice(0, 24), pass = $("passIn").value, id = name.toLowerCase(), email = $("emailIn").value.trim().toLowerCase();
   if (name.length < 2){ acctBusy(false, "Type your name (at least 2 letters)."); return; }
   if (pass.length < 4){ acctBusy(false, "Type a password (at least 4 characters)."); return; }
+  if (mode === "create" && !EMAIL_OK(email)){ acctBusy(false, "Type your email address to create your home."); $("emailIn").focus(); return; }
   const chosen = document.querySelector('input[name="look"]:checked'), look = chosen && STYLES[chosen.value] ? chosen.value : "floralF";
   const pfx = "u:" + id + ":";
   acctBusy(true, mode === "create" ? "Creating your account…" : "Logging in…");
   try {
     if (cloudOn()){
-      const r = await rpc(mode === "create" ? "veed_register" : "veed_login", mode === "create" ? {p_name: name, p_pass: pass, p_code: ($("codeIn").value || "").trim().toUpperCase() || null} : {p_name: name, p_pass: pass});
+      const r = await rpc(mode === "create" ? "veed_register" : "veed_login", mode === "create" ? {p_name: name, p_pass: pass, p_code: ($("codeIn").value || "").trim().toUpperCase() || null, p_email: email} : {p_name: name, p_pass: pass});
       LS.set("veed-paid:" + id, r.paid === false ? "0" : "1");
       if (r.recovery) sessionStorage.setItem("veed-recovery", r.recovery);
       if (mode === "create"){ acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look)); }
@@ -4461,7 +4492,7 @@ async function acctSubmit(mode){
       if (mode === "create"){
         if (rec) throw new Error("That name already has an account on this device. Log in instead.");
         const salt = id + ":" + Math.random().toString(36).slice(2);
-        LS.set("veed-acct:" + id, JSON.stringify({salt, hash: await pbkdf(pass, salt), display: name}));
+        LS.set("veed-acct:" + id, JSON.stringify({salt, hash: await pbkdf(pass, salt), display: name, email}));
         acctMigrateLegacy(pfx); LS.set(pfx + "veed-look", JSON.stringify(look));
         LS.set("veed-current-display", name);
       } else {
@@ -4507,7 +4538,31 @@ function acctPaid(){ return !cloudOn() || !ACCT.user ? true : LS.get("veed-paid:
   if (inn && sessionStorage.getItem("veed-just-logged")){ sessionStorage.removeItem("veed-just-logged"); if (paid) toast("Welcome, " + ACCT.display + "! Your game is saved to your account.", 4000); }
 })();
 $("trialBtn").addEventListener("click", () => { try { sessionStorage.setItem("veed-trial", "1"); } catch(e){} location.reload(); });
-$("trialEnd").addEventListener("click", () => { try { sessionStorage.removeItem("veed-trial"); sessionStorage.setItem("veed-create", "1"); } catch(e){} location.reload(); });
+$("emailWrap").hidden = !!ACCT.user || TRIAL;
+/* ---------- the look-around lasts TRIAL_SECONDS; then (or when the visitor tries to invite someone) a sign-up card appears that only an account can close ---------- */
+const TRIAL_SECONDS = 20, SIGNUP = {open: false, left: TRIAL_SECONDS};
+function signupOpen(){ return SIGNUP.open; }
+function openSignup(why){
+  if (SIGNUP.open || ACCT.user) return;
+  SIGNUP.open = true; keys && Object.keys(keys).forEach(k => keys[k] = false);
+  $("suSub").textContent = why === "invite" ? "Inviting someone needs a home of your own. Make yours in a minute: it's saved, and your guest knocks on your door." : why === "time" ? "Your " + TRIAL_SECONDS + "-second look-around is over. Make your home in a minute: it's saved, and you can invite the one you love." : "Make your home in a minute: it's saved, and you can invite the one you love.";
+  $("suName").value = ($("nameIn").value || "").trim().slice(0, 24); $("suCode").hidden = !cloudOn();
+  $("signupDlg").hidden = false; $("trialBar").hidden = true;
+  setTimeout(() => ($("suName").value ? $("suEmail") : $("suName")).focus(), 50);
+}
+$("suForm").addEventListener("submit", e => {
+  e.preventDefault();
+  $("nameIn").value = $("suName").value; $("passIn").value = $("suPass").value; $("emailIn").value = $("suEmail").value; $("codeIn").value = $("suCode").value;
+  acctSubmit("create");
+});
+$("suLogin").addEventListener("click", () => { try { sessionStorage.removeItem("veed-trial"); } catch(e){} location.reload(); });
+$("trialEnd").addEventListener("click", () => openSignup("end"));
+if (TRIAL) setInterval(() => {
+  if (!entered || SIGNUP.open) return;
+  SIGNUP.left = Math.max(0, SIGNUP.left - 1);
+  $("trialText").textContent = "Looking around · " + Math.floor(SIGNUP.left / 60) + ":" + String(SIGNUP.left % 60).padStart(2, "0") + " left";
+  if (SIGNUP.left <= 0) openSignup("time");
+}, 1000);
 if (!TRIAL && !ACCT.user && sessionStorage.getItem("veed-create")){ sessionStorage.removeItem("veed-create"); setTimeout(() => $("nameIn").focus(), 400); }
 // save online every so often, and when the app is put away
 let acctSaving = null, acctAgain = false, acctLastErr = 0;
@@ -8028,7 +8083,7 @@ function renderMask(cx, cz, half){
   MASK.cx = cx; MASK.cz = cz; MASK.half = half;
 }
 function maskGrass(x, z){
-  if (!MASK.ok) return true;
+  if (!MASK.ok) return false;
   const u = (x - (MASK.cx - MASK.half)) / (2 * MASK.half), v = ((MASK.cz + MASK.half) - z) / (2 * MASK.half);
   if (u < 0 || u >= 1 || v < 0 || v >= 1) return false;
   const i = ((v * MASK.res | 0) * MASK.res + (u * MASK.res | 0)) * 4, r = MASK.buf[i], g = MASK.buf[i + 1], b = MASK.buf[i + 2];
@@ -8042,6 +8097,7 @@ function grassAllowed(x, z){
   if (z > ROAD.z0 - 5.4 && z < ROAD.z1 + 5.4) return false;
   if (Math.abs(x - 75) < 5.6 && z > -153 && z < 203) return false;
   if (typeof PADDIES !== "undefined" && PADDIES.some(p => x > p[0] - 1 && x < p[2] + 1 && z > p[1] - 1 && z < p[3] + 1)) return false;
+  const zn = zoneAt(x, z); if (zn && (zn.indoor || zn.hall || zn.name === "Masjid")) return false;   // never inside a building or the masjid courtyard
   return true;
 }
 // one tile of blades: a ray down at each spot keeps grass off floors, paths, beds, roads and water
