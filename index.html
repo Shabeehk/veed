@@ -167,6 +167,8 @@ select{font:500 12.5px var(--font);color:var(--ink);background:var(--chip);borde
 .payhead .curr{font-size:12px;color:var(--muted)}
 .payhead .linkbtn.on{font-weight:700;color:var(--ink);text-decoration:none}
 .paybox .btn b{font-weight:800}
+.dialog .panel.paydlg{max-width:420px}
+.paydlg .paybox{margin-top:8px}
 .codeRow input{flex:1;min-width:0;font:600 13px var(--font);letter-spacing:.04em;text-transform:uppercase}
 .trialbar{position:fixed;z-index:8;left:50%;transform:translateX(-50%);top:calc(48px + env(safe-area-inset-top,0px));display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 8px 6px 14px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:nowrap}
 .trialbar .btn{padding:6px 10px;font-size:12.5px}
@@ -580,6 +582,24 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
   <div class="wardrow"><canvas id="wardCv" width="224" height="336" aria-hidden="true"></canvas><div class="grid2" id="wardOpts"></div></div>
   <button class="btn" type="button" data-close>Close</button>
 </div></div>
+<div class="dialog" id="payDlg" hidden><div class="panel paydlg" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+  <h2 id="payTitle">Invite the one you love</h2>
+  <p class="note" id="paySub">Everything in Veed is free. Inviting someone into your home is a one-time payment, then invite anyone, any time.</p>
+  <div id="payBox" class="paybox">
+      <div class="payhead"><b>Invite someone into your home</b><span class="curr"><button type="button" class="linkbtn" id="currIn" data-c="INR">₹ India</button> · <button type="button" class="linkbtn" id="currUs" data-c="USD">$ Outside India</button></span></div>
+      <button class="btn primary" type="button" id="payBtn">Pay <b id="payPrice">₹99</b> once · invite anyone, forever</button>
+      <button class="btn" type="button" id="payCoupleBtn">Couple pack <b id="payCouplePrice">₹149</b> · invites for both of us</button>
+      <p class="fine">UPI, cards and net banking through Razorpay. We never see your card details.</p>
+      <div class="row codeRow"><input id="payCodeIn" maxlength="24" placeholder="Have a couple code or coupon?" autocapitalize="characters" autocomplete="off" aria-label="Couple code or coupon"><button class="btn" type="button" id="payCodeBtn">Use</button></div>
+      <p class="acctmsg" id="payMsg" hidden role="alert"></p>
+    </div>
+    <div id="coupleCodeBox" class="paybox" hidden>
+      <b>Your couple code</b>
+      <div class="row codeRow"><input id="coupleCode" readonly aria-label="Couple code"><button class="btn" type="button" id="coupleCopy">Copy</button></div>
+      <p class="fine">Send it to your partner. They choose a name and password, then type this code instead of paying. It works once.</p>
+    </div>
+  <div class="row"><button class="btn" type="button" data-close>Not now</button></div>
+</div></div>
 <div class="dialog" id="azanDlg" hidden><div class="panel azan" role="dialog" aria-labelledby="azanTitle">
   <h2 id="azanTitle">Azan times at the masjid</h2>
   <p class="note">The masjid follows the place you live in: the azan, the prayer boards and the sky's real time. Pick your city, or type any prayer's time to set it yourself.</p>
@@ -700,27 +720,14 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
     <p class="acctmsg" id="acctMsg" hidden role="alert"></p>
     <div class="row acctbtns"><button class="btn primary" type="submit" id="acctLogin">Log in</button><button class="btn" type="button" id="acctCreate">Create my home</button></div>
     <p class="fine" id="forgotRow" hidden><button class="linkbtn" type="button" id="forgotBtn">Forgot your password?</button></p>
-    <p class="fine" id="priceNote" hidden>One home is <b id="priceSingle">₹99</b>, once. No subscription. Pay after you choose your name.</p>
+    <p class="fine" id="priceNote" hidden>Free to play. Only inviting someone into your home costs <b id="priceSingle">₹99</b>, once.</p>
     <button class="btn" type="button" id="trialBtn">Look around first (nothing is saved)</button>
     <button class="btn primary" type="submit" id="enterBtn" hidden>Enter home</button>
-    <div id="payBox" class="paybox" hidden>
-      <div class="payhead"><b>Your home is built. Pay once to open it.</b><span class="curr"><button type="button" class="linkbtn" id="currIn" data-c="INR">₹ India</button> · <button type="button" class="linkbtn" id="currUs" data-c="USD">$ Outside India</button></span></div>
-      <button class="btn primary" type="button" id="payBtn">Pay <b id="payPrice">₹99</b> · my home, forever</button>
-      <button class="btn" type="button" id="payCoupleBtn">Couple pack <b id="payCouplePrice">₹149</b> · two homes</button>
-      <p class="fine">UPI, cards and net banking through Razorpay. We never see your card details.</p>
-      <p class="fine">Have a couple code? Type it in the box above and press Use.</p>
-      <p class="acctmsg" id="payMsg" hidden role="alert"></p>
-    </div>
     <div id="recoveryShow" class="paybox recovery" hidden>
       <b>Your recovery code</b>
       <div class="row codeRow"><input id="recoveryCode" readonly aria-label="Recovery code"><button class="btn" type="button" id="recoveryCopy">Copy</button></div>
       <p class="fine"><b>Write it down somewhere safe.</b> It's the only way back into your home if you forget your password. It's shown once; you can make a new one from the panel inside.</p>
       <button class="btn" type="button" id="recoveryOk">I've saved it</button>
-    </div>
-    <div id="coupleCodeBox" class="paybox" hidden>
-      <b>Your couple code</b>
-      <div class="row codeRow"><input id="coupleCode" readonly aria-label="Couple code"><button class="btn" type="button" id="coupleCopy">Copy</button></div>
-      <p class="fine">Send it to your partner. They choose a name and password, then type this code instead of paying. It works once.</p>
     </div>
     <p class="fine" id="acctNote"></p>
     <p class="fine links"><a href="policies.html#terms" target="_blank" rel="noopener">Terms</a> · <a href="policies.html#privacy" target="_blank" rel="noopener">Privacy</a> · <a href="policies.html#refunds" target="_blank" rel="noopener">Refunds</a> · <a href="policies.html#contact" target="_blank" rel="noopener">Contact</a></p>
@@ -733,14 +740,10 @@ body.hideui .uitoggle::after{content:"";position:absolute;width:26px;height:2px;
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/renderers/CSS3DRenderer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/SAOShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/DepthLimitedBlurShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/UnpackDepthRGBAShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/SAOPass.js"></script>
 <script type="module">
 try {
   const T = await import("https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm");
@@ -810,7 +813,7 @@ scene.add(hemi, sun, sun.target, new THREE.AmbientLight(0xffffff, 0.08));
 const MAXANI = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 function canvasTex(size, draw, srgb){
   const c = document.createElement("canvas"); c.width = c.height = size;
-  draw(c.getContext("2d"), size);
+  draw(c.getContext("2d", {willReadFrequently: true}), size);   // a CPU canvas: normal maps read it back, and a GPU canvas makes that slow
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAXANI;
   if (srgb !== false) t.encoding = THREE.sRGBEncoding;
@@ -819,17 +822,29 @@ function canvasTex(size, draw, srgb){
 // a normal map made from a texture's own light and dark: every surface gets fine relief without any image files
 const NORMALS = {};
 function normalFromTex(key, tex, strength, blur){
-  const src = tex.image, s = src.width, g = document.createElement("canvas").getContext("2d"); g.canvas.width = g.canvas.height = s;
-  g.drawImage(src, 0, 0); const d = g.getImageData(0, 0, s, s).data, H = new Float32Array(s * s);
-  for (let i = 0; i < s * s; i++) H[i] = (d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11) / 255;
-  if (blur) for (let p = 0; p < blur; p++){ const B = new Float32Array(s * s); for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){ let a = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) a += H[((y + dy + s) % s) * s + (x + dx + s) % s]; B[y * s + x] = a / 9; } H.set(B); }
+  // tight loops over typed arrays (no Math.hypot, no modulo in the inner loop): ~10x faster than before, same result
+  const src = tex.image, s = src.width, cv = document.createElement("canvas"); cv.width = cv.height = s;
+  const g = cv.getContext("2d", {willReadFrequently: true});
+  g.drawImage(src, 0, 0); const d = g.getImageData(0, 0, s, s).data, N = s * s, m = s - 1;
+  let H = new Float32Array(N);
+  for (let i = 0, p = 0; i < N; i++, p += 4) H[i] = (d[p] * .3 + d[p + 1] * .59 + d[p + 2] * .11) * (1 / 255);
+  for (let pass = 0; pass < (blur || 0); pass++){
+    // 3x3 box blur with wrap-around, as two 1-D passes
+    const A = new Float32Array(N), B = new Float32Array(N);
+    for (let y = 0; y < s; y++){ const r = y * s; for (let x = 0; x < s; x++) A[r + x] = H[r + ((x + m) & m)] + H[r + x] + H[r + ((x + 1) & m)]; }
+    for (let y = 0; y < s; y++){ const r0 = ((y + m) & m) * s, r1 = y * s, r2 = ((y + 1) & m) * s; for (let x = 0; x < s; x++) B[r1 + x] = (A[r0 + x] + A[r1 + x] + A[r2 + x]) * (1 / 9); }
+    H = B;
+  }
   const out = g.createImageData(s, s), o = out.data;
-  for (let y = 0; y < s; y++) for (let x = 0; x < s; x++){
-    const dx = (H[y * s + (x + 1) % s] - H[y * s + (x + s - 1) % s]) * strength, dy = (H[((y + 1) % s) * s + x] - H[((y + s - 1) % s) * s + x]) * strength, n = Math.hypot(dx, dy, 1), i = (y * s + x) * 4;
-    o[i] = (-dx / n * .5 + .5) * 255; o[i + 1] = (dy / n * .5 + .5) * 255; o[i + 2] = (1 / n * .5 + .5) * 255; o[i + 3] = 255;
+  for (let y = 0; y < s; y++){
+    const r = y * s, up = ((y + 1) & m) * s, dn = ((y + m) & m) * s;
+    for (let x = 0; x < s; x++){
+      const dx = (H[r + ((x + 1) & m)] - H[r + ((x + m) & m)]) * strength, dy = (H[up + x] - H[dn + x]) * strength, inv = 1 / Math.sqrt(dx * dx + dy * dy + 1), i = (r + x) * 4;
+      o[i] = (-dx * inv * .5 + .5) * 255; o[i + 1] = (dy * inv * .5 + .5) * 255; o[i + 2] = (inv * .5 + .5) * 255; o[i + 3] = 255;
+    }
   }
   g.putImageData(out, 0, 0);
-  const t = new THREE.CanvasTexture(g.canvas); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAXANI;
+  const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAXANI;
   NORMALS[key] = {tex: t, scale: strength > 3 ? .9 : .6}; tex.userData.nkey = key;
   return t;
 }
@@ -1924,7 +1939,7 @@ const _cloth = {}, _seeded = s => () => { s = s + 0x6D2B79F5 | 0; let t = Math.i
 const _hex = v => "#" + (v >>> 0).toString(16).padStart(6, "0");
 function clothTex(kind, c1, c2){
   const key = kind + "|" + c1 + "|" + (c2 || 0); if (_cloth[key]) return _cloth[key];
-  const n = 256, c = document.createElement("canvas"); c.width = c.height = n; const g = c.getContext("2d"), R = _seeded(key.length * 7919 + c1);
+  const n = 256, c = document.createElement("canvas"); c.width = c.height = n; const g = c.getContext("2d", {willReadFrequently: true}), R = _seeded(key.length * 7919 + c1);
   g.fillStyle = _hex(c1); g.fillRect(0, 0, n, n);
   if (kind === "denim"){ g.globalAlpha = .16; g.strokeStyle = "#0a1a33"; g.lineWidth = 1; for (let i = -n; i < n * 2; i += 4){ g.beginPath(); g.moveTo(i, 0); g.lineTo(i + n, n); g.stroke(); } g.globalAlpha = .08; g.strokeStyle = "#dfe8f4"; for (let i = -n; i < n * 2; i += 4){ g.beginPath(); g.moveTo(i + 2, 0); g.lineTo(i + n + 2, n); g.stroke(); } g.globalAlpha = 1; }
   else { g.globalAlpha = .06; g.fillStyle = "#000"; for (let y = 0; y < n; y += 2) g.fillRect(0, y, n, 1); g.fillStyle = "#fff"; for (let x = 0; x < n; x += 2) g.fillRect(x, 0, 1, n); g.globalAlpha = 1; }
@@ -3275,6 +3290,7 @@ function pruneInvites(){ store.set("veed-invites", invites); }
 function inviteLink(tok){ return location.origin + location.pathname + "?home=" + net.homeId + "&invite=" + tok; }
 function createInvite(){
   if (TRIAL && typeof openSignup === "function"){ openSignup("invite"); return; }
+  if (ACCT.user && !acctPaid() && typeof openPay === "function"){ openPay("invite"); return; }   // inviting is the one paid thing
   pruneInvites();
   for (const k in invites) if (!invites[k].guest) delete invites[k];       // a new link replaces older unused ones
   currentInvite = randTok(10);
@@ -3361,7 +3377,6 @@ function ensureCtx(){
 $("enterForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (!ACCT.user && !TRIAL){ acctSubmit(e.submitter && e.submitter.id === "acctCreate" ? "create" : "login"); return; }   // log in first
-  if (ACCT.user && !acctPaid()){ renderPay(); return; }                                                               // pay first
   const n = (TRIAL ? $("nameIn").value.trim().replace(/\s+/g, " ") : (ACCT.display || ACCT.user)).slice(0, 24); if (!n){ $("nameIn").focus(); return; }
   const chosen = document.querySelector('input[name="look"]:checked');
   me.name = n; me.look = chosen && STYLES[chosen.value] ? chosen.value : chosen && chosen.value === "bandhgala" ? "thobeM" : "floralF";
@@ -4720,7 +4735,7 @@ $("acctOut").addEventListener("click", () => typeof openShare === "function" ? o
 function acctPaid(){ return !cloudOn() || !ACCT.user ? true : LS.get("veed-paid:" + ACCT.user) === "1"; }
 (function acctUI(){
   const inn = !!ACCT.user, paid = inn && acctPaid();
-  $("acctFields").hidden = inn; $("acctWho").hidden = !inn; $("enterBtn").hidden = !(inn && paid || TRIAL); $("acctLogin").hidden = inn || TRIAL; $("acctCreate").hidden = inn || TRIAL;
+  $("acctFields").hidden = inn; $("acctWho").hidden = !inn; $("enterBtn").hidden = !(inn || TRIAL); $("acctLogin").hidden = inn || TRIAL; $("acctCreate").hidden = inn || TRIAL;
   $("passWrap").hidden = TRIAL; $("trialBtn").hidden = inn || TRIAL; $("priceNote").hidden = inn || TRIAL || !cloudOn(); $("codeRowNew").hidden = TRIAL || !cloudOn() || (inn && paid);
   $("nameIn").required = !inn; $("passIn").required = !inn && !TRIAL;
   if (inn){ $("acctName").textContent = ACCT.display; $("acctPanelName").textContent = ACCT.display; }
@@ -4728,7 +4743,6 @@ function acctPaid(){ return !cloudOn() || !ACCT.user ? true : LS.get("veed-paid:
   $("acctNote").textContent = TRIAL ? "In a look-around nothing is saved: golden points, land and plans disappear when you close the tab." : cloudOn() ? "Your game saves to your account, so you can continue on any phone or computer." : "Your game saves to your account on this device.";
   if (TRIAL){ $("enterSub").textContent = visitHome ? "Type a name to show your host, then knock." : "Walk round the village, try the boat and the cinema. Type a name to show to others."; $("enterBtn").textContent = visitHome ? "Knock" : "Look around"; }
   else if (!inn) $("enterSub").textContent = net && !visitHome ? "Log in, or create your own home with a name and a password. It's saved and continues next time." : $("enterSub").textContent;
-  if (inn && !paid){ $("enterSub").textContent = "Welcome, " + ACCT.display + ". Your home is ready: pay once and it's yours."; setTimeout(renderPay, 0); }
   if (inn && sessionStorage.getItem("veed-just-logged")){ sessionStorage.removeItem("veed-just-logged"); if (paid) toast("Welcome, " + ACCT.display + "! Your game is saved to your account.", 4000); }
 })();
 $("trialBtn").addEventListener("click", () => { try { sessionStorage.setItem("veed-trial", "1"); } catch(e){} location.reload(); });
@@ -4762,7 +4776,7 @@ if (!TRIAL && !ACCT.user && sessionStorage.getItem("veed-create")){ sessionStora
 let acctSaving = null, acctAgain = false, acctLastErr = 0;
 // saves this account online; if a save is already running, another one follows it so nothing is skipped
 function acctSave(keepalive){
-  if (!ACCT.user || !cloudOn() || !acctToken() || !acctPaid()) return Promise.resolve(false);
+  if (!ACCT.user || !cloudOn() || !acctToken()) return Promise.resolve(false);
   if (acctSaving){ acctAgain = true; return acctSaving; }
   acctSaving = (async () => {
     let ok = false;
@@ -4792,7 +4806,7 @@ addEventListener("pagehide", () => { if (store.dirty) acctSave(true); });
 // opening the game: if this account was played more recently on another device, bring those saves here first
 (async function acctPull(){
   if (!ACCT.user || !cloudOn() || !acctToken()) { if (ACCT.user) $("acctSync").textContent = cloudOn() ? "Saved online" : "Saved on this device"; return; }
-  if (sessionStorage.getItem("veed-pulled") && acctPaid()) { $("acctSync").textContent = "Saved online"; return; }
+  if (sessionStorage.getItem("veed-pulled")) { $("acctSync").textContent = "Saved online"; return; }
   sessionStorage.setItem("veed-pulled", "1");
   try {
     const r = await rpc("veed_load", {p_name: ACCT.user, p_token: acctToken()});
@@ -4812,7 +4826,7 @@ function payMsg(t, isErr){ const m = $("payMsg"); m.textContent = t || ""; m.hid
 function renderPay(){
   if (!ACCT.user) return;
   const paid = acctPaid();
-  $("payBox").hidden = paid; $("enterBtn").hidden = !paid;
+  $("payBox").hidden = paid;
   $("currIn").classList.toggle("on", PAY.curr === "INR"); $("currUs").classList.toggle("on", PAY.curr === "USD");
   $("payPrice").textContent = PRICE_TEXT[PAY.curr].single; $("payCouplePrice").textContent = PRICE_TEXT[PAY.curr].couple;
   const code = LS.get("veed-couple-code:" + ACCT.user);
@@ -4862,11 +4876,22 @@ async function confirmPay(resp, plan){
     LS.set("veed-paid:" + ACCT.user, "1");
     if (typeof pixel === "function") pixel("Purchase", {content_name: plan, currency: PAY.curr, value: PIXEL_AMOUNTS[PAY.curr][plan]});
     if (r.code) LS.set("veed-couple-code:" + ACCT.user, r.code);
-    payMsg("Paid. Welcome home!"); renderPay();
+    payMsg("Paid. Now invite the one you love!");
     if (r.code){ $("coupleCodeBox").hidden = false; $("coupleCode").value = r.code; }
-    toast("Your home is yours. ❤", 4000);
+    paidNow(); toast("Paid. You can invite anyone now. ❤", 4000);
   } catch(e){ payMsg(String(e.message || e), true); }
   PAY.busy = false; ["payBtn", "payCoupleBtn"].forEach(id => $(id).disabled = false);
+}
+/* playing is free; only inviting someone needs a payment (once). After paying, the invite link is made straight away. */
+const PAYWHY = {invite: false};
+function openPay(why){
+  PAYWHY.invite = why === "invite"; payMsg(""); renderPay();
+  $("paySub").textContent = acctPaid() ? "Paid. You can invite anyone, any time." : "Everything in Veed is free. Inviting someone into your home is a one-time payment, then invite anyone, any time.";
+  $("payDlg").hidden = false; setTimeout(() => (acctPaid() ? $("payDlg").querySelector("[data-close]") : $("payBtn")).focus(), 50);
+}
+function paidNow(){
+  renderPay(); $("paySub").textContent = "Paid. You can invite anyone, any time.";
+  if (PAYWHY.invite && $("coupleCodeBox").hidden){ PAYWHY.invite = false; $("payDlg").hidden = true; createInvite(); }
 }
 $("payBtn").addEventListener("click", () => startPay("single"));
 $("payCoupleBtn").addEventListener("click", () => startPay("couple"));
@@ -4874,9 +4899,16 @@ $("codeBtn").addEventListener("click", async () => {
   const code = $("codeIn").value.trim().toUpperCase(); if (!code){ $("codeIn").focus(); return; }
   if (!ACCT.user){ payMsg("Type your name and password and press Create my home first; the code is used then."); return; }
   payMsg("Checking the code…");
-  try { const r = await rpc("veed_redeem", {p_name: ACCT.user, p_token: acctToken(), p_code: code}); if (r && r.ok){ LS.set("veed-paid:" + ACCT.user, "1"); payMsg("The code worked. Welcome home!"); renderPay(); } }
+  try { const r = await rpc("veed_redeem", {p_name: ACCT.user, p_token: acctToken(), p_code: code}); if (r && r.ok){ LS.set("veed-paid:" + ACCT.user, "1"); payMsg("The code worked. You can invite people now."); paidNow(); } }
   catch(e){ payMsg(String(e.message || e), true); }
 });
+$("payCodeBtn").addEventListener("click", async () => {
+  const code = $("payCodeIn").value.trim().toUpperCase(); if (!code){ $("payCodeIn").focus(); return; }
+  payMsg("Checking the code…");
+  try { const r = await rpc("veed_redeem", {p_name: ACCT.user, p_token: acctToken(), p_code: code}); if (r && r.ok){ LS.set("veed-paid:" + ACCT.user, "1"); payMsg("The code worked. You can invite people now."); paidNow(); } }
+  catch(e){ payMsg(String(e.message || e), true); }
+});
+$("payCodeIn").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("payCodeBtn").click(); } });
 $("coupleCopy").addEventListener("click", () => copyText($("coupleCode").value, "Code copied. Send it to your partner."));
 $("codeIn").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("codeBtn").click(); } });
 
@@ -8046,7 +8078,7 @@ setInterval(renderFriends, 3000);
 // a recovery code is shown once after it's made (never stored on the device)
 function showRecovery(code){ if (!code) return; $("recoveryShow").hidden = false; $("recoveryCode").value = code; $("enterBtn").hidden = true; }
 $("recoveryCopy").addEventListener("click", () => copyText($("recoveryCode").value, "Recovery code copied. Keep it somewhere safe."));
-$("recoveryOk").addEventListener("click", () => { $("recoveryShow").hidden = true; $("recoveryCode").value = ""; $("enterBtn").hidden = !(ACCT.user && acctPaid() || TRIAL); if (ACCT.user && !acctPaid()) renderPay(); });
+$("recoveryOk").addEventListener("click", () => { $("recoveryShow").hidden = true; $("recoveryCode").value = ""; $("enterBtn").hidden = !(ACCT.user || TRIAL); });
 (function recoveryOnLoad(){ try { const c = sessionStorage.getItem("veed-recovery"); if (c){ sessionStorage.removeItem("veed-recovery"); setTimeout(() => showRecovery(c), 0); } } catch(e){} })();
 $("recoveryNew").addEventListener("click", async () => {
   if (!cloudOn() || !ACCT.user) { toast("Recovery codes need online accounts."); return; }
@@ -8120,7 +8152,7 @@ const META_PIXEL_ID = "1518315262337802";
 const PIXEL_AMOUNTS = {INR: {single: 99, couple: 149}, USD: {single: 1.99, couple: 2.99}};
 function pixel(ev, data){ try { if (typeof fbq === "function") fbq("track", ev, data || {}); } catch(e){} }
 if (/^\d{8,20}$/.test(META_PIXEL_ID) && location.protocol === "https:"){
-  (function(f,b,e,v,n,t,s){ if (f.fbq) return; n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = true; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = true; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+  (function(f,b,e,v,n,t,s){ if (f.fbq) return; n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = true; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = true; t.src = v; s = b.getElementsByTagName(e)[0]; const add = () => s.parentNode.insertBefore(t, s); if (b.readyState === "complete") setTimeout(add, 1500); else f.addEventListener("load", () => setTimeout(add, 1500), {once: true}); })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
   fbq("init", META_PIXEL_ID); fbq("track", "PageView");
   try {
     if (sessionStorage.getItem("veed-registered")){ sessionStorage.removeItem("veed-registered"); pixel("CompleteRegistration", {content_name: "home", status: "ok"}); }
@@ -8401,8 +8433,10 @@ function tickGrass(dt){
   const b = bodyPos(), cx = Math.round(b.x / TILE), cz = Math.round(b.z / TILE);
   const n = Math.ceil(G.radius / TILE);
   if (cx !== G.cx || cz !== G.cz || G.dirty){
+    // the top-down mask covers a wider area than needed, so walking only re-draws it every ~20 m instead of every 8 m
+    const need = (n + 1) * TILE, X = cx * TILE, Z = cz * TILE;
+    if (G.dirty || !MASK.ok || Math.abs(X - MASK.cx) + need > MASK.half || Math.abs(Z - MASK.cz) + need > MASK.half) renderMask(X, Z, need + 20);
     G.cx = cx; G.cz = cz; G.dirty = false; G.queue = [];
-    renderMask(cx * TILE, cz * TILE, (n + 1) * TILE);
     for (let i = cx - n; i <= cx + n; i++) for (let j = cz - n; j <= cz + n; j++){ const k = i + "," + j; if (!G.tiles.has(k)) G.queue.push([i, j, k]); }
     G.queue.sort((p, q) => (Math.abs(p[0] - cx) + Math.abs(p[1] - cz)) - (Math.abs(q[0] - cx) + Math.abs(q[1] - cz)));
     G.rebuild = true;
